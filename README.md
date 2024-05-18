@@ -67,7 +67,7 @@ Here's a screenshot of the test console app running:
 
 ## Change Log
 
-### v0.9.0-beta
+### v0.9.0-beta (2024-05-18)
 
 - Introduced the `BasicMemoryVectorDatabase` class as the basic Vector Database implementations that uses a Bag of Words vectorization strategy, with Cosine similarity, a dictionary vocabulary store, and a basic text preprocessor.
 - Add more C# Generics use, so the library is more customizable when used, and custom vector databases can be implemented if desired.
@@ -75,7 +75,7 @@ Here's a screenshot of the test console app running:
 - Update `.Search` method to support search result paging and threshold support for similarity comparison
 - Add some basic Unit Tests
 
-### v0.8.0-beta
+### v0.8.0-beta (2024-05-17)
 
 - Initial release
 
