@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTest", "ConsoleTest\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Build5Nines.SharpVector", "Build5Nines.SharpVector\Build5Nines.SharpVector.csproj", "{770C2E6B-4B00-4F4D-9D38-F43D299EC0E6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpVectorTest", "SharpVectorTest\SharpVectorTest.csproj", "{AFF76051-E043-45EB-9B5F-05D9C45D0DC7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{770C2E6B-4B00-4F4D-9D38-F43D299EC0E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{770C2E6B-4B00-4F4D-9D38-F43D299EC0E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{770C2E6B-4B00-4F4D-9D38-F43D299EC0E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFF76051-E043-45EB-9B5F-05D9C45D0DC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFF76051-E043-45EB-9B5F-05D9C45D0DC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFF76051-E043-45EB-9B5F-05D9C45D0DC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFF76051-E043-45EB-9B5F-05D9C45D0DC7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

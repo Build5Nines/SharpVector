@@ -30,3 +30,4 @@ The vector algorithm currently used in the `Build5Nines.SharpVector.MemoryVector
         }
     }
 ```
+

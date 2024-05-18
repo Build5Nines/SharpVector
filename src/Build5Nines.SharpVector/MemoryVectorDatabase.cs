@@ -98,14 +98,14 @@ public class MemoryVectorDatabase<TMetadata> : IVectorDatabase<TMetadata>
     /// <returns></returns>
     public IVectorTextResult<TMetadata> Search(string queryText, int n = 5)
     {
-        var topSimilarIds = FindMostSimilarTextsIds(queryText, n);
+        var similarityMatches = FindMostSimilarTextsIds(queryText, n);
 
         // Retrieve the actual texts for context
         var texts = new List<VectorTextResultItem<TMetadata>>();
-        foreach (var id in topSimilarIds)
+        foreach (var match in similarityMatches)
         {
-            var item = GetText(id);
-            texts.Add(new VectorTextResultItem<TMetadata>(item));
+            var item = GetText(match.Id);
+            texts.Add(new VectorTextResultItem<TMetadata>(item, match.Similarity));
         }
 
         return new VectorTextResult<TMetadata>(texts.ToArray());
@@ -118,7 +118,7 @@ public class MemoryVectorDatabase<TMetadata> : IVectorDatabase<TMetadata>
     /// <param name="n"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    private int[] FindMostSimilarTextsIds(string queryText, int n = 5)
+    private IEnumerable<VectorSimilarity<int>> FindMostSimilarTextsIds(string queryText, int n = 5)
     {
         var queryTokens = TokenizeAndPreprocess(queryText);
         float[] queryVector = GenerateVectorFromTokens(queryTokens);
@@ -129,17 +129,17 @@ public class MemoryVectorDatabase<TMetadata> : IVectorDatabase<TMetadata>
             throw new InvalidOperationException("The database is empty.");
         }
 
-        var similarities = new List<(int Id, float Similarity)>();
+        var similarities = new List<VectorSimilarity<int>>();
 
         foreach (var kvp in _database)
         {
             float similarity = CalculateCosineSimilarity(NormalizeVector(queryVector, desiredLength), NormalizeVector(kvp.Value.Vector, desiredLength));
-            similarities.Add((kvp.Key, similarity));
+            similarities.Add(new VectorSimilarity<int>(kvp.Key, similarity));
         }
 
         similarities = similarities.OrderByDescending(s => s.Similarity).Take(n).ToList();
 
-        return similarities.Select(s => s.Id).ToArray();
+        return similarities;
     }
 
     /// <summary>

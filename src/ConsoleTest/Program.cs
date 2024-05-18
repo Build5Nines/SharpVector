@@ -106,6 +106,7 @@ public static class Program
                     foreach (var item in result.Texts)
                     {
                         Console.WriteLine(item.Metadata);
+                        Console.WriteLine($"Vector Similarity: {item.Similarity}");
                         Console.WriteLine(item.Text);
                         Console.WriteLine(string.Empty);
                     }

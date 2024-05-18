@@ -63,6 +63,16 @@ Here's a screenshot of the test console app running:
 
 ![](assets/build5nines-sharpvector-console-screenshot.jpg)
 
+## Change Log
+
+### v0.9.0-beta
+
+- Added `VectorTextResultItem.Similarity` so consuming code can inspect similarity of the Text in the vector search results.
+
+### v0.8.0-beta
+
+- Initial release
+
 ## Maintained By
 
 The [Build5Nines](https://build5nines.com) SharpVector project is maintained by [Chris Pietschmann](https://pietschsoft.com), Microsoft MVP, HashiCorp Ambassador.

@@ -27,9 +27,12 @@ public interface IVectorTextResultItem<TMetadata>
 public class VectorTextResultItem<TMetadata> : IVectorTextResultItem<TMetadata>
 {
     private VectorTextItem<TMetadata> _item;
-    public VectorTextResultItem(VectorTextItem<TMetadata> item){
+    public VectorTextResultItem(VectorTextItem<TMetadata> item, float similarity){
         _item = item;
+        Similarity = similarity;
     }
+    
     public string Text { get => _item.Text; }
     public TMetadata Metadata { get => _item.Metadata; }
+    public float Similarity { get; private set; }
 }
