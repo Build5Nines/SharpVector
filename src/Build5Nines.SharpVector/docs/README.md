@@ -1,4 +1,4 @@
-a simple, small, easy to embed, in-memory Vector Database for use in any .NET application.
+Build5Nines.SharpVector is a simple, small, easy to embed, in-memory Vector Database for use in any .NET application.
 
 The vector algorithm currently used in the `Build5Nines.SharpVector.MemoryVectorDatabase` class is based on TF-IDF (Term Frequency-Inverse Document Frequency) combined with cosine similarity for searching similar texts.
 
