@@ -1,36 +1,43 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using Build5Nines.SharpVector;
 
 public static class Program
 {
     public static void Main(string[] args)
     {
-        // // Create a Vector Database with metadata of type string
-        // var vdb = new MemoryVectorDatabase<string>();
+        // Create a Vector Database with metadata of type string
+        var vdb = new MemoryVectorDatabase<string>();
 
-        // // Parse Movie JSON data and add it to the Vector Database
-        // var jsonString = File.ReadAllText("movies.json");
+        // Parse Movie JSON data and add it to the Vector Database
+        var jsonString = File.ReadAllText("movies.json");
         
-        // Console.WriteLine("Importing Movie data into Vector Database...");
+        Console.WriteLine("Importing Movie data into Vector Database...");
 
-        // using (JsonDocument document = JsonDocument.Parse(jsonString))
-        // {
-        //     JsonElement root = document.RootElement;
-        //     JsonElement movies = root.GetProperty("movies");
+        var importTimer = new Stopwatch();
+        importTimer.Start();    
 
-        //     foreach (JsonElement movie in movies.EnumerateArray())
-        //     {
-        //         var text = movie.GetProperty("description").GetString();
-        //         var metadata = movie.GetProperty("title").GetString();
+        using (JsonDocument document = JsonDocument.Parse(jsonString))
+        {
+            JsonElement root = document.RootElement;
+            JsonElement movies = root.GetProperty("movies");
+
+            foreach (JsonElement movie in movies.EnumerateArray())
+            {
+                var text = movie.GetProperty("description").GetString();
+                var metadata = movie.GetProperty("title").GetString();
                 
-        //         if (!string.IsNullOrWhiteSpace(text) && !string.IsNullOrWhiteSpace(metadata))
-        //         {
-        //             vdb.AddText(text, metadata);
-        //         }
-        //     }
-        // }
+                if (!string.IsNullOrWhiteSpace(text) && !string.IsNullOrWhiteSpace(metadata))
+                {
+                    vdb.AddText(text, metadata);
+                }
+            }
+        }
+        
+        importTimer.Stop();
+        Console.WriteLine("Movie data imported into Vector Database.");
+        Console.WriteLine($"Import took {importTimer.ElapsedMilliseconds} ms");
 
-        // Console.WriteLine("Movie data imported into Vector Database.");
 
 
 
@@ -66,7 +73,7 @@ public static class Program
 
 
         // // Create a Vector Database with metadata of type double
-        var vdb = new MemoryVectorDatabase<double>();
+        // var vdb = new MemoryVectorDatabase<double>();
         
         // // Load Vector Database with some sample text
         // vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", 5.0);
@@ -87,8 +94,6 @@ public static class Program
         // vdb.AddText("In Toy Story 2, Andy's toys are left to their own devices while he goes to Cowboy Camp, and Woody is kidnapped by a toy collector named Al McWhiggin. Buzz Lightyear and the other toys set out on a rescue mission to save Woody before he becomes a museum toy.", 5.0);
         // vdb.AddText("Iron Man 2 is a 2010 action-adventure fantasy film about Tony Stark (Robert Downey Jr.), a billionaire inventor and superhero who must deal with declining health, government pressure, and a vengeful enemy.", 5.0);
 
-        vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", 5.0);
-
 
 
         // Allow user to search for similar text 
@@ -100,11 +105,21 @@ public static class Program
                 break;
             }
             
+            Console.WriteLine(string.Empty);
+
             if (newPrompt != null) {
                 var resultsToReturn = 3; // Number of results to return
-                var result = vdb.Search(newPrompt, resultsToReturn);
+                IVectorTextResult<string> result;
+                
+                var timer = new Stopwatch();
+                timer.Start();
 
-                Console.WriteLine(string.Empty);
+                result = vdb.Search(newPrompt, resultsToReturn);
+
+                timer.Stop();
+                Console.WriteLine($"Search took {timer.ElapsedMilliseconds} ms");
+
+
                 if (result == null || !result.HasTexts)
                 {
                     Console.WriteLine("No similar text found.");

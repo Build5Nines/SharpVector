@@ -139,6 +139,8 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
 
     #region Private Methods
 
+
+
     /// <summary>
     /// Finds the top N most similar texts ids to the given text
     /// </summary>
