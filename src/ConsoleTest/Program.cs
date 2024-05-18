@@ -98,6 +98,7 @@ public static class Program
 
         // Allow user to search for similar text 
         Console.WriteLine("Type in prompt text, or type 'exit' to exit the app.");
+        Console.WriteLine("What movie or TV show are you looking for? Try describing it in a few words.");
         while(true) {
             Console.Write("Prompt: ");
             var newPrompt = Console.ReadLine();
