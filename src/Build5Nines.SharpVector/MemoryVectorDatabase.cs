@@ -3,6 +3,7 @@ using Build5Nines.SharpVector.Id;
 using Build5Nines.SharpVector.Preprocessing;
 using Build5Nines.SharpVector.Vectorization;
 using Build5Nines.SharpVector.Similarity;
+using Build5Nines.SharpVector.VectorStore;
 
 namespace Build5Nines.SharpVector;
 
@@ -16,6 +17,7 @@ public class MemoryVectorDatabase<TId, TMetadata>
      : MemoryVectorDatabaseBase<
         int, 
         TMetadata,
+        MemoryDictionaryVectorStore<int, TMetadata>,
         DictionaryVocabularyStore<string>,
         IntIdGenerator,
         BasicTextPreprocessor,
@@ -25,6 +27,7 @@ public class MemoryVectorDatabase<TId, TMetadata>
 {
     public MemoryVectorDatabase()
         : base(
+            new MemoryDictionaryVectorStore<int, TMetadata>(),
             new DictionaryVocabularyStore<string>()
             )
     { }

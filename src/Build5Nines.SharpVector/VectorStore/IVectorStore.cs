@@ -1,0 +1,36 @@
+using System.Collections;
+
+namespace Build5Nines.SharpVector.VectorStore;
+
+public interface IVectorStore<TId, TMetadata> : IEnumerable<KeyValuePair<TId, IVectorTextItem<TMetadata>>>, IEnumerable, IReadOnlyCollection<KeyValuePair<TId, IVectorTextItem<TMetadata>>>
+{
+    /// <summary>
+    /// Retrieves a text and metadata by its ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+    IVectorTextItem<TMetadata> Get(TId id);
+
+    /// <summary>
+    /// Retrieves a text and metadata by its ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+    void Set(TId id, IVectorTextItem<TMetadata> item);
+
+    /// <summary>
+    /// Deletes a text by its ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <exception cref="KeyNotFoundException"></exception>
+    void Delete(TId id);
+
+    /// <summary>
+    /// Checks if the database contains a key
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    bool ContainsKey(TId id);
+}

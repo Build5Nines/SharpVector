@@ -3,18 +3,19 @@ using Build5Nines.SharpVector.Preprocessing;
 using Build5Nines.SharpVector.Vocabulary;
 using Build5Nines.SharpVector.Vectorization;
 using Build5Nines.SharpVector.Similarity;
+using Build5Nines.SharpVector.VectorStore;
 
 namespace Build5Nines.SharpVector;
 
-public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorSimilarityCalculator> : IVectorDatabase<TId, TMetadata>
+public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabularyStore, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorSimilarityCalculator> : IVectorDatabase<TId, TMetadata>
     where TId : notnull
+    where TVectorStore : IVectorStore<TId, TMetadata>
     where TVocabularyStore : IVocabularyStore<string, int>
     where TIdGenerator : IIdGenerator<TId>, new()
     where TTextPreprocessor : ITextPreprocessor, new()
     where TVectorizer : IVectorizer<string, int>, new()
     where TVectorSimilarityCalculator : IVectorSimilarityCalculator, new()
 {
-    private Dictionary<TId, VectorTextItem<TMetadata>> _database;
     private TIdGenerator _idGenerator;
 
     private TTextPreprocessor _textPreprocessor;
@@ -23,12 +24,20 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
 
     private TVectorSimilarityCalculator _vectorSimilarityCalculator;
 
+    /// <summary>
+    /// The Vector Store used to store the text vectors of the database
+    /// </summary>
+    protected TVectorStore VectorStore { get; private set; }
+
+    /// <summary>
+    /// The Vocabulary Store used to store the vocabulary of the database
+    /// </summary>
     protected TVocabularyStore VocabularyStore { get; private set; }
 
-    public MemoryVectorDatabaseBase(TVocabularyStore vocabularyStore)
+    public MemoryVectorDatabaseBase(TVectorStore vectorStore, TVocabularyStore vocabularyStore)
     {
+        VectorStore = vectorStore;
         VocabularyStore = vocabularyStore;
-        _database = new Dictionary<TId, VectorTextItem<TMetadata>>();
         _idGenerator = new TIdGenerator();
         _textPreprocessor = new TTextPreprocessor();
         _vectorizer = new TVectorizer();
@@ -47,7 +56,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
         VocabularyStore.Update(tokens);
         float[] vector = _vectorizer.GenerateVectorFromTokens(VocabularyStore, tokens);
         TId id = _idGenerator.NewId();
-        _database[id] = new VectorTextItem<TMetadata>(text, metadata, vector);
+        VectorStore.Set(id, new VectorTextItem<TMetadata>(text, metadata, vector));
         return id;
     }
 
@@ -59,11 +68,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
     /// <exception cref="KeyNotFoundException"></exception>
     public IVectorTextItem<TMetadata> GetText(TId id)
     {
-        if (_database.TryGetValue(id, out var entry))
-        {
-            return entry;
-        }
-        throw new KeyNotFoundException($"Text with ID {id} not found.");
+        return VectorStore.Get(id);
     }
 
     /// <summary>
@@ -73,14 +78,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
     /// <exception cref="KeyNotFoundException"></exception>
     public void DeleteText(TId id)
     {
-        if (_database.ContainsKey(id))
-        {
-            _database.Remove(id);
-        }
-        else
-        {
-            throw new KeyNotFoundException($"Text with ID {id} not found.");
-        }
+        VectorStore.Delete(id);
     }
 
     /// <summary>
@@ -91,13 +89,13 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
     /// <exception cref="KeyNotFoundException"></exception>
     public void UpdateText(TId id, string text)
     {
-        if (_database.ContainsKey(id))
+        if (VectorStore.ContainsKey(id))
         {
             var tokens = _textPreprocessor.TokenizeAndPreprocess(text);
             VocabularyStore.Update(tokens);
             float[] vector = _vectorizer.GenerateVectorFromTokens(VocabularyStore, tokens);
-            var metadata = _database[id].Metadata;
-            _database[id] = new VectorTextItem<TMetadata>(text, metadata, vector);
+            var metadata = VectorStore.Get(id).Metadata;
+            VectorStore.Set(id, new VectorTextItem<TMetadata>(text, metadata, vector));
         }
         else
         {
@@ -112,7 +110,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
     /// <param name="metadata"></param>
     /// <exception cref="KeyNotFoundException"></exception>
     public void UpdateTextMetadata(TId id, TMetadata metadata) {
-        if (_database.ContainsKey(id))
+        if (VectorStore.ContainsKey(id))
         {
             var text = GetText(id);
             text.Metadata = metadata;
@@ -155,7 +153,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
         // Method to get the maximum vector length in the database
         int desiredLength = VocabularyStore.Count;
 
-        if (_database.Count == 0)
+        if (VectorStore.Count == 0)
         {
             throw new InvalidOperationException("The database is empty.");
         }
@@ -167,7 +165,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
         float thresholdToCompare = threshold ?? (float)0.0f;
         bool includeSimilarity = true;
         bool thresholdIsEqual;
-        foreach (var kvp in _database)
+        foreach (var kvp in VectorStore)
         {
             var item = kvp.Value;
             float similarity = _vectorSimilarityCalculator.CalculateVectorSimilarity(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
