@@ -8,7 +8,7 @@ The Build5Nines SharpVector project provides a simple, small, easy to embed, in-
 
 The vector algorithm currently used in the `Build5Nines.SharpVector.MemoryVectorDatabase` class is based on TF-IDF (Term Frequency-Inverse Document Frequency) combined with cosine similarity for searching similar texts.
 
-### Nuget Package
+## Nuget Package
 
 The `Build5Nines.SharpVector` library is available as a Nuget Package to easily include into your .NET projects:
 
@@ -18,11 +18,11 @@ dotnet add package Build5Nines.SharpVector --version 0.8.0-beta
 
 You can view it on Nuget.org here: <https://www.nuget.org/packages/Build5Nines.SharpVector/>
 
-### Supports .NET 6 and greater
+## Supports .NET 6 and greater
 
 The library is built using no external dependencies other than what's available from .NET, and it's built to target .NET 6 and greater.
 
-### Example Usage
+## Example Usage
 
 As you can see with the following example usage of the `Build5Nines.SharpVector` library, it's really simple to embed an in-memory Vector Database for use in any .NET application:
 
@@ -53,7 +53,7 @@ As you can see with the following example usage of the `Build5Nines.SharpVector`
     }
 ```
 
-### Sample Console App
+## Sample Console App
 
 The [sample console app](src/ConsoleTest/) in this repo show example usage of Build5Nines.SharpVector.dll
 
@@ -63,6 +63,6 @@ Here's a screenshot of the test console app running:
 
 ![](assets/build5nines-sharpvector-console-screenshot.jpg)
 
-### Maintained By
+## Maintained By
 
 The [Build5Nines](https://build5nines.com) SharpVector project is maintained by [Chris Pietschmann](https://pietschsoft.com), Microsoft MVP, HashiCorp Ambassador.
