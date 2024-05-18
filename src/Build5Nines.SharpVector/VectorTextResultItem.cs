@@ -11,7 +11,8 @@ public interface IVectorTextResultItem<TMetadata>
 public class VectorTextResultItem<TMetadata> : IVectorTextResultItem<TMetadata>
 {
     private IVectorTextItem<TMetadata> _item;
-    public VectorTextResultItem(IVectorTextItem<TMetadata> item, float similarity){
+    public VectorTextResultItem(IVectorTextItem<TMetadata> item, float similarity)
+    {
         _item = item;
         Similarity = similarity;
     }

@@ -31,7 +31,7 @@ public interface IVectorDatabase<TId, TMetadata>
     /// <param name="id"></param>
     /// <param name="text"></param>
     /// <exception cref="KeyNotFoundException"></exception>
-    public void UpdateText(int id, string text);
+    public void UpdateText(TId id, string text);
 
     /// <summary>
     /// Updates the Metadata of a Text by its ID
@@ -39,7 +39,7 @@ public interface IVectorDatabase<TId, TMetadata>
     /// <param name="id"></param>
     /// <param name="metadata"></param>
     /// <exception cref="KeyNotFoundException"></exception>
-    void UpdateTextMetadata(int id, TMetadata metadata);
+    void UpdateTextMetadata(TId id, TMetadata metadata);
 
     /// <summary>
     /// Performs a vector search to find the top N most similar texts to the given text

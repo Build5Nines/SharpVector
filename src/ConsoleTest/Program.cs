@@ -5,32 +5,38 @@ public static class Program
 {
     public static void Main(string[] args)
     {
-        // Create a Vector Database with metadata of type string
-        var vdb = new MemoryVectorDatabase<string>();
+        // // Create a Vector Database with metadata of type string
+        // var vdb = new MemoryVectorDatabase<string>();
 
-        // Parse Movie JSON data and add it to the Vector Database
-        var jsonString = File.ReadAllText("movies.json");
+        // // Parse Movie JSON data and add it to the Vector Database
+        // var jsonString = File.ReadAllText("movies.json");
         
-        Console.WriteLine("Importing Movie data into Vector Database...");
+        // Console.WriteLine("Importing Movie data into Vector Database...");
 
-        using (JsonDocument document = JsonDocument.Parse(jsonString))
-        {
-            JsonElement root = document.RootElement;
-            JsonElement movies = root.GetProperty("movies");
+        // using (JsonDocument document = JsonDocument.Parse(jsonString))
+        // {
+        //     JsonElement root = document.RootElement;
+        //     JsonElement movies = root.GetProperty("movies");
 
-            foreach (JsonElement movie in movies.EnumerateArray())
-            {
-                var text = movie.GetProperty("description").GetString();
-                var metadata = movie.GetProperty("title").GetString();
+        //     foreach (JsonElement movie in movies.EnumerateArray())
+        //     {
+        //         var text = movie.GetProperty("description").GetString();
+        //         var metadata = movie.GetProperty("title").GetString();
                 
-                if (!string.IsNullOrWhiteSpace(text) && !string.IsNullOrWhiteSpace(metadata))
-                {
-                    vdb.AddText(text, metadata);
-                }
-            }
-        }
+        //         if (!string.IsNullOrWhiteSpace(text) && !string.IsNullOrWhiteSpace(metadata))
+        //         {
+        //             vdb.AddText(text, metadata);
+        //         }
+        //     }
+        // }
 
-        Console.WriteLine("Movie data imported into Vector Database.");
+        // Console.WriteLine("Movie data imported into Vector Database.");
+
+
+
+
+
+
 
         // Paths to the large text files
         // string[] filePaths = { "file1.txt", "file2.txt", "file3.txt" };
@@ -60,7 +66,7 @@ public static class Program
 
 
         // // Create a Vector Database with metadata of type double
-        // IVectorDatabase<double> vdb = new MemoryVectorDatabase<double>();
+        var vdb = new MemoryVectorDatabase<double>();
         
         // // Load Vector Database with some sample text
         // vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", 5.0);
@@ -80,6 +86,8 @@ public static class Program
         // vdb.AddText("Toy Story is a 1995 animated comedy film about the relationship between Woody, a cowboy doll, and Buzz Lightyear, an action figure. The film takes place in a world where toys come to life when humans are not present. Woody is the leader of the toys in Andy's room, including a Tyrannosaurus Rex and Mr. Potato Head. When Buzz becomes Andy's favorite toy, Woody becomes jealous and plots against him. When Andy's family moves, Woody and Buzz must escape the clutches of their neighbor, Sid Phillips, and reunite with Andy.", 5.0);
         // vdb.AddText("In Toy Story 2, Andy's toys are left to their own devices while he goes to Cowboy Camp, and Woody is kidnapped by a toy collector named Al McWhiggin. Buzz Lightyear and the other toys set out on a rescue mission to save Woody before he becomes a museum toy.", 5.0);
         // vdb.AddText("Iron Man 2 is a 2010 action-adventure fantasy film about Tony Stark (Robert Downey Jr.), a billionaire inventor and superhero who must deal with declining health, government pressure, and a vengeful enemy.", 5.0);
+
+        vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", 5.0);
 
 
 
@@ -105,7 +113,7 @@ public static class Program
                     Console.WriteLine(string.Empty);
                     foreach (var item in result.Texts)
                     {
-                        Console.WriteLine(item.Metadata);
+                        Console.WriteLine($"Metadata: {item.Metadata}");
                         Console.WriteLine($"Vector Similarity: {item.Similarity}");
                         Console.WriteLine(item.Text);
                         Console.WriteLine(string.Empty);

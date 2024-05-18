@@ -5,6 +5,8 @@ using Build5Nines.SharpVector;
 [TestClass]
 public class VectorDatabaseTest
 {
+    private float similarityEqualsTolerance = 1e-8f;
+
     [TestMethod]
     public void SimpleTest()
     {
@@ -18,7 +20,7 @@ public class VectorDatabaseTest
         Assert.AreEqual(1, results.Texts.Length);
         Assert.IsTrue(results.Texts[0].Text.Contains("Lion King"));
         Assert.AreEqual(5.0, results.Texts[0].Metadata);
-        Assert.AreEqual(0.3396831154823303, results.Texts[0].Similarity);
+        Assert.AreEqual("0.3396831154823303", results.Texts[0].Similarity.ToString());
     }
 
     [TestMethod]
@@ -34,7 +36,7 @@ public class VectorDatabaseTest
         Assert.AreEqual(1, results.Texts.Length);
         Assert.IsTrue(results.Texts[0].Text.Contains("Lion King"));
         Assert.AreEqual(5.0, results.Texts[0].Metadata);
-        Assert.AreEqual(0.3396831154823303, results.Texts[0].Similarity);
+        Assert.AreEqual(0.3396831154823303f, results.Texts[0].Similarity, similarityEqualsTolerance);
     }
 
     [TestMethod]
@@ -70,7 +72,7 @@ public class VectorDatabaseTest
         Assert.AreEqual(1, results.Texts.Length);
         Assert.IsTrue(results.Texts[0].Text.Contains("Lion King"));
         Assert.AreEqual("{ value: \"JSON Metadata Value\" }", results.Texts[0].Metadata);
-        Assert.AreEqual(0.3396831154823303, results.Texts[0].Similarity);
+        Assert.AreEqual(0.3396831154823303f, results.Texts[0].Similarity, similarityEqualsTolerance);
     }
 
     [TestMethod]
@@ -86,7 +88,7 @@ public class VectorDatabaseTest
         Assert.AreEqual(1, results.Texts.Length);
         Assert.IsTrue(results.Texts[0].Text.Contains("Lion King"));
         Assert.AreEqual("{ value: \"JSON Metadata Value\" }", results.Texts[0].Metadata);
-        Assert.AreEqual(0.3396831154823303, results.Texts[0].Similarity);
+        Assert.AreEqual(0.3396831154823303f, results.Texts[0].Similarity, similarityEqualsTolerance);
 
         vdb.UpdateTextMetadata(id, "{ value: \"New Value\" }");
 
