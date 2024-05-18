@@ -67,6 +67,7 @@ Here's a screenshot of the test console app running:
 
 ### v0.9.0-beta
 
+- Add more C# Generics use, so the library is more customizable when used.
 - Added `VectorTextResultItem.Similarity` so consuming code can inspect similarity of the Text in the vector search results.
 
 ### v0.8.0-beta

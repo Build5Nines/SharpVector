@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Build5Nines.SharpVector;
 
-public class MemoryVectorDatabase<TMetadata> : IVectorDatabase<TMetadata>
+public class MemoryVectorDatabase<TMetadata> : IVectorDatabase<int, TMetadata>
 {
     private Dictionary<int, VectorTextItem<TMetadata>> _database;
     private int _currentId;
@@ -42,7 +43,7 @@ public class MemoryVectorDatabase<TMetadata> : IVectorDatabase<TMetadata>
     /// <param name="id"></param>
     /// <returns></returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    public VectorTextItem<TMetadata> GetText(int id)
+    public IVectorTextItem<TMetadata> GetText(int id)
     {
         if (_database.TryGetValue(id, out var entry))
         {
@@ -66,6 +67,24 @@ public class MemoryVectorDatabase<TMetadata> : IVectorDatabase<TMetadata>
             float[] vector = GenerateVectorFromTokens(tokens);
             var metadata = _database[id].Metadata;
             _database[id] = new VectorTextItem<TMetadata>(text, metadata, vector);
+        }
+        else
+        {
+            throw new KeyNotFoundException($"Text with ID {id} not found.");
+        }
+    }
+
+    /// <summary>
+    /// Updates the Metadata of a Text by its ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="metadata"></param>
+    /// <exception cref="KeyNotFoundException"></exception>
+    public void UpdateTextMetadata(int id, TMetadata metadata) {
+        if (_database.ContainsKey(id))
+        {
+            var text = GetText(id);
+            text.Metadata = metadata;
         }
         else
         {
@@ -101,7 +120,7 @@ public class MemoryVectorDatabase<TMetadata> : IVectorDatabase<TMetadata>
         var similarityMatches = FindMostSimilarTextsIds(queryText, n);
 
         // Retrieve the actual texts for context
-        var texts = new List<VectorTextResultItem<TMetadata>>();
+        var texts = new List<IVectorTextResultItem<TMetadata>>();
         foreach (var match in similarityMatches)
         {
             var item = GetText(match.Id);
@@ -110,6 +129,9 @@ public class MemoryVectorDatabase<TMetadata> : IVectorDatabase<TMetadata>
 
         return new VectorTextResult<TMetadata>(texts.ToArray());
     }
+
+
+    #region Private Methods
 
     /// <summary>
     /// Finds the top N most similar texts ids to the given text
@@ -234,4 +256,6 @@ public class MemoryVectorDatabase<TMetadata> : IVectorDatabase<TMetadata>
 
         return dotProduct / (magnitudeA * magnitudeB);
     }
+
+    #endregion
 }

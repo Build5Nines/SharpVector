@@ -6,7 +6,7 @@ public static class Program
     public static void Main(string[] args)
     {
         // Create a Vector Database with metadata of type string
-        IVectorDatabase<string> vdb = new MemoryVectorDatabase<string>();
+        var vdb = new MemoryVectorDatabase<string>();
 
         // Parse Movie JSON data and add it to the Vector Database
         var jsonString = File.ReadAllText("movies.json");

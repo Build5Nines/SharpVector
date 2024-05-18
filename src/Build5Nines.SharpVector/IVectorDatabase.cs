@@ -1,6 +1,6 @@
 namespace Build5Nines.SharpVector;
 
-public interface IVectorDatabase<TMetadata>
+public interface IVectorDatabase<TId, TMetadata>
 {
     /// <summary>
     /// Adds a new text with Metadata to the database and returns its ID
@@ -8,7 +8,38 @@ public interface IVectorDatabase<TMetadata>
     /// <param name="metadata"></param>
     /// <param name="text"></param>
     /// <returns></returns>
-    int AddText(string text, TMetadata metadata);
+    TId AddText(string text, TMetadata metadata);
+
+    /// <summary>
+    /// Retrieves a Text by its ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    /// <exception cref="KeyNotFoundException"></exception>
+    IVectorTextItem<TMetadata> GetText(TId id);
+
+    /// <summary>
+    /// Deletes a Text by its ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <exception cref="KeyNotFoundException"></exception>
+    void DeleteText(TId id);
+
+    /// <summary>
+    /// Updates a Text by its ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="text"></param>
+    /// <exception cref="KeyNotFoundException"></exception>
+    public void UpdateText(int id, string text);
+
+    /// <summary>
+    /// Updates the Metadata of a Text by its ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="metadata"></param>
+    /// <exception cref="KeyNotFoundException"></exception>
+    void UpdateTextMetadata(int id, TMetadata metadata);
 
     /// <summary>
     /// Performs a vector search to find the top N most similar texts to the given text
