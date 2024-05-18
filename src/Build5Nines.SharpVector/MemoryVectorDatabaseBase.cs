@@ -152,7 +152,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
         float[] queryVector = GenerateVectorFromTokens(queryTokens);
 
         // Method to get the maximum vector length in the database
-        int desiredLength = _idGenerator.GetTotalCountGenerated();
+        int desiredLength = VocabularyStore.Count;
 
         if (_database.Count == 0)
         {
@@ -182,6 +182,28 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
     {
         float[] normalizedVector = new float[length];
         Array.Copy(vector, normalizedVector, Math.Min(vector.Length, length));
+        
+        // Normalize the vector
+        float magnitude = (float)Math.Sqrt(normalizedVector.Sum(v => v * v));
+        if (magnitude > 0)
+        {
+            for (int i = 0; i < normalizedVector.Length; i++)
+            {
+                normalizedVector[i] /= magnitude;
+            }
+        }
+        // else
+        // {
+        //     // If magnitude is zero, return the vector as it is
+        //     // or handle it as per your requirement
+        //     // For example, you can use a small value to avoid division by zero
+        //     for (int i = 0; i < normalizedVector.Length; i++)
+        //     {
+        //         //normalizedVector[i] = 0; // or 
+        //         normalizedVector[i] = 1e-10f;
+        //     }
+        // }
+        
         return normalizedVector;
     }
 
@@ -245,6 +267,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
 
         return dotProduct / (magnitudeA * magnitudeB);
     }
+
 
     #endregion
 }
