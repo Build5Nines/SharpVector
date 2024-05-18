@@ -40,7 +40,7 @@ As you can see with the following example usage of the `Build5Nines.SharpVector`
     vdb.AddText("Frozen is a 2013 Disney movie about a fearless optimist named Anna who sets off on a journey to find her sister Elsa, whose icy powers have trapped their kingdom in eternal winter.", "Frozen (2013)");
 
     // Perform a Vector Search
-    var result = vdb.Search(newPrompt, resultsToReturn);
+    var result = vdb.Search(newPrompt, pageCount: 5); // return the first 5 results
 
     if (result.HasResults)
     {
