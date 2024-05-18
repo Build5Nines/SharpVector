@@ -1,23 +1,27 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Text.RegularExpressions;
-using Build5Nines.SharpVector;
-using Build5Nines.SharpVector.Data.Id;
-using Build5Nines.SharpVector.Data.Vocabulary;
+using Build5Nines.SharpVector.Id;
+using Build5Nines.SharpVector.Preprocessing;
+using Build5Nines.SharpVector.Vocabulary;
+using Build5Nines.SharpVector.Vectorization;
+using Build5Nines.SharpVector.Similarity;
 
 namespace Build5Nines.SharpVector;
 
-public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore, TIdGenerator> : IVectorDatabase<TId, TMetadata>
+public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorSimilarityCalculator> : IVectorDatabase<TId, TMetadata>
     where TId : notnull
     where TVocabularyStore : IVocabularyStore<string, int>
     where TIdGenerator : IIdGenerator<TId>, new()
+    where TTextPreprocessor : ITextPreprocessor, new()
+    where TVectorizer : IVectorizer<string, int>, new()
+    where TVectorSimilarityCalculator : IVectorSimilarityCalculator, new()
 {
     private Dictionary<TId, VectorTextItem<TMetadata>> _database;
     private TIdGenerator _idGenerator;
+
+    private TTextPreprocessor _textPreprocessor;
+
+    private TVectorizer _vectorizer;
+
+    private TVectorSimilarityCalculator _vectorSimilarityCalculator;
 
     protected TVocabularyStore VocabularyStore { get; private set; }
 
@@ -26,6 +30,9 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
         VocabularyStore = vocabularyStore;
         _database = new Dictionary<TId, VectorTextItem<TMetadata>>();
         _idGenerator = new TIdGenerator();
+        _textPreprocessor = new TTextPreprocessor();
+        _vectorizer = new TVectorizer();
+        _vectorSimilarityCalculator = new TVectorSimilarityCalculator();
     }
 
     /// <summary>
@@ -36,9 +43,9 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
     /// <returns></returns>
     public TId AddText(string text, TMetadata metadata)
     {
-        var tokens = TokenizeAndPreprocess(text);
+        var tokens = _textPreprocessor.TokenizeAndPreprocess(text);
         VocabularyStore.Update(tokens);
-        float[] vector = GenerateVectorFromTokens(tokens);
+        float[] vector = _vectorizer.GenerateVectorFromTokens(VocabularyStore, tokens);
         TId id = _idGenerator.NewId();
         _database[id] = new VectorTextItem<TMetadata>(text, metadata, vector);
         return id;
@@ -86,9 +93,9 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
     {
         if (_database.ContainsKey(id))
         {
-            var tokens = TokenizeAndPreprocess(text);
+            var tokens = _textPreprocessor.TokenizeAndPreprocess(text);
             VocabularyStore.Update(tokens);
-            float[] vector = GenerateVectorFromTokens(tokens);
+            float[] vector = _vectorizer.GenerateVectorFromTokens(VocabularyStore, tokens);
             var metadata = _database[id].Metadata;
             _database[id] = new VectorTextItem<TMetadata>(text, metadata, vector);
         }
@@ -140,13 +147,10 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
         return new VectorTextResult<TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
     }
 
-    #region Private Methods
-
-
     private IEnumerable<VectorTextResultItem<TMetadata>> CalculateSimilarities(string queryText, float? threshold = null)
     {
-        var queryTokens = TokenizeAndPreprocess(queryText);
-        float[] queryVector = GenerateVectorFromTokens(queryTokens);
+        var queryTokens = _textPreprocessor.TokenizeAndPreprocess(queryText);
+        float[] queryVector = _vectorizer.GenerateVectorFromTokens(VocabularyStore, queryTokens);
 
         // Method to get the maximum vector length in the database
         int desiredLength = VocabularyStore.Count;
@@ -166,7 +170,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
         foreach (var kvp in _database)
         {
             var item = kvp.Value;
-            float similarity = CalculateCosineSimilarity(NormalizeVector(queryVector, desiredLength), NormalizeVector(item.Vector, desiredLength));
+            float similarity = _vectorSimilarityCalculator.CalculateVectorSimilarity(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
 
             if (!includeAll) {
                 thresholdIsEqual = Math.Abs(similarity - thresholdToCompare) < 1e-6f; // epsilon;
@@ -180,104 +184,4 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
 
         return similarities;
     }
-
-
-    /// <summary>
-    /// Method to normalize vectors to a specific length by padding or truncating
-    /// </summary>
-    /// <param name="vector"></param>
-    /// <param name="length"></param>
-    /// <returns></returns>
-    private static float[] NormalizeVector(float[] vector, int length)
-    {
-        float[] normalizedVector = new float[length];
-        Array.Copy(vector, normalizedVector, Math.Min(vector.Length, length));
-        
-        // Normalize the vector
-        float magnitude = (float)Math.Sqrt(normalizedVector.Sum(v => v * v));
-        if (magnitude > 0)
-        {
-            for (int i = 0; i < normalizedVector.Length; i++)
-            {
-                normalizedVector[i] /= magnitude;
-            }
-        }
-        // else
-        // {
-        //     // If magnitude is zero, return the vector as it is
-        //     // or handle it as per your requirement
-        //     // For example, you can use a small value to avoid division by zero
-        //     for (int i = 0; i < normalizedVector.Length; i++)
-        //     {
-        //         //normalizedVector[i] = 0; // or 
-        //         normalizedVector[i] = 1e-10f;
-        //     }
-        // }
-        
-        return normalizedVector;
-    }
-
-
-    private static List<string> TokenizeAndPreprocess(string text)
-    {
-        text = text.ToLower();
-        text = Regex.Replace(text, @"[^\w\s]", "");
-        text = Regex.Replace(text, @"\s+", " ").Trim();
-        return text.Split(' ').ToList();
-    }
-
-    private float[] GenerateVectorFromTokens(List<string> tokens)
-    {
-        var vector = new float[VocabularyStore.Count];
-
-        foreach (var token in tokens)
-        {
-            if (VocabularyStore.TryGetValue(token, out var index))
-            {
-                vector[index]++;
-            }
-        }
-
-        return vector;
-    }
-
-
-    /// <summary>
-    /// Calculates the cosine similarity between two vectors
-    /// </summary>
-    /// <param name="vectorA"></param>
-    /// <param name="vectorB"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    private static float CalculateCosineSimilarity(float[] vectorA, float[] vectorB)
-    {
-        if (vectorA.Length != vectorB.Length)
-        {
-            throw new ArgumentException("Vectors must be of the same length.");
-        }
-
-        float dotProduct = 0;
-        float magnitudeA = 0;
-        float magnitudeB = 0;
-
-        for (int i = 0; i < vectorA.Length; i++)
-        {
-            dotProduct += vectorA[i] * vectorB[i];
-            magnitudeA += vectorA[i] * vectorA[i];
-            magnitudeB += vectorB[i] * vectorB[i];
-        }
-
-        magnitudeA = (float)Math.Sqrt(magnitudeA);
-        magnitudeB = (float)Math.Sqrt(magnitudeB);
-
-        if (magnitudeA == 0 || magnitudeB == 0)
-        {
-            return 0;
-        }
-
-        return dotProduct / (magnitudeA * magnitudeB);
-    }
-
-
-    #endregion
 }

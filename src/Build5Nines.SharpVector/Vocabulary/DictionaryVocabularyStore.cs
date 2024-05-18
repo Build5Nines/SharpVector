@@ -1,4 +1,4 @@
-namespace Build5Nines.SharpVector.Data.Vocabulary;
+namespace Build5Nines.SharpVector.Vocabulary;
 
 public class DictionaryVocabularyStore<TKey> : IVocabularyStore<TKey, int>
     where TKey : notnull
@@ -10,7 +10,7 @@ public class DictionaryVocabularyStore<TKey> : IVocabularyStore<TKey, int>
         _vocabulary = new Dictionary<TKey, int>();
     }
 
-    public void Update(List<TKey> tokens)
+    public void Update(IEnumerable<TKey> tokens)
     {
         foreach (var token in tokens)
         {

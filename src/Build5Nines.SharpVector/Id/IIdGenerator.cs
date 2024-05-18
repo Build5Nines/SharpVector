@@ -1,4 +1,4 @@
-namespace Build5Nines.SharpVector.Data.Id;
+namespace Build5Nines.SharpVector.Id;
 
 public interface IIdGenerator<TId>
     where TId : notnull

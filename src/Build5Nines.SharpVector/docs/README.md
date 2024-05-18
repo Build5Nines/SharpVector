@@ -1,12 +1,12 @@
 Build5Nines.SharpVector is a simple, small, easy to embed, in-memory Vector Database for use in any .NET application.
 
-The vector algorithm currently used in the `Build5Nines.SharpVector.MemoryVectorDatabase` class is based on TF-IDF (Term Frequency-Inverse Document Frequency) combined with cosine similarity for searching similar texts.
+The `Build5Nines.SharpVector.BasicMemoryVectorDatabase` class uses a Bag of Words vectorization strategy, with Cosine similarity, a dictionary vocabulary store, and a basic text preprocessor.
 
 ### Example Usage
 
 ```csharp
     // Create a Vector Database with metadata of type string
-    IVectorDatabase<string> vdb = new MemoryVectorDatabase<string>();
+    var vdb = new BasicMemoryVectorDatabase();
     // The Metadata is declared using generics, so you can store whatever data you need there.
 
     // Load Vector Database with some sample text data

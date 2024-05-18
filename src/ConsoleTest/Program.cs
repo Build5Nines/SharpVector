@@ -7,7 +7,7 @@ public static class Program
     public static void Main(string[] args)
     {
         // Create a Vector Database with metadata of type string
-        var vdb = new MemoryVectorDatabase<string>();
+        var vdb = new BasicMemoryVectorDatabase();
 
         // Parse Movie JSON data and add it to the Vector Database
         var jsonString = File.ReadAllText("movies.json");
@@ -73,7 +73,7 @@ public static class Program
 
 
         // // Create a Vector Database with metadata of type double
-        // var vdb = new MemoryVectorDatabase<double>();
+        // var vdb = new MemoryVectorDatabase<int, double>();
 
         // // Load Vector Database with some sample text
         // vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", 5.0);

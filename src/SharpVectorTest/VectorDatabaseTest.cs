@@ -6,9 +6,25 @@ using Build5Nines.SharpVector;
 public class VectorDatabaseTest
 {
     [TestMethod]
+    public void BasicMemoryVectorDatabase_01()
+    {
+        var vdb = new BasicMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", "[some metadata here]");
+        
+        var results = vdb.Search("Lion King");
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
+        Assert.AreEqual("[some metadata here]", results.Texts.First().Metadata);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+    }
+
+    [TestMethod]
     public void SimpleTest_01()
     {
-        var vdb = new MemoryVectorDatabase<double>();
+        var vdb = new MemoryVectorDatabase<int, double>();
         
         // // Load Vector Database with some sample text
         vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", 5.0);
@@ -24,7 +40,7 @@ public class VectorDatabaseTest
     [TestMethod]
     public void SimpleTest_02()
     {
-        var vdb = new MemoryVectorDatabase<double>();
+        var vdb = new MemoryVectorDatabase<int, double>();
         
         // // Load Vector Database with some sample text
         vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", 5.0);
@@ -56,7 +72,7 @@ public class VectorDatabaseTest
     [TestMethod]
     public void SimpleTest_IMemoryVectorDatabase()
     {
-        IVectorDatabase<int, double> vdb = new MemoryVectorDatabase<double>();
+        IVectorDatabase<int, double> vdb = new MemoryVectorDatabase<int, double>();
         
         // // Load Vector Database with some sample text
         vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", 5.0);
@@ -72,7 +88,7 @@ public class VectorDatabaseTest
     [TestMethod]
     public void Text_Update_01()
     {
-        var vdb = new MemoryVectorDatabase<string>();
+        var vdb = new MemoryVectorDatabase<int, string>();
         
         // // Load Vector Database with some sample text
         var id = vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", "{ value: \"JSON Metadata Value\" }");
@@ -92,7 +108,7 @@ public class VectorDatabaseTest
     [TestMethod]
     public void Text_Metadata_String_01()
     {
-        var vdb = new MemoryVectorDatabase<string>();
+        var vdb = new MemoryVectorDatabase<int, string>();
         
         // // Load Vector Database with some sample text
         vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", "{ value: \"JSON Metadata Value\" }");
@@ -108,7 +124,7 @@ public class VectorDatabaseTest
     [TestMethod]
     public void Text_Metadata_String_Update()
     {
-        var vdb = new MemoryVectorDatabase<string>();
+        var vdb = new MemoryVectorDatabase<int, string>();
         
         // // Load Vector Database with some sample text
         var id = vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", "{ value: \"JSON Metadata Value\" }");

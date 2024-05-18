@@ -28,7 +28,7 @@ As you can see with the following example usage of the `Build5Nines.SharpVector`
 
 ```csharp
     // Create a Vector Database with metadata of type string
-    IVectorDatabase<string> vdb = new MemoryVectorDatabase<string>();
+    var vdb = new BasicMemoryVectorDatabase();
     // The Metadata is declared using generics, so you can store whatever data you need there.
 
     // Load Vector Database with some sample text data
@@ -53,6 +53,8 @@ As you can see with the following example usage of the `Build5Nines.SharpVector`
     }
 ```
 
+The `Build5Nines.SharpVector.BasicMemoryVectorDatabase` class uses a Bag of Words vectorization strategy, with Cosine similarity, a dictionary vocabulary store, and a basic text preprocessor. The library contains generic classes and plenty of extension points to create customized vector database implementations with it if needed.
+
 ## Sample Console App
 
 The [sample console app](src/ConsoleTest/) in this repo show example usage of Build5Nines.SharpVector.dll
@@ -67,7 +69,8 @@ Here's a screenshot of the test console app running:
 
 ### v0.9.0-beta
 
-- Add more C# Generics use, so the library is more customizable when used.
+- Introduced the `BasicMemoryVectorDatabase` class as the basic Vector Database implementations that uses a Bag of Words vectorization strategy, with Cosine similarity, a dictionary vocabulary store, and a basic text preprocessor.
+- Add more C# Generics use, so the library is more customizable when used, and custom vector databases can be implemented if desired.
 - Added `VectorTextResultItem.Similarity` so consuming code can inspect similarity of the Text in the vector search results.
 - Update `.Search` method to support search result paging and threshold support for similarity comparison
 - Add some basic Unit Tests
