@@ -74,7 +74,7 @@ public static class Program
 
         // // Create a Vector Database with metadata of type double
         // var vdb = new MemoryVectorDatabase<double>();
-        
+
         // // Load Vector Database with some sample text
         // vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", 5.0);
         // vdb.AddText("Aladdin is a 2019 live-action Disney adaptation of the 1992 animated classic of the same name about a street urchin who finds a magic lamp and uses a genie's wishes to become a prince so he can marry Princess Jasmine.", 5.0);
@@ -99,6 +99,8 @@ public static class Program
         // Allow user to search for similar text 
         Console.WriteLine("Type in prompt text, or type 'exit' to exit the app.");
         Console.WriteLine("What movie or TV show are you looking for? Try describing it in a few words.");
+
+
         while(true) {
             Console.Write("Prompt: ");
             var newPrompt = Console.ReadLine();
@@ -109,23 +111,33 @@ public static class Program
             Console.WriteLine(string.Empty);
 
             if (newPrompt != null) {
-                var resultsToReturn = 3; // Number of results to return
                 IVectorTextResult<string> result;
                 
                 var timer = new Stopwatch();
                 timer.Start();
 
-                result = vdb.Search(newPrompt, resultsToReturn);
+
+                var pageSize = 3;
+                result = vdb.Search(newPrompt,
+                    threshold: 0.001f, // 0.2f, // Only return results with similarity greater than this threshold
+                    //pageIndex: 0, // Page index of the search results (default is 0; the first page)
+                    pageCount: pageSize // Number of search results per page or max number to return
+                    );
 
                 timer.Stop();
                 Console.WriteLine($"Search took {timer.ElapsedMilliseconds} ms");
 
 
-                if (result == null || !result.HasTexts)
+                if (result == null || result.IsEmpty)
                 {
                     Console.WriteLine("No similar text found.");
                 } else {
-                    Console.WriteLine("Similar Text Found:");
+                    Console.WriteLine("Similar Text Found!");
+
+                    var firstItemIndex = result.PageIndex * pageSize + 1;
+                    var lastItemIndex = firstItemIndex + (pageSize > result.Texts.Count() ? result.Texts.Count() : pageSize) - 1;
+
+                    Console.WriteLine($"Page: {result.PageIndex + 1} (Showing {firstItemIndex} to {lastItemIndex} of Total {result.TotalCount})");
                     Console.WriteLine(string.Empty);
                     foreach (var item in result.Texts)
                     {

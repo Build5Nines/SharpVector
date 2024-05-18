@@ -15,10 +15,10 @@ public class VectorDatabaseTest
         
         var results = vdb.Search("Lion King");
 
-        Assert.AreEqual(1, results.Texts.Length);
-        Assert.IsTrue(results.Texts[0].Text.Contains("Lion King"));
-        Assert.AreEqual(5.0, results.Texts[0].Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts[0].Similarity);
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
+        Assert.AreEqual(5.0, results.Texts.First().Metadata);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
     }
 
     [TestMethod]
@@ -45,12 +45,12 @@ public class VectorDatabaseTest
         vdb.AddText("In Toy Story 2, Andy's toys are left to their own devices while he goes to Cowboy Camp, and Woody is kidnapped by a toy collector named Al McWhiggin. Buzz Lightyear and the other toys set out on a rescue mission to save Woody before he becomes a museum toy.", 5.0);
         vdb.AddText("Iron Man 2 is a 2010 action-adventure fantasy film about Tony Stark (Robert Downey Jr.), a billionaire inventor and superhero who must deal with declining health, government pressure, and a vengeful enemy.", 5.0);
         
-        var results = vdb.Search("Lion King");
+        var results = vdb.Search("Lion King", pageCount: 5);
 
-        Assert.AreEqual(5, results.Texts.Length);
-        Assert.IsTrue(results.Texts[0].Text.Contains("Lion King"));
-        Assert.AreEqual(5.0, results.Texts[0].Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts[0].Similarity);
+        Assert.AreEqual(5, results.Texts.Count());
+        Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
+        Assert.AreEqual(5.0, results.Texts.First().Metadata);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
     }
 
     [TestMethod]
@@ -63,10 +63,10 @@ public class VectorDatabaseTest
         
         var results = vdb.Search("Lion King");
 
-        Assert.AreEqual(1, results.Texts.Length);
-        Assert.IsTrue(results.Texts[0].Text.Contains("Lion King"));
-        Assert.AreEqual(5.0, results.Texts[0].Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts[0].Similarity);
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
+        Assert.AreEqual(5.0, results.Texts.First().Metadata);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
     }
 
     [TestMethod]
@@ -79,14 +79,14 @@ public class VectorDatabaseTest
         
         var results = vdb.Search("Lion King");
 
-        Assert.AreEqual(1, results.Texts.Length);
-        Assert.IsTrue(results.Texts[0].Text.Contains("Lion King"));
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
 
         vdb.UpdateText(id, "The Lion King is a great movie!");
 
         results = vdb.Search("Lion King");
-        Assert.AreEqual("The Lion King is a great movie!", results.Texts[0].Text);
-        Assert.AreEqual("{ value: \"JSON Metadata Value\" }", results.Texts[0].Metadata);
+        Assert.AreEqual("The Lion King is a great movie!", results.Texts.First().Text);
+        Assert.AreEqual("{ value: \"JSON Metadata Value\" }", results.Texts.First().Metadata);
     }
 
     [TestMethod]
@@ -99,10 +99,10 @@ public class VectorDatabaseTest
         
         var results = vdb.Search("Lion King");
 
-        Assert.AreEqual(1, results.Texts.Length);
-        Assert.IsTrue(results.Texts[0].Text.Contains("Lion King"));
-        Assert.AreEqual("{ value: \"JSON Metadata Value\" }", results.Texts[0].Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts[0].Similarity);
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
+        Assert.AreEqual("{ value: \"JSON Metadata Value\" }", results.Texts.First().Metadata);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
     }
 
     [TestMethod]
@@ -115,14 +115,14 @@ public class VectorDatabaseTest
         
         var results = vdb.Search("Lion King");
 
-        Assert.AreEqual(1, results.Texts.Length);
-        Assert.IsTrue(results.Texts[0].Text.Contains("Lion King"));
-        Assert.AreEqual("{ value: \"JSON Metadata Value\" }", results.Texts[0].Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts[0].Similarity);
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
+        Assert.AreEqual("{ value: \"JSON Metadata Value\" }", results.Texts.First().Metadata);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
 
         vdb.UpdateTextMetadata(id, "{ value: \"New Value\" }");
 
         results = vdb.Search("Lion King");
-        Assert.AreEqual("{ value: \"New Value\" }", results.Texts[0].Metadata);
+        Assert.AreEqual("{ value: \"New Value\" }", results.Texts.First().Metadata);
     }
 }

@@ -44,8 +44,10 @@ public interface IVectorDatabase<TId, TMetadata>
     /// <summary>
     /// Performs a vector search to find the top N most similar texts to the given text
     /// </summary>
-    /// <param name="queryText"></param>
-    /// <param name="n"></param>
+    /// <param name="queryText">The query prompt to search by.</param>
+    /// <param name="threshold">The similarity threshold to filter by.</param>
+    /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
+    /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
     /// <returns></returns>
-    IVectorTextResult<TMetadata> Search(string queryText, int n = 5);
+    public IVectorTextResult<TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null);
 }

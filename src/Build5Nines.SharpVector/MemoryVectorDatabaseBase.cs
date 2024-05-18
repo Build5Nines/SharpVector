@@ -119,36 +119,31 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
     /// <summary>
     /// Performs a vector search to find the top N most similar texts to the given text
     /// </summary>
-    /// <param name="queryText"></param>
-    /// <param name="n"></param>
+    /// <param name="queryText">The query prompt to search by.</param>
+    /// <param name="topN">The highest number of results to show.</param>
+    /// <param name="threshold">The similarity threshold. Only return items greater or equal to the threshold. Null returns all.</param>
     /// <returns></returns>
-    public IVectorTextResult<TMetadata> Search(string queryText, int n = 5)
+    public IVectorTextResult<TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
-        var similarityMatches = FindMostSimilarTextsIds(queryText, n);
+        var similarities = CalculateSimilarities(queryText, threshold).OrderByDescending(s => s.Similarity);
 
-        // Retrieve the actual texts for context
-        var texts = new List<IVectorTextResultItem<TMetadata>>();
-        foreach (var match in similarityMatches)
-        {
-            var item = GetText(match.Id);
-            texts.Add(new VectorTextResultItem<TMetadata>(item, match.Similarity));
+        var totalCountFoundInSearch = similarities.Count();
+
+        IEnumerable<VectorTextResultItem<TMetadata>> resultsToReturn;
+        if (pageCount != null && pageCount >= 0 && pageIndex >= 0) {
+            resultsToReturn = similarities.Skip(pageIndex * pageCount.Value).Take(pageCount.Value);
+        } else {
+            // no paging specified, return all results
+            resultsToReturn = similarities;
         }
 
-        return new VectorTextResult<TMetadata>(texts.ToArray());
+        return new VectorTextResult<TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
     }
 
     #region Private Methods
 
 
-
-    /// <summary>
-    /// Finds the top N most similar texts ids to the given text
-    /// </summary>
-    /// <param name="queryText"></param>
-    /// <param name="n"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
-    private IEnumerable<VectorSimilarity<TId>> FindMostSimilarTextsIds(string queryText, int n = 5)
+    private IEnumerable<VectorTextResultItem<TMetadata>> CalculateSimilarities(string queryText, float? threshold = null)
     {
         var queryTokens = TokenizeAndPreprocess(queryText);
         float[] queryVector = GenerateVectorFromTokens(queryTokens);
@@ -161,18 +156,31 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVocabularyStore,
             throw new InvalidOperationException("The database is empty.");
         }
 
-        var similarities = new List<VectorSimilarity<TId>>();
+        var similarities = new List<VectorTextResultItem<TMetadata>>();
 
+
+        bool includeAll = threshold == null;
+        float thresholdToCompare = threshold ?? (float)0.0f;
+        bool includeSimilarity = true;
+        bool thresholdIsEqual;
         foreach (var kvp in _database)
         {
-            float similarity = CalculateCosineSimilarity(NormalizeVector(queryVector, desiredLength), NormalizeVector(kvp.Value.Vector, desiredLength));
-            similarities.Add(new VectorSimilarity<TId>(kvp.Key, similarity));
-        }
+            var item = kvp.Value;
+            float similarity = CalculateCosineSimilarity(NormalizeVector(queryVector, desiredLength), NormalizeVector(item.Vector, desiredLength));
 
-        similarities = similarities.OrderByDescending(s => s.Similarity).Take(n).ToList();
+            if (!includeAll) {
+                thresholdIsEqual = Math.Abs(similarity - thresholdToCompare) < 1e-6f; // epsilon;
+                includeSimilarity = thresholdIsEqual || similarity >= thresholdToCompare;
+            }
+
+            if (includeAll || includeSimilarity) {
+                similarities.Add(new VectorTextResultItem<TMetadata>(item, similarity));
+            }
+        }
 
         return similarities;
     }
+
 
     /// <summary>
     /// Method to normalize vectors to a specific length by padding or truncating
