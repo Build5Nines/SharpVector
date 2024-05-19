@@ -13,7 +13,7 @@ The vector algorithm currently used in the `Build5Nines.SharpVector.MemoryVector
 The `Build5Nines.SharpVector` library is available as a Nuget Package to easily include into your .NET projects:
 
 ```bash
-dotnet add package Build5Nines.SharpVector --version 0.9.0-beta
+dotnet add package Build5Nines.SharpVector --version 0.9.5-beta
 ```
 
 You can view it on Nuget.org here: <https://www.nuget.org/packages/Build5Nines.SharpVector/>
@@ -23,6 +23,8 @@ You can view it on Nuget.org here: <https://www.nuget.org/packages/Build5Nines.S
 The library is built using no external dependencies other than what's available from .NET, and it's built to target .NET 6 and greater.
 
 ## Example Usage
+
+### Loading and Searching Vector Database
 
 As you can see with the following example usage of the `Build5Nines.SharpVector` library, it's really simple to embed an in-memory Vector Database for use in any .NET application:
 
@@ -55,6 +57,48 @@ As you can see with the following example usage of the `Build5Nines.SharpVector`
 
 The `Build5Nines.SharpVector.BasicMemoryVectorDatabase` class uses a Bag of Words vectorization strategy, with Cosine similarity, a dictionary vocabulary store, and a basic text preprocessor. The library contains generic classes and plenty of extension points to create customized vector database implementations with it if needed.
 
+### Loading with Different Text Chunking Methods
+
+Also, the `TextDataLoader` can be used to help load text documents into the Vector Database with support for multiple different text chunking methods:
+
+```csharp
+/// Paragraph Chunking
+var loader = new TextDataLoader<int, string>(vdb);
+loader.AddDocument(document, new TextChunkingOptions<string>
+{
+    Method = TextChunkingMethod.Paragraph,
+    RetrieveMetadata = (chunk) => {
+        // add some basic metadata since this can't be null
+        return "{ chuckSize: \"" + chunk.Length + "\" }";
+    }
+});
+
+/// Sentence Chunking
+var loader = new TextDataLoader<int, string>(vdb);
+loader.AddDocument(document, new TextChunkingOptions<string>
+{
+    Method = TextChunkingMethod.Sentence,
+    RetrieveMetadata = (chunk) => {
+        // add some basic metadata since this can't be null
+        return "{ chuckSize: \"" + chunk.Length + "\" }";
+    }
+});
+
+/// Fixed Length Chunking
+var loader = new TextDataLoader<int, string>(vdb);
+loader.AddDocument(document, new TextChunkingOptions<string>
+{
+    Method = TextChunkingMethod.FixedLength,
+    ChunkSize = 150,
+    RetrieveMetadata = (chunk) => {
+        // add some basic metadata since this can't be null
+        return "{ chuckSize: \"" + chunk.Length + "\" }";
+    }
+});
+```
+
+The `RetrieveMetadata` accepts a lambda function that can be used to easily define the Metadata for the chucks as they are loaded.
+
 ## Sample Console App
 
 The [sample console app](src/ConsoleTest/) in this repo show example usage of Build5Nines.SharpVector.dll
@@ -66,6 +110,10 @@ Here's a screenshot of the test console app running:
 ![](assets/build5nines-sharpvector-console-screenshot.jpg)
 
 ## Change Log
+
+### v0.9.5-beta (2024-05-18)
+
+- Add `TextDataLoader` class to provide support for different methods of text chunking when loading documents into the vector database.
 
 ### v0.9.0-beta (2024-05-18)
 

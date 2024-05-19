@@ -2,7 +2,7 @@ Build5Nines.SharpVector is a simple, small, easy to embed, in-memory Vector Data
 
 The `Build5Nines.SharpVector.BasicMemoryVectorDatabase` class uses a Bag of Words vectorization strategy, with Cosine similarity, a dictionary vocabulary store, and a basic text preprocessor.
 
-### Example Usage
+### Example Usage: Load and Search Vector Database
 
 ```csharp
     // Create a Vector Database with metadata of type string
@@ -31,3 +31,19 @@ The `Build5Nines.SharpVector.BasicMemoryVectorDatabase` class uses a Bag of Word
     }
 ```
 
+### Example Usage: Loading with Different Text Chunking Methods
+
+Also, the `TextDataLoader` can be used to help load text documents into the Vector Database with support for multiple different text chunking methods:
+
+```csharp
+/// Paragraph Chunking
+var loader = new TextDataLoader<int, string>(vdb);
+loader.AddDocument(document, new TextChunkingOptions<string>
+{
+    Method = TextChunkingMethod.Paragraph,
+    RetrieveMetadata = (chunk) => {
+        // add some basic metadata since this can't be null
+        return "{ chuckSize: \"" + chunk.Length + "\" }";
+    }
+});
+```

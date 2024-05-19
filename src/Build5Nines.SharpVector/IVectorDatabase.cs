@@ -1,6 +1,8 @@
 namespace Build5Nines.SharpVector;
 
 public interface IVectorDatabase<TId, TMetadata>
+    where TId : notnull
+    where TMetadata : notnull
 {
     /// <summary>
     /// Adds a new text with Metadata to the database and returns its ID

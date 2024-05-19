@@ -3,7 +3,7 @@ namespace SharpVectorTest;
 using Build5Nines.SharpVector;
 
 [TestClass]
-public class VectorDatabaseTest
+public class VectorDatabaseTests
 {
     [TestMethod]
     public void BasicMemoryVectorDatabase_01()
