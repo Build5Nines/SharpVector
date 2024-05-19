@@ -1,4 +1,4 @@
-# Build5Nines SharpVector is a lightweight in-memory Vector Database for C# Applications
+# Build5Nines SharpVector - a lightweight, in-memory Vector Database for any C# / .NET Applications
 
 Vector databases are used with Generative AI solutions augmenting the LLM (Large Language Model) with the ability to load additional context data with the AI prompt using the RAG (Retrieval-Augmented Generation) design pattern.
 
