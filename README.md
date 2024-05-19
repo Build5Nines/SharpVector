@@ -1,10 +1,10 @@
-# Build5Nines SharpVector is a simple in-memory Vector Database for C# Applications
+# Build5Nines SharpVector is a lightweight in-memory Vector Database for C# Applications
 
 Vector databases are used with Generative AI solutions augmenting the LLM (Large Language Model) with the ability to load additional context data with the AI prompt using the RAG (Retrieval-Augmented Generation) design pattern.
 
-While there are lots of large databases that can be used to build Vector Databases (like Azure CosmosDB, PostgreSQL w/ pgvector, Azure AI Search, Elasticsearch, and more), there aren't many options for a light weight, simple solution to embed into any .NET application.
+While there are lots of large databases that can be used to build Vector Databases (like Azure CosmosDB, PostgreSQL w/ pgvector, Azure AI Search, Elasticsearch, and more), there are not many options for a lightweight vector database that can be embedded into any .NET application.
 
-The Build5Nines SharpVector project provides a simple, small, easy to embed, in-memory Vector Database for use in any .NET application.
+The Build5Nines SharpVector project provides a lightweight in-memory Vector Database for use in any .NET application.
 
 The vector algorithm currently used in the `Build5Nines.SharpVector.MemoryVectorDatabase` class is based on TF-IDF (Term Frequency-Inverse Document Frequency) combined with cosine similarity for searching similar texts.
 
@@ -26,7 +26,7 @@ The library is built using no external dependencies other than what's available 
 
 ### Loading and Searching Vector Database
 
-As you can see with the following example usage of the `Build5Nines.SharpVector` library, it's really simple to embed an in-memory Vector Database for use in any .NET application:
+As you can see with the following example usage of the `Build5Nines.SharpVector` library, in only a couple lines of code you can embed an in-memory Vector Database into any .NET application:
 
 ```csharp
     // Create a Vector Database with metadata of type string

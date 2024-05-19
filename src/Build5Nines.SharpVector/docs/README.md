@@ -1,4 +1,4 @@
-Build5Nines.SharpVector is a simple, small, easy to embed, in-memory Vector Database for use in any .NET application.
+Build5Nines.SharpVector is a lightweight in-memory Vector Database for use in any .NET application.
 
 The `Build5Nines.SharpVector.BasicMemoryVectorDatabase` class uses a Bag of Words vectorization strategy, with Cosine similarity, a dictionary vocabulary store, and a basic text preprocessor.
 
