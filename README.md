@@ -111,7 +111,7 @@ Here's a screenshot of the test console app running:
 
 ## Change Log
 
-### v0.9.6-beta (not released yet)
+### v0.9.8-beta (2024-05-20)
 
 - Added `Async` version of classes to support multi-threading
 - Metadata is no longer required when calling `.AddText()` and `.AddTextAsync()`
