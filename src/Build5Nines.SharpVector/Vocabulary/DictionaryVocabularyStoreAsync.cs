@@ -3,26 +3,30 @@ using System.Collections.Concurrent;
 namespace Build5Nines.SharpVector.Vocabulary;
 
 /// <summary>
-/// A simple in-memory database for storing and querying vectorized text items.
+/// A thread safe simple in-memory database for storing and querying vectorized text items.
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
-public class DictionaryVocabularyStore<TKey> : IVocabularyStore<TKey, int>
+public class DictionaryVocabularyStoreAsync<TKey> : IVocabularyStoreAsync<TKey, int>
     where TKey : notnull
 {
-    private Dictionary<TKey, int> _vocabulary;
+    private ConcurrentDictionary<TKey, int> _vocabulary;
 
-    public DictionaryVocabularyStore()
+    public DictionaryVocabularyStoreAsync()
     {
-        _vocabulary = new Dictionary<TKey, int>();
+        _vocabulary = new ConcurrentDictionary<TKey, int>();
     }
+
+    private object _lock = new object();
 
     public void Update(IEnumerable<TKey> tokens)
     {
-        foreach (var token in tokens)
-        {
-            if (!_vocabulary.ContainsKey(token))
+        lock(_lock) {
+            foreach (var token in tokens)
             {
-                _vocabulary[token] = Count;
+                if (!_vocabulary.ContainsKey(token))
+                {
+                    _vocabulary[token] = Count;
+                }
             }
         }
     }

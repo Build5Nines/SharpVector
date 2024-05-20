@@ -1,18 +1,20 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
 using Build5Nines.SharpVector;
+using System.Threading.Tasks;
 
 public static class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         // Create a Vector Database with metadata of type string
-        var vdb = new BasicMemoryVectorDatabase();
+        var vdb = new BasicMemoryVectorDatabaseAsync();
+
 
         // Parse Movie JSON data and add it to the Vector Database
-        var jsonString = File.ReadAllText("movies.json");
-        
         Console.WriteLine("Importing Movie data into Vector Database...");
+
+        var jsonString = await File.ReadAllTextAsync("movies.json");
 
         var importTimer = new Stopwatch();
         importTimer.Start();    
@@ -22,16 +24,27 @@ public static class Program
             JsonElement root = document.RootElement;
             JsonElement movies = root.GetProperty("movies");
 
-            foreach (JsonElement movie in movies.EnumerateArray())
+            await Parallel.ForEachAsync(movies.EnumerateArray(), async (movie, cancellationToken) =>
             {
                 var text = movie.GetProperty("description").GetString();
                 var metadata = movie.GetProperty("title").GetString();
-                
+
                 if (!string.IsNullOrWhiteSpace(text) && !string.IsNullOrWhiteSpace(metadata))
                 {
-                    vdb.AddText(text, metadata);
+                    await vdb.AddTextAsync(text, metadata);
                 }
-            }
+            });
+
+            // foreach (JsonElement movie in movies.EnumerateArray())
+            // {
+            //     var text = movie.GetProperty("description").GetString();
+            //     var metadata = movie.GetProperty("title").GetString();
+                
+            //     if (!string.IsNullOrWhiteSpace(text) && !string.IsNullOrWhiteSpace(metadata))
+            //     {
+            //         await vdb.AddTextAsync(text, metadata);
+            //     }
+            // }
         }
         
         importTimer.Stop();
@@ -118,7 +131,8 @@ public static class Program
 
 
                 var pageSize = 3;
-                result = vdb.Search(newPrompt,
+                // result = await vdb.Search(newPrompt,
+                result = await vdb.SearchAsync(newPrompt,
                     threshold: 0.001f, // 0.2f, // Only return results with similarity greater than this threshold
                     //pageIndex: 0, // Page index of the search results (default is 0; the first page)
                     pageCount: pageSize // Number of search results per page or max number to return

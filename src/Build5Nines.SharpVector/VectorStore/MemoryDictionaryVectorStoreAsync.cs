@@ -4,22 +4,22 @@ using System.Collections.Concurrent;
 namespace Build5Nines.SharpVector.VectorStore;
 
 /// <summary>
-/// A simple in-memory database for storing and querying vectorized text items.
+/// A thread safe simple in-memory database for storing and querying vectorized text items.
 /// </summary>
 /// <typeparam name="TId"></typeparam>
 /// <typeparam name="TMetadata"></typeparam>
-public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMetadata>
+public class MemoryDictionaryVectorStoreAsync<TId, TMetadata> : IVectorStoreAsync<TId, TMetadata>
     where TId : notnull
 {
-    private Dictionary<TId, IVectorTextItem<TMetadata>> _database;
+    private ConcurrentDictionary<TId, IVectorTextItem<TMetadata>> _database;
 
     /// <summary>
     /// The number of items in the database
     /// </summary>
     public int Count => _database.Count;
 
-    public MemoryDictionaryVectorStore() {
-        _database = new Dictionary<TId, IVectorTextItem<TMetadata>>();
+    public MemoryDictionaryVectorStoreAsync() {
+        _database = new ConcurrentDictionary<TId, IVectorTextItem<TMetadata>>();
     }
 
     /// <summary>
@@ -30,7 +30,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     /// <exception cref="KeyNotFoundException"></exception>
     public void Set(TId id, IVectorTextItem<TMetadata> item)
     {
-        _database[id] = item;
+        _database.AddOrUpdate(id, item, (key, oldValue) => item);
     }
 
     /// <summary>
