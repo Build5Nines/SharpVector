@@ -1,11 +1,12 @@
 using System.Collections;
+using System.Collections.Concurrent;
 
 namespace Build5Nines.SharpVector.VectorStore;
 
 public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMetadata>
     where TId : notnull
 {
-    private Dictionary<TId, IVectorTextItem<TMetadata>> _database;
+    private ConcurrentDictionary<TId, IVectorTextItem<TMetadata>> _database;
 
     /// <summary>
     /// The number of items in the database
@@ -13,7 +14,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     public int Count => _database.Count;
 
     public MemoryDictionaryVectorStore() {
-        _database = new Dictionary<TId, IVectorTextItem<TMetadata>>();
+        _database = new ConcurrentDictionary<TId, IVectorTextItem<TMetadata>>();
     }
 
     /// <summary>
@@ -24,7 +25,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     /// <exception cref="KeyNotFoundException"></exception>
     public void Set(TId id, IVectorTextItem<TMetadata> item)
     {
-        _database[id] = item;
+        _database.AddOrUpdate(id, item, (key, oldValue) => item);
     }
 
     /// <summary>
@@ -51,7 +52,8 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     {
         if (_database.ContainsKey(id))
         {
-            _database.Remove(id);
+            IVectorTextItem<TMetadata> itemRemoved;
+            _database.Remove(id, out itemRemoved);
         }
         else
         {

@@ -122,6 +122,27 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     }
 
     /// <summary>
+    /// Updates a Text by its ID with new text and metadata values
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="text"></param>
+    /// <param name="metadata"></param>
+    public void UpdateTextAndMetadata(TId id, string text, TMetadata metadata)
+    {
+        if (VectorStore.ContainsKey(id))
+        {
+            var tokens = _textPreprocessor.TokenizeAndPreprocess(text);
+            VocabularyStore.Update(tokens);
+            float[] vector = _vectorizer.GenerateVectorFromTokens(VocabularyStore, tokens);
+            VectorStore.Set(id, new VectorTextItem<TMetadata>(text, metadata, vector));
+        }
+        else
+        {
+            throw new KeyNotFoundException($"Text with ID {id} not found.");
+        }
+    }
+
+    /// <summary>
     /// Performs a vector search to find the top N most similar texts to the given text
     /// </summary>
     /// <param name="queryText">The query prompt to search by.</param>

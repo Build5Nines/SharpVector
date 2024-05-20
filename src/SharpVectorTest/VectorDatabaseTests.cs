@@ -70,6 +70,28 @@ public class VectorDatabaseTests
     }
 
     [TestMethod]
+    public void SimpleTest_MemoryVectorDatabase_UpdateTextAndMetadata_01()
+    {
+        var vdb = new MemoryVectorDatabase<int, string>();
+        
+        // // Load Vector Database with some sample text
+        var id = vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", "5.0");
+
+        var newText = "The Incredibles is a 2004 Pixar animated action-adventure film about a family of superheroes who are forced to live a normal suburban life while hiding their powers. The movie is set in a retro-futuristic 1960s and has a runtime of 1 hour and 55 minutes.";
+        vdb.UpdateTextAndMetadata(id, newText, "6.0");
+        
+        var results = vdb.Search("Lion King", threshold: 0.001f);
+        Assert.AreEqual(0, results.Texts.Count());
+
+        results = vdb.Search("Incredibles", threshold: 0.001f);
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual(newText, results.Texts.First().Text);
+        Assert.AreEqual("6.0", results.Texts.First().Metadata);
+        Assert.AreEqual(0.11704113334417343, results.Texts.First().Similarity);
+    }
+
+    [TestMethod]
     public void SimpleTest_IMemoryVectorDatabase()
     {
         IVectorDatabase<int, double> vdb = new MemoryVectorDatabase<int, double>();

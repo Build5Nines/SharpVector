@@ -33,7 +33,7 @@ public interface IVectorDatabase<TId, TMetadata>
     /// <param name="id"></param>
     /// <param name="text"></param>
     /// <exception cref="KeyNotFoundException"></exception>
-    public void UpdateText(TId id, string text);
+    void UpdateText(TId id, string text);
 
     /// <summary>
     /// Updates the Metadata of a Text by its ID
@@ -44,6 +44,14 @@ public interface IVectorDatabase<TId, TMetadata>
     void UpdateTextMetadata(TId id, TMetadata metadata);
 
     /// <summary>
+    /// Updates a Text by its ID with new text and metadata values
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="text"></param>
+    /// <param name="metadata"></param>
+    void UpdateTextAndMetadata(TId id, string text, TMetadata metadata);
+
+    /// <summary>
     /// Performs a vector search to find the top N most similar texts to the given text
     /// </summary>
     /// <param name="queryText">The query prompt to search by.</param>
@@ -51,5 +59,5 @@ public interface IVectorDatabase<TId, TMetadata>
     /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
     /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
     /// <returns></returns>
-    public IVectorTextResult<TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null);
+    IVectorTextResult<TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null);
 }

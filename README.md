@@ -111,6 +111,10 @@ Here's a screenshot of the test console app running:
 
 ## Change Log
 
+### v0.9.6-beta (not released yet)
+
+- Updated `MemoryDictionaryVectorStore` to use `ConcurrentDictionary<>` instead of `Dictionary<>` so it's thread safe for multi-threaded use.
+
 ### v0.9.5-beta (2024-05-18)
 
 - Add `TextDataLoader` class to provide support for different methods of text chunking when loading documents into the vector database.
