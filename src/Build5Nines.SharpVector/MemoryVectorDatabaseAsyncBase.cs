@@ -192,7 +192,7 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
     /// <returns></returns>
     public async Task<IVectorTextResult<TMetadata>> SearchAsync(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
-        var similarities = (await CalculateVectorComparisonAsync(queryText, threshold));
+        var similarities = await CalculateVectorComparisonAsync(queryText, threshold);
 
         similarities = await _vectorComparer.SortAsync(similarities);
 
@@ -227,11 +227,11 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
         foreach (var kvp in VectorStore)
         {
             var item = kvp.Value;
-            float similarity = await _vectorComparer.CalculateAsync(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
+            float vectorComparisonValue = await _vectorComparer.CalculateAsync(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
 
-            if (_vectorComparer.IsWithinThreshold(threshold, similarity))
+            if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
             {
-                similarities.Add(new VectorTextResultItem<TMetadata>(item, similarity));
+                similarities.Add(new VectorTextResultItem<TMetadata>(item, vectorComparisonValue));
             }
         }
 

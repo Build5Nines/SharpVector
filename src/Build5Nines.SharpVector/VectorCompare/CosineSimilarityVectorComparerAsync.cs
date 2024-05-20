@@ -58,7 +58,7 @@ public class CosineSimilarityVectorComparerAsync : IVectorComparer, IVectorCompa
 
     public IEnumerable<VectorTextResultItem<TMetadata>> Sort<TMetadata>(IEnumerable<VectorTextResultItem<TMetadata>> results)
     {
-        return results.OrderByDescending(s => s.Similarity);
+        return results.OrderByDescending(s => s.VectorComparison);
     }
 
     public async Task<IEnumerable<VectorTextResultItem<TMetadata>>> SortAsync<TMetadata>(IEnumerable<VectorTextResultItem<TMetadata>> results)
@@ -74,6 +74,6 @@ public class CosineSimilarityVectorComparerAsync : IVectorComparer, IVectorCompa
         }
         var thresholdToCompare = threshold ?? (float)0.0f;
         var thresholdIsEqual = Math.Abs(vectorComparisonValue - thresholdToCompare) < 1e-6f; // epsilon;
-        return thresholdIsEqual || vectorComparisonValue >= thresholdToCompare;
+        return thresholdIsEqual || vectorComparisonValue > thresholdToCompare;
     }
 }

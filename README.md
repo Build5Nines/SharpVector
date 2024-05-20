@@ -118,6 +118,7 @@ Here's a screenshot of the test console app running:
 - Refactor `IVectorSimilarityCalculator` to `IVectorComparer` and `CosineVectorSimilarityCalculatorAsync` to `CosineSimilarityVectorComparerAsync`
 - Add new `EuclideanDistanceVectorComparerAsync`
 - Fix `MemoryVectorDatabase` to no longer requird unused `TId` generic type
+- Rename `VectorSimilarity` and `Similarity` properties to `VectorComparison`
 
 ### v0.9.5-beta (2024-05-18)
 

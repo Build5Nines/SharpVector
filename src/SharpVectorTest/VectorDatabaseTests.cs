@@ -24,7 +24,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(1, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.AreEqual("[some metadata here]", results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
 
     [TestMethod]
@@ -40,7 +40,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(1, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.IsNull(results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
 
     [TestMethod]
@@ -56,7 +56,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(1, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.AreEqual(0, results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
 
     [TestMethod]
@@ -72,7 +72,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(1, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.IsNull(results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
 
     [TestMethod]
@@ -88,7 +88,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(1, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.AreEqual(5.0, results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
 
     [TestMethod]
@@ -120,7 +120,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(5, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.AreEqual(5.0, results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
 
     [TestMethod]
@@ -155,7 +155,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(5, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.AreEqual(5.0, results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
 
     [TestMethod]
@@ -209,7 +209,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(5, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.AreEqual(5.0, results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
 
     [TestMethod]
@@ -225,7 +225,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(1, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.AreEqual(0, results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
 
     [TestMethod]
@@ -241,7 +241,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(1, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.IsNull(results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
 
     [TestMethod]
@@ -263,7 +263,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(1, results.Texts.Count());
         Assert.AreEqual(newText, results.Texts.First().Text);
         Assert.AreEqual("6.0", results.Texts.First().Metadata);
-        Assert.AreEqual(0.11704113334417343, results.Texts.First().Similarity);
+        Assert.AreEqual(0.11704113334417343, results.Texts.First().VectorComparison);
     }
 
     [TestMethod]
@@ -279,7 +279,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(1, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.AreEqual(5.0, results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
 
     [TestMethod]
@@ -315,7 +315,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(1, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.AreEqual("{ value: \"JSON Metadata Value\" }", results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
 
     [TestMethod]
@@ -331,7 +331,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(1, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.AreEqual("{ value: \"JSON Metadata Value\" }", results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
 
         vdb.UpdateTextMetadata(id, "{ value: \"New Value\" }");
 
@@ -377,7 +377,7 @@ public class VectorDatabaseTests
         Assert.AreEqual(5, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.StartsWith("The Lion King is a 1994 Disney"));
         Assert.AreEqual(5.0, results.Texts.First().Metadata);
-        Assert.AreEqual(1.1491886377334595, results.Texts.First().Similarity);
+        Assert.AreEqual(1.1491886377334595, results.Texts.First().VectorComparison);
     }
 
     

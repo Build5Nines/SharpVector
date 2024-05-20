@@ -46,6 +46,6 @@ public class TextDataLoaderAsyncTests
         Assert.AreEqual(1, results.Texts.Count());
         Assert.AreEqual("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna. ", results.Texts.First().Text);
         Assert.AreEqual("{ chuckSize: \"133\" }", results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
 }

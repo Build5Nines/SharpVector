@@ -41,7 +41,7 @@ public class EuclideanDistanceVectorComparerAsync : IVectorComparer, IVectorComp
 
     public IEnumerable<VectorTextResultItem<TMetadata>> Sort<TMetadata>(IEnumerable<VectorTextResultItem<TMetadata>> results)
     {
-        return results.OrderBy(s => s.Similarity);
+        return results.OrderBy(s => s.VectorComparison);
     }
 
     public async Task<IEnumerable<VectorTextResultItem<TMetadata>>> SortAsync<TMetadata>(IEnumerable<VectorTextResultItem<TMetadata>> results)
@@ -57,6 +57,6 @@ public class EuclideanDistanceVectorComparerAsync : IVectorComparer, IVectorComp
         }
         var thresholdToCompare = threshold ?? (float)0.0f;
         var thresholdIsEqual = Math.Abs(vectorComparisonValue - thresholdToCompare) < 1e-6f; // epsilon;
-        return thresholdIsEqual || vectorComparisonValue <= thresholdToCompare;
+        return thresholdIsEqual || vectorComparisonValue < thresholdToCompare;
     }
 }

@@ -5,19 +5,19 @@ public interface IVectorTextResultItem<TMetadata>
     string Text{ get; }
     TMetadata? Metadata { get; }
 
-    float Similarity { get; }
+    float VectorComparison { get; }
 }
 
 public class VectorTextResultItem<TMetadata> : IVectorTextResultItem<TMetadata>
 {
     private IVectorTextItem<TMetadata> _item;
-    public VectorTextResultItem(IVectorTextItem<TMetadata> item, float similarity)
+    public VectorTextResultItem(IVectorTextItem<TMetadata> item, float vectorComparison)
     {
         _item = item;
-        Similarity = similarity;
+        VectorComparison = vectorComparison;
     }
     
     public string Text { get => _item.Text; }
     public TMetadata? Metadata { get => _item.Metadata; }
-    public float Similarity { get; private set; }
+    public float VectorComparison { get; private set; }
 }

@@ -195,11 +195,11 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         foreach (var kvp in VectorStore)
         {
             var item = kvp.Value;
-            float similarity = _vectorComparer.Calculate(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
+            float vectorComparisonValue = _vectorComparer.Calculate(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
 
-            if (_vectorComparer.IsWithinThreshold(threshold, similarity))
+            if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
             {
-                similarities.Add(new VectorTextResultItem<TMetadata>(item, similarity));
+                similarities.Add(new VectorTextResultItem<TMetadata>(item, vectorComparisonValue));
             }
         }
 

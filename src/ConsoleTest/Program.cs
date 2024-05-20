@@ -161,7 +161,8 @@ public static class Program
                 // result = await vdb.Search(newPrompt,
                 result = await vdb.SearchAsync(newPrompt,
                     //threshold: 0.001f, // 0.2f, // Cosine Similarity - Only return results with similarity greater than this threshold
-                    threshold: 1.3f, // Euclidean Distance - Only return results with distance less than this threshold
+                    threshold: (float)1.4f, // Euclidean Distance - Only return results with distance less than this threshold
+
                     //pageIndex: 0, // Page index of the search results (default is 0; the first page)
                     pageCount: pageSize // Number of search results per page or max number to return
                     );
@@ -184,7 +185,7 @@ public static class Program
                     foreach (var item in result.Texts)
                     {
                         Console.WriteLine($"Metadata: {item.Metadata}");
-                        Console.WriteLine($"Vector Comparison: {item.Similarity}");
+                        Console.WriteLine($"Vector Comparison: {item.VectorComparison}");
                         Console.WriteLine(item.Text);
                         Console.WriteLine(string.Empty);
                     }
