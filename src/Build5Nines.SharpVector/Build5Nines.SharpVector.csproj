@@ -9,7 +9,7 @@
     <PackageId>Build5Nines.SharpVector</PackageId>
     <PackageProjectUrl>https://github.com/Build5Nines/SharpVector</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Build5Nines/SharpVector</RepositoryUrl>
-    <Version>0.9.6-beta</Version>
+    <Version>0.9.8-beta</Version>
     <Description>Simple In-memory Vector Database for C# Applications</Description>
     <Copyright>Copyright (c) 2024 Build5Nines LLC</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
