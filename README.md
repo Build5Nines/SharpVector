@@ -113,7 +113,9 @@ Here's a screenshot of the test console app running:
 
 ### v0.9.6-beta (not released yet)
 
-- Updated `MemoryDictionaryVectorStore` to use `ConcurrentDictionary<>` instead of `Dictionary<>` so it's thread safe for multi-threaded use.
+- Thread safe updates
+    - Updated `MemoryDictionaryVectorStore` to use `ConcurrentDictionary<>` instead of `Dictionary<>`
+    - Make `NumericIdGenerator<>` thread safe
 
 ### v0.9.5-beta (2024-05-18)
 

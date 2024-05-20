@@ -3,17 +3,38 @@ namespace Build5Nines.SharpVector.Id;
 public class NumericIdGenerator<TId> : IIdGenerator<TId>
     where TId : struct
 {
-    public TId CurrentId { get; set; } = default(TId);
+    private readonly object _lock = new object();
+    private TId _currentId = default(TId);
+
+    public TId CurrentId
+    {
+        get
+        {
+            lock (_lock) {
+                return _currentId;
+            }
+        }
+        set
+        {
+            lock (_lock) {
+                _currentId = value;
+            }
+        }
+    }
 
     public int GetTotalCountGenerated()
     {
-        return Convert.ToInt32(CurrentId);
+        lock (_lock) {
+            return Convert.ToInt32(_currentId);
+        }
     }
 
     public TId NewId() {
-        dynamic current = CurrentId;
-        current++;
-        CurrentId = current;
-        return CurrentId;
+        lock(_lock) {
+            dynamic current = _currentId;
+            current++;
+            _currentId = current;
+            return _currentId;
+        }
     }
 }
