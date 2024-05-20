@@ -1,6 +1,7 @@
 namespace SharpVectorTest.VectorStore;
 
-public static class MemoryDictionaryVectorStoreTests
+[TestClass]
+public class MemoryDictionaryVectorStoreTests
 {
     
 }

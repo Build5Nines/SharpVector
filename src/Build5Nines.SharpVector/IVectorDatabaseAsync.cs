@@ -5,6 +5,14 @@ public interface IVectorDatabaseAsync<TId, TMetadata> : IVectorDatabase<TId, TMe
     where TMetadata : notnull
 {
     /// <summary>
+    /// Adds a new text with Metadata to the database and returns its ID
+    /// </summary>
+    /// <param name="metadata"></param>
+    /// <param name="text"></param>
+    /// <returns></returns>
+    Task<TId> AddTextAsync(string text, TMetadata metadata);
+
+    /// <summary>
     /// Performs an asynchronous search vector search to find the top N most similar texts to the given text
     /// </summary>
     /// <param name="queryText">The query prompt to search by.</param>
