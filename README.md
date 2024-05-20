@@ -13,7 +13,7 @@ The vector algorithm currently used in the `Build5Nines.SharpVector.MemoryVector
 The `Build5Nines.SharpVector` library is available as a Nuget Package to easily include into your .NET projects:
 
 ```bash
-dotnet add package Build5Nines.SharpVector --version 0.9.5-beta
+dotnet add package Build5Nines.SharpVector --version 0.9.8-beta
 ```
 
 You can view it on Nuget.org here: <https://www.nuget.org/packages/Build5Nines.SharpVector/>
