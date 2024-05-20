@@ -3,7 +3,7 @@ namespace Build5Nines.SharpVector;
 public interface IVectorTextResultItem<TMetadata>
 {
     string Text{ get; }
-    TMetadata Metadata { get; }
+    TMetadata? Metadata { get; }
 
     float Similarity { get; }
 }
@@ -18,6 +18,6 @@ public class VectorTextResultItem<TMetadata> : IVectorTextResultItem<TMetadata>
     }
     
     public string Text { get => _item.Text; }
-    public TMetadata Metadata { get => _item.Metadata; }
+    public TMetadata? Metadata { get => _item.Metadata; }
     public float Similarity { get; private set; }
 }

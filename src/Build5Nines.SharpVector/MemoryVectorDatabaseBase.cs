@@ -160,7 +160,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <returns></returns>
     public IVectorTextResult<TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
-        var similarities = CalculateSimilarities(queryText, threshold);
+        var similarities = CalculateVectorComparison(queryText, threshold);
 
         similarities = _vectorComparer.Sort(similarities);
 
@@ -177,7 +177,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         return new VectorTextResult<TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
     }
 
-    private IEnumerable<VectorTextResultItem<TMetadata>> CalculateSimilarities(string queryText, float? threshold = null)
+    private IEnumerable<VectorTextResultItem<TMetadata>> CalculateVectorComparison(string queryText, float? threshold = null)
     {
         var queryTokens = _textPreprocessor.TokenizeAndPreprocess(queryText);
         float[] queryVector = _vectorizer.GenerateVectorFromTokens(VocabularyStore, queryTokens);
@@ -192,22 +192,13 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
         var similarities = new List<VectorTextResultItem<TMetadata>>();
 
-
-        bool includeAll = threshold == null;
-        float thresholdToCompare = threshold ?? (float)0.0f;
-        bool includeSimilarity = true;
-        bool thresholdIsEqual;
         foreach (var kvp in VectorStore)
         {
             var item = kvp.Value;
             float similarity = _vectorComparer.Calculate(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
 
-            if (!includeAll) {
-                thresholdIsEqual = Math.Abs(similarity - thresholdToCompare) < 1e-6f; // epsilon;
-                includeSimilarity = thresholdIsEqual || similarity >= thresholdToCompare;
-            }
-
-            if (includeAll || includeSimilarity) {
+            if (_vectorComparer.IsWithinThreshold(threshold, similarity))
+            {
                 similarities.Add(new VectorTextResultItem<TMetadata>(item, similarity));
             }
         }

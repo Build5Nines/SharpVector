@@ -160,7 +160,8 @@ public static class Program
                 var pageSize = 3;
                 // result = await vdb.Search(newPrompt,
                 result = await vdb.SearchAsync(newPrompt,
-                    //threshold: 0.001f, // 0.2f, // Only return results with similarity greater than this threshold
+                    //threshold: 0.001f, // 0.2f, // Cosine Similarity - Only return results with similarity greater than this threshold
+                    threshold: 1.3f, // Euclidean Distance - Only return results with distance less than this threshold
                     //pageIndex: 0, // Page index of the search results (default is 0; the first page)
                     pageCount: pageSize // Number of search results per page or max number to return
                     );

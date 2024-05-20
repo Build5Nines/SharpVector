@@ -165,7 +165,7 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
     /// <returns></returns>
     public IVectorTextResult<TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
-        var similarities = CalculateSimilaritiesAsync(queryText, threshold).Result;
+        var similarities = CalculateVectorComparisonAsync(queryText, threshold).Result;
         
         similarities = _vectorComparer.Sort(similarities);
 
@@ -192,7 +192,7 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
     /// <returns></returns>
     public async Task<IVectorTextResult<TMetadata>> SearchAsync(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
-        var similarities = (await CalculateSimilaritiesAsync(queryText, threshold));
+        var similarities = (await CalculateVectorComparisonAsync(queryText, threshold));
 
         similarities = await _vectorComparer.SortAsync(similarities);
 
@@ -209,7 +209,7 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
         return new VectorTextResult<TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
     }
 
-    private async Task<IEnumerable<VectorTextResultItem<TMetadata>>> CalculateSimilaritiesAsync(string queryText, float? threshold = null)
+    private async Task<IEnumerable<VectorTextResultItem<TMetadata>>> CalculateVectorComparisonAsync(string queryText, float? threshold = null)
     {
         var queryTokens = _textPreprocessor.TokenizeAndPreprocess(queryText);
         float[] queryVector = _vectorizer.GenerateVectorFromTokens(VocabularyStore, queryTokens);
@@ -224,22 +224,13 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
 
         var similarities = new List<VectorTextResultItem<TMetadata>>();
 
-
-        bool includeAll = threshold == null;
-        float thresholdToCompare = threshold ?? (float)0.0f;
-        bool includeSimilarity = true;
-        bool thresholdIsEqual;
         foreach (var kvp in VectorStore)
         {
             var item = kvp.Value;
             float similarity = await _vectorComparer.CalculateAsync(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
 
-            if (!includeAll) {
-                thresholdIsEqual = Math.Abs(similarity - thresholdToCompare) < 1e-6f; // epsilon;
-                includeSimilarity = thresholdIsEqual || similarity >= thresholdToCompare;
-            }
-
-            if (includeAll || includeSimilarity) {
+            if (_vectorComparer.IsWithinThreshold(threshold, similarity))
+            {
                 similarities.Add(new VectorTextResultItem<TMetadata>(item, similarity));
             }
         }

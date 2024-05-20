@@ -18,4 +18,12 @@ public interface IVectorComparer
     /// <param name="results"></param>
     /// <returns></returns>
     IEnumerable<VectorTextResultItem<TMetadata>> Sort<TMetadata>(IEnumerable<VectorTextResultItem<TMetadata>> results);
+
+    /// <summary>
+    /// Determines if the comparison is within threshold threshold
+    /// </summary>
+    /// <param name="threshold"></param>
+    /// <param name="vectorComparisonValue"></param>
+    /// <returns></returns>
+    bool IsWithinThreshold(float? threshold, float vectorComparisonValue);
 }

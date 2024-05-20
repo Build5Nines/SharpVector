@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Build5Nines.SharpVector.VectorCompare;
 
 public class CosineSimilarityVectorComparerAsync : IVectorComparer, IVectorComparerAsync
@@ -62,5 +64,16 @@ public class CosineSimilarityVectorComparerAsync : IVectorComparer, IVectorCompa
     public async Task<IEnumerable<VectorTextResultItem<TMetadata>>> SortAsync<TMetadata>(IEnumerable<VectorTextResultItem<TMetadata>> results)
     {
         return await Task.Run(() => Sort(results));
+    }
+
+    public bool IsWithinThreshold(float? threshold, float vectorComparisonValue)
+    {
+        if (threshold == null)
+        {
+            return true;
+        }
+        var thresholdToCompare = threshold ?? (float)0.0f;
+        var thresholdIsEqual = Math.Abs(vectorComparisonValue - thresholdToCompare) < 1e-6f; // epsilon;
+        return thresholdIsEqual || vectorComparisonValue >= thresholdToCompare;
     }
 }

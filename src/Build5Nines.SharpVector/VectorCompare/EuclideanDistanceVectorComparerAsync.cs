@@ -48,4 +48,15 @@ public class EuclideanDistanceVectorComparerAsync : IVectorComparer, IVectorComp
     {
         return await Task.Run(() => Sort(results));
     }
+
+    public bool IsWithinThreshold(float? threshold, float vectorComparisonValue)
+    {
+        if (threshold == null)
+        {
+            return true;
+        }
+        var thresholdToCompare = threshold ?? (float)0.0f;
+        var thresholdIsEqual = Math.Abs(vectorComparisonValue - thresholdToCompare) < 1e-6f; // epsilon;
+        return thresholdIsEqual || vectorComparisonValue <= thresholdToCompare;
+    }
 }
