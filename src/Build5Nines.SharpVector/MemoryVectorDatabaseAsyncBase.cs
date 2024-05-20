@@ -2,12 +2,12 @@ using Build5Nines.SharpVector.Id;
 using Build5Nines.SharpVector.Preprocessing;
 using Build5Nines.SharpVector.Vocabulary;
 using Build5Nines.SharpVector.Vectorization;
-using Build5Nines.SharpVector.Similarity;
+using Build5Nines.SharpVector.VectorCompare;
 using Build5Nines.SharpVector.VectorStore;
 
 namespace Build5Nines.SharpVector;
 
-public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore, TVocabularyStore, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorSimilarityCalculator>
+public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore, TVocabularyStore, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorComparer>
     : IVectorDatabaseAsync<TId, TMetadata>
     where TId : notnull
     where TVectorStore : IVectorStoreAsync<TId, TMetadata>
@@ -15,7 +15,7 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
     where TIdGenerator : IIdGenerator<TId>, new()
     where TTextPreprocessor : ITextPreprocessor, new()
     where TVectorizer : IVectorizerAsync<string, int>, new()
-    where TVectorSimilarityCalculator : IVectorSimilarityCalculatorAsync, new()
+    where TVectorComparer : IVectorComparerAsync, new()
 {
     private TIdGenerator _idGenerator;
 
@@ -23,7 +23,7 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
 
     private TVectorizer _vectorizer;
 
-    private TVectorSimilarityCalculator _vectorSimilarityCalculator;
+    private TVectorComparer _vectorComparer;
 
     /// <summary>
     /// The Vector Store used to store the text vectors of the database
@@ -42,7 +42,7 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
         _idGenerator = new TIdGenerator();
         _textPreprocessor = new TTextPreprocessor();
         _vectorizer = new TVectorizer();
-        _vectorSimilarityCalculator = new TVectorSimilarityCalculator();
+        _vectorComparer = new TVectorComparer();
     }
 
     /// <summary>
@@ -51,12 +51,12 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
     /// <param name="metadata"></param>
     /// <param name="text"></param>
     /// <returns></returns>
-    public TId AddText(string text, TMetadata metadata)
+    public TId AddText(string text, TMetadata? metadata = default(TMetadata))
     {
         return AddTextAsync(text, metadata).Result;
     }
 
-    public async Task<TId> AddTextAsync(string text, TMetadata metadata)
+    public async Task<TId> AddTextAsync(string text, TMetadata? metadata = default(TMetadata))
     {
         // Perform preprocessing asynchronously
         var tokens = await _textPreprocessor.TokenizeAndPreprocessAsync(text);
@@ -165,7 +165,9 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
     /// <returns></returns>
     public IVectorTextResult<TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
-        var similarities = CalculateSimilaritiesAsync(queryText, threshold).Result.OrderByDescending(s => s.Similarity);
+        var similarities = CalculateSimilaritiesAsync(queryText, threshold).Result;
+        
+        similarities = _vectorComparer.Sort(similarities);
 
         var totalCountFoundInSearch = similarities.Count();
 
@@ -190,7 +192,9 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
     /// <returns></returns>
     public async Task<IVectorTextResult<TMetadata>> SearchAsync(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
-        var similarities = (await CalculateSimilaritiesAsync(queryText, threshold)).OrderByDescending(s => s.Similarity);
+        var similarities = (await CalculateSimilaritiesAsync(queryText, threshold));
+
+        similarities = await _vectorComparer.SortAsync(similarities);
 
         var totalCountFoundInSearch = similarities.Count();
 
@@ -228,7 +232,7 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
         foreach (var kvp in VectorStore)
         {
             var item = kvp.Value;
-            float similarity = await _vectorSimilarityCalculator.CalculateVectorSimilarityAsync(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
+            float similarity = await _vectorComparer.CalculateAsync(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
 
             if (!includeAll) {
                 thresholdIsEqual = Math.Abs(similarity - thresholdToCompare) < 1e-6f; // epsilon;

@@ -114,6 +114,10 @@ Here's a screenshot of the test console app running:
 ### v0.9.6-beta (not released yet)
 
 - Added `Async` version of classes to support multi-threading
+- Metadata is no longer required when calling `.AddText()` and `.AddTextAsync()`
+- Refactor `IVectorSimilarityCalculator` to `IVectorComparer` and `CosineVectorSimilarityCalculatorAsync` to `CosineSimilarityVectorComparerAsync`
+- Add new `EuclideanDistanceVectorComparerAsync`
+- Fix `MemoryVectorDatabase` to no longer requird unused `TId` generic type
 
 ### v0.9.5-beta (2024-05-18)
 

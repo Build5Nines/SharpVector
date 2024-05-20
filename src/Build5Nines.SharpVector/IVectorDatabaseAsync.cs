@@ -2,7 +2,6 @@ namespace Build5Nines.SharpVector;
 
 public interface IVectorDatabaseAsync<TId, TMetadata> : IVectorDatabase<TId, TMetadata>
     where TId : notnull
-    where TMetadata : notnull
 {
     /// <summary>
     /// Adds a new text with Metadata to the database and returns its ID
@@ -10,7 +9,7 @@ public interface IVectorDatabaseAsync<TId, TMetadata> : IVectorDatabase<TId, TMe
     /// <param name="metadata"></param>
     /// <param name="text"></param>
     /// <returns></returns>
-    Task<TId> AddTextAsync(string text, TMetadata metadata);
+    Task<TId> AddTextAsync(string text, TMetadata? metadata = default(TMetadata));
 
     /// <summary>
     /// Performs an asynchronous search vector search to find the top N most similar texts to the given text

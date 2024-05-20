@@ -2,7 +2,6 @@ namespace Build5Nines.SharpVector;
 
 public interface IVectorDatabase<TId, TMetadata>
     where TId : notnull
-    where TMetadata : notnull
 {
     /// <summary>
     /// Adds a new text with Metadata to the database and returns its ID
@@ -10,7 +9,7 @@ public interface IVectorDatabase<TId, TMetadata>
     /// <param name="metadata"></param>
     /// <param name="text"></param>
     /// <returns></returns>
-    TId AddText(string text, TMetadata metadata);
+    TId AddText(string text, TMetadata? metadata = default(TMetadata));
 
     /// <summary>
     /// Retrieves a Text by its ID

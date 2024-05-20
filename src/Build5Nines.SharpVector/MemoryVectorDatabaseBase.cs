@@ -2,19 +2,20 @@ using Build5Nines.SharpVector.Id;
 using Build5Nines.SharpVector.Preprocessing;
 using Build5Nines.SharpVector.Vocabulary;
 using Build5Nines.SharpVector.Vectorization;
-using Build5Nines.SharpVector.Similarity;
+using Build5Nines.SharpVector.VectorCompare;
 using Build5Nines.SharpVector.VectorStore;
 
 namespace Build5Nines.SharpVector;
 
-public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabularyStore, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorSimilarityCalculator> : IVectorDatabase<TId, TMetadata>
+public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabularyStore, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorComparer>
+    : IVectorDatabase<TId, TMetadata>
     where TId : notnull
     where TVectorStore : IVectorStore<TId, TMetadata>
     where TVocabularyStore : IVocabularyStore<string, int>
     where TIdGenerator : IIdGenerator<TId>, new()
     where TTextPreprocessor : ITextPreprocessor, new()
     where TVectorizer : IVectorizer<string, int>, new()
-    where TVectorSimilarityCalculator : IVectorSimilarityCalculator, new()
+    where TVectorComparer : IVectorComparer, new()
 {
     private TIdGenerator _idGenerator;
 
@@ -22,7 +23,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
     private TVectorizer _vectorizer;
 
-    private TVectorSimilarityCalculator _vectorSimilarityCalculator;
+    private TVectorComparer _vectorComparer;
 
     /// <summary>
     /// The Vector Store used to store the text vectors of the database
@@ -41,7 +42,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         _idGenerator = new TIdGenerator();
         _textPreprocessor = new TTextPreprocessor();
         _vectorizer = new TVectorizer();
-        _vectorSimilarityCalculator = new TVectorSimilarityCalculator();
+        _vectorComparer = new TVectorComparer();
     }
 
     /// <summary>
@@ -50,7 +51,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="metadata"></param>
     /// <param name="text"></param>
     /// <returns></returns>
-    public TId AddText(string text, TMetadata metadata)
+    public TId AddText(string text, TMetadata? metadata = default(TMetadata))
     {
         // Perform preprocessing asynchronously
         var tokens = _textPreprocessor.TokenizeAndPreprocess(text);
@@ -159,7 +160,9 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <returns></returns>
     public IVectorTextResult<TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
-        var similarities = CalculateSimilarities(queryText, threshold).OrderByDescending(s => s.Similarity);
+        var similarities = CalculateSimilarities(queryText, threshold);
+
+        similarities = _vectorComparer.Sort(similarities);
 
         var totalCountFoundInSearch = similarities.Count();
 
@@ -197,7 +200,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         foreach (var kvp in VectorStore)
         {
             var item = kvp.Value;
-            float similarity = _vectorSimilarityCalculator.CalculateVectorSimilarity(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
+            float similarity = _vectorComparer.Calculate(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
 
             if (!includeAll) {
                 thresholdIsEqual = Math.Abs(similarity - thresholdToCompare) < 1e-6f; // epsilon;
