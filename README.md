@@ -1,12 +1,20 @@
 # Build5Nines SharpVector - a lightweight, in-memory Vector Database for any C# / .NET Applications
 
+`Build5Nines.SharpVector` is an in-memory vector database library designed for .NET applications. It allows you to store, search, and manage text data using vector representations. The library is customizable and extensible, enabling support for different vector comparison methods, preprocessing techniques, and vectorization strategies.
+
 Vector databases are used with Generative AI solutions augmenting the LLM (Large Language Model) with the ability to load additional context data with the AI prompt using the RAG (Retrieval-Augmented Generation) design pattern.
 
 While there are lots of large databases that can be used to build Vector Databases (like Azure CosmosDB, PostgreSQL w/ pgvector, Azure AI Search, Elasticsearch, and more), there are not many options for a lightweight vector database that can be embedded into any .NET application.
 
 The Build5Nines SharpVector project provides a lightweight in-memory Vector Database for use in any .NET application.
 
-The vector algorithm currently used in the `Build5Nines.SharpVector.MemoryVectorDatabase` class is based on TF-IDF (Term Frequency-Inverse Document Frequency) combined with cosine similarity for searching similar texts.
+## Key Features
+
+- **In-Memory Database**: Lightweight vector database that can be embedded within any .NET application.
+- **Vector Comparisons**: Supports various vector comparison methods for searching similar texts.
+    - Including cosine similarity (by default), and configurable for Euclidean distance. Or write your own custom vector comparison algorithm.
+- **Custom Metadata**: Store additional metadata with each text entry stored in the vector database.
+- **Supports async/await**: Async methods for scalable and non-blocking database operations.
 
 ## Nuget Package
 
