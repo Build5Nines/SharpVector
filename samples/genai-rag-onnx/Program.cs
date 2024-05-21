@@ -1,7 +1,9 @@
 ﻿using System;
 using Build5Nines.SharpVector;
+using Build5Nines.SharpVector.Data;
 using Microsoft.ML.OnnxRuntimeGenAI;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 // Sample: GenAI RAG (Retrieval Augmented Generation) with ONNX Model
 //
@@ -20,23 +22,27 @@ using System.Threading.Tasks;
 // Step 2: Download text files and place them in a directory.
 // Then set the 'ragFilesDirectoryPath' variable to the path of the directory.
 //
+// Example: git clone "https://github.com/hashicorp/terraform-docs-common.git" "C:/tfdocs"
+//
+//
 // Step 3: Run the code and type a prompt to get a response from the
 // AI assitant using RAG and the ONNX model.
 //
 
 class Program
 {
-    // The path to the directory containing the text files to load into the Vector Database
-    private string ragFilesDirectoryPath = @"C:\YourDirectoryPath";
-
-    // The absolute path to the folder where the Phi-3 model is stored (folder to the ".onnx" file)
-    private string modelPath = $"C:\\onnx\\cpu_and_mobile\\cpu-int4-rtn-block-32";
-
-    // System prompt will be used to instruct the AI how to response to the user prompt
-    private string systemPrompt = "You are a knowledgeable and friendly assistant made by Build5Nines named Jarvis. Answer the following question as clearly and concisely as possible, providing any relevant information and examples.";
-
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
+        // The path to the directory containing the text files to load into the Vector Database
+        var ragFilesDirectoryPath = "C:\\tfdocs";
+
+        // The absolute path to the folder where the Phi-3 model is stored (folder to the ".onnx" file)
+        var modelPath = "C:\\Users\\chris\\Desktop\\csharp-onnx-phi3mini\\onnx2\\cpu_and_mobile\\cpu-int4-rtn-block-32";
+
+        // System prompt will be used to instruct the AI how to response to the user prompt
+        var systemPrompt = "You are a knowledgeable and friendly assistant made by Build5Nines named Jarvis. Answer the following question as clearly and concisely as possible, providing any relevant information and examples.";
+
+
         // ************************************************************************************************
         // CREATE AND LOAD VECTOR DATABASE
         // ************************************************************************************************
@@ -45,31 +51,41 @@ class Program
         var vectorDatabase = new BasicMemoryVectorDatabaseAsync();
 
         // Timer for measuring the time it takes to load the database
-        var timer = new System.Diagnostics.Stopwatch();
-        timer.Start();
+        var loadVectorTimer = new System.Diagnostics.Stopwatch();
+        loadVectorTimer.Start();
 
         // Load Vector Database from files
-        // Get the names of all the files in the directory
-        string[] files = Directory.GetFiles(ragFilesDirectoryPath);
+        // Get the names of all the files in the directory and it's sub-directories
+        var files = Directory.GetFiles(ragFilesDirectoryPath, "*.*", SearchOption.AllDirectories);
+        // only read in Text and Markdown files
+        files = files.Where(f => f.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".md", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".mdx", StringComparison.OrdinalIgnoreCase)).ToArray();
+
         // Loop through the file names and load the database asynchronously
-        Parallels.ForEach(files, async file =>
+
+        var vectorDataLoader = new TextDataLoaderAsync<int, string>(vectorDatabase);
+        Parallel.ForEach(files, async file =>
         {
-            var filename = Path.GetFileName(file);
-            // Load the file into the database
-            await vectorDatabase.AddDocumentAsync(File.ReadAllText(filename), new TextChunkingOptions<string>
+            Console.WriteLine($"Loading {file}");
+            if (File.Exists(file))
             {
-                Method = TextChunkingMethod.Paragraph,
-                // Set the metadata to the file name
-                RetrieveMetadata = (chunk) => filename
-            });
+                // Load the file into the database
+                var fileContents = File.ReadAllText(file);
+                await vectorDataLoader.AddDocumentAsync(fileContents, new TextChunkingOptions<string>
+                {
+                    Method = TextChunkingMethod.Paragraph,
+                    // Set the metadata to the file name
+                    RetrieveMetadata = (chunk) => file
+                });
+            }
         });
 
         // Stop the timer and print the time it took to load the database
-        timer.Stop();
-        Console.WriteLine($"Loaded {files.Length} documents in {timer.ElapsedMilliseconds} ms");
+        loadVectorTimer.Stop();
+        Console.WriteLine($"Loaded {files.Length} documents in {loadVectorTimer.ElapsedMilliseconds} ms");
 
 
 
+        Console.WriteLine("Loading AI model...");
 
         // Create a new Model object from the ONNX model file
         var model = new Model(modelPath);
@@ -81,23 +97,30 @@ class Program
             Console.Write("Type Prompt then Press [Enter] or CTRL-C to Exit: ");
             var userPrompt = Console.ReadLine();
             
-            // show in console that the assistant is responding
-            Console.WriteLine("");
-            Console.Write("Assistant: ");
-
         
             // ************************************************************************************************
             // RETRIEVAL AUGMENTED GENERATION (RAG) PART
             // ************************************************************************************************
             // DO THE VECTOR SEARCH TO LOAD ADDITIONAL CONTEXT
 
+            Console.WriteLine("Searching Vector Database...");
+
+
+            // Timer for measuring the time it takes to search the vector database
+            var searchVectorTimer = new System.Diagnostics.Stopwatch();
+            searchVectorTimer.Start();
+
             // Search the Vector Database for the user prompt
             // To get the most relevant results
-            var vectorDataResults = await vectorDatabase.Search(
+            var vectorDataResults = await vectorDatabase.SearchAsync(
                 userPrompt,     // User Prompt
-                pageCount: 2,  // Number of results to return
+                pageCount: 8,  // Number of results to return
                 threshold: 0.3f // Threshold for the vector comparison
                 );
+
+            // Stop the timer and print the time it took to load the database
+            searchVectorTimer.Stop();
+            Console.WriteLine($"Vector search took {searchVectorTimer.ElapsedMilliseconds} ms");
 
             // Loop through the vector search results and print them
             var ragContext = string.Empty;
@@ -109,7 +132,7 @@ class Program
                 // Print the metadata, vector comparison, and text of the result to the console
                 Console.WriteLine($"Document: {result.Metadata}");
                 Console.WriteLine($"Vector Comparison: {result.VectorComparison}");
-                Console.WriteLine($"Text: {result.Text}");
+                Console.WriteLine($"Text Chunk Length: {result.Text.Length}");
                 Console.WriteLine("");
             }
             Console.WriteLine("");
@@ -119,7 +142,17 @@ class Program
             // ************************************************************************************************
 
             // Build the Prompt
-            // Single User Prompt with System Prompt and RAG Context
+            var maxPromptLength = 4096; /// max_length - context length configured for the model
+
+            // Make sure RAG Context isn't too long (truncate it)
+            var maxAllowedContextLength = maxPromptLength - systemPrompt.Length - userPrompt.Length - 46; // the last number factors in the chat prompt format used
+            if (ragContext.Length > maxAllowedContextLength)
+            {
+                Console.WriteLine("RAG Context too long, truncating it...");
+                ragContext = ragContext.Substring(0, maxAllowedContextLength);
+            }
+
+            // Chat format - Single User Prompt with System Prompt and RAG Context
             var fullPrompt = $"<|system|>{systemPrompt}<|end|><|user|>{ragContext}\n\n{userPrompt}<|end|><|assistant|>";
 
             // Tokenize the prompt
@@ -127,23 +160,33 @@ class Program
             
             // Set generator params
             var generatorParams = new GeneratorParams(model);
-            generatorParams.SetSearchOption("max_length", 2048);
+            generatorParams.SetSearchOption("max_length", maxPromptLength);
             generatorParams.SetSearchOption("past_present_share_buffer", false);
             generatorParams.SetInputSequences(tokens);
 
             // Generate the response
+            Console.WriteLine("AI is thinking...");
             var generator = new Generator(model, generatorParams);
-            Console.WriteLine("Generative AI Response:");
+
+            // show in console that the assistant is responding
+            Console.WriteLine("");
+            Console.Write("Assistant: ");         
+
             // Output response as each token in generated
             while (!generator.IsDone()) {
                 generator.ComputeLogits();
                 generator.GenerateNextToken();
-                var outputTokens = generator.GetSequence(0);
-                var newToken = outputTokens.Slice(outputTokens.Length - 1, 1);
-                var output = tokenizer.Decode(newToken);
+                var output = GetOutputTokens(generator, tokenizer);
                 Console.Write(output);
             }
             Console.WriteLine();
-        }
+        }  
+    }
+
+    private static string GetOutputTokens(Generator generator, Tokenizer tokenizer)
+    {
+        var outputTokens = generator.GetSequence(0);
+        var newToken = outputTokens.Slice(outputTokens.Length - 1, 1);
+        return tokenizer.Decode(newToken);
     }
 }
