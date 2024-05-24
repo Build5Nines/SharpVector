@@ -35,6 +35,15 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     }
 
     /// <summary>
+    /// Gets all the Ids for every text.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<TId> GetIds()
+    {
+        return _database.Keys;
+    }
+
+    /// <summary>
     /// Retrieves a text and metadata by its ID asynchronously
     /// </summary>
     /// <param name="id"></param>
@@ -64,13 +73,17 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     /// Deletes a text by its ID
     /// </summary>
     /// <param name="id"></param>
+    /// <returns>The removed text item</returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    public void Delete(TId id)
+    public IVectorTextItem<TMetadata> Delete(TId id)
     {
         if (_database.ContainsKey(id))
         {
             IVectorTextItem<TMetadata>? itemRemoved;
             _database.Remove(id, out itemRemoved);
+#pragma warning disable CS8603 // Possible null reference return.
+            return itemRemoved;
+#pragma warning restore CS8603 // Possible null reference return.
         }
         else
         {

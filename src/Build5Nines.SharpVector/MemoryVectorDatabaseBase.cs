@@ -47,6 +47,15 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     }
 
     /// <summary>
+    /// Get all the Ids for each text the database.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<TId> GetIds()
+    {
+        return VectorStore.GetIds();
+    }
+
+    /// <summary>
     /// Adds a new text with Metadata to the database and returns its ID
     /// </summary>
     /// <param name="metadata"></param>
@@ -97,9 +106,9 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// </summary>
     /// <param name="id"></param>
     /// <exception cref="KeyNotFoundException"></exception>
-    public void DeleteText(TId id)
+    public IVectorTextItem<TMetadata> DeleteText(TId id)
     {
-        VectorStore.Delete(id);
+        return VectorStore.Delete(id);
     }
 
     /// <summary>

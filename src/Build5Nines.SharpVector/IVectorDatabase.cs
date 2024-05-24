@@ -18,6 +18,12 @@ public interface IVectorDatabase<TId, TMetadata>
     /// <param name="text"></param>
     /// <returns></returns>
     Task<TId> AddTextAsync(string text, TMetadata? metadata = default(TMetadata));
+    
+    /// <summary>
+    /// Get all the Ids for each text the database.
+    /// </summary>
+    /// <returns></returns>
+    IEnumerable<TId> GetIds();
 
     /// <summary>
     /// Retrieves a Text by its ID
@@ -32,7 +38,7 @@ public interface IVectorDatabase<TId, TMetadata>
     /// </summary>
     /// <param name="id"></param>
     /// <exception cref="KeyNotFoundException"></exception>
-    void DeleteText(TId id);
+    IVectorTextItem<TMetadata> DeleteText(TId id);
 
     /// <summary>
     /// Updates a Text by its ID

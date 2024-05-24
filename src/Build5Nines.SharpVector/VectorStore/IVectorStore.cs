@@ -17,6 +17,12 @@ public interface IVectorStore<TId, TMetadata>
     IVectorTextItem<TMetadata> Get(TId id);
 
     /// <summary>
+    /// Gets all the Ids for every text.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<TId> GetIds();
+
+    /// <summary>
     /// Retrieves a text and metadata by its ID
     /// </summary>
     /// <param name="id"></param>
@@ -36,8 +42,9 @@ public interface IVectorStore<TId, TMetadata>
     /// Deletes a text by its ID
     /// </summary>
     /// <param name="id"></param>
+    /// <returns>The removed text item</returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    void Delete(TId id);
+    IVectorTextItem<TMetadata> Delete(TId id);
 
     /// <summary>
     /// Checks if the database contains a key
