@@ -48,7 +48,7 @@ class Program
         // ************************************************************************************************
 
         // Create a new BasicMemoryVectorDatabase to store the text vectors
-        var vectorDatabase = new BasicMemoryVectorDatabaseAsync();
+        var vectorDatabase = new BasicMemoryVectorDatabase();
 
         // Timer for measuring the time it takes to load the database
         var loadVectorTimer = new System.Diagnostics.Stopwatch();
@@ -62,7 +62,7 @@ class Program
 
         // Loop through the file names and load the database asynchronously
 
-        var vectorDataLoader = new TextDataLoaderAsync<int, string>(vectorDatabase);
+        var vectorDataLoader = new TextDataLoader<int, string>(vectorDatabase);
         Parallel.ForEach(files, async file =>
         {
             Console.WriteLine($"Loading {file}");
