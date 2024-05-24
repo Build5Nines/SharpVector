@@ -126,7 +126,7 @@ public class VectorDatabaseTests
     [TestMethod]
     public async Task SimpleTest_Async_01()
     {
-        var vdb = new MemoryVectorDatabaseAsync<double>();
+        var vdb = new MemoryVectorDatabase<double>();
         
         // // Load Vector Database with some sample text
         var tasks = new Task[17];
@@ -161,7 +161,7 @@ public class VectorDatabaseTests
     [TestMethod]
     public async Task SimpleTest_Async_02()
     {
-        var vdb = new MemoryVectorDatabaseAsync<double>();
+        var vdb = new MemoryVectorDatabase<double>();
         
         // // Load Vector Database with some sample text
         var textTasks = new Task[17];
@@ -215,7 +215,7 @@ public class VectorDatabaseTests
     [TestMethod]
     public async Task SimpleTest_Async_03()
     {
-        var vdb = new MemoryVectorDatabaseAsync<double>();
+        var vdb = new MemoryVectorDatabase<double>();
         
         // // Load Vector Database with some sample text
         await vdb.AddTextAsync("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.");
@@ -231,7 +231,7 @@ public class VectorDatabaseTests
     [TestMethod]
     public async Task SimpleTest_Async_04()
     {
-        var vdb = new MemoryVectorDatabaseAsync<double?>();
+        var vdb = new MemoryVectorDatabase<double?>();
         
         // // Load Vector Database with some sample text
         await vdb.AddTextAsync("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.");
@@ -393,7 +393,7 @@ public class EuclideanDistanceVectorComparerAsyncMemoryVectorDatabase<TMetadata>
         IntIdGenerator,
         BasicTextPreprocessor,
         BagOfWordsVectorizer<string, int>,
-        EuclideanDistanceVectorComparerAsync
+        EuclideanDistanceVectorComparer
         >
 {
     public EuclideanDistanceVectorComparerAsyncMemoryVectorDatabase()

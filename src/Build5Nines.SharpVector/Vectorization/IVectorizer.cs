@@ -20,6 +20,14 @@ public interface IVectorizer<TVocabularyKey, TVocabularyValue>
     float[] GenerateVectorFromTokens(IVocabularyStore<TVocabularyKey, TVocabularyValue> vocabularyStore, IEnumerable<TVocabularyKey> tokens);
 
     /// <summary>
+    /// Generates vectors from tokens using the vocabulary asynchronously.
+    /// </summary>
+    /// <param name="vocabularyStore"></param>
+    /// <param name="tokens"></param>
+    /// <returns></returns>
+    Task<float[]> GenerateVectorFromTokensAsync(IVocabularyStore<TVocabularyKey, TVocabularyValue> vocabularyStore, IEnumerable<TVocabularyKey> tokens);
+
+    /// <summary>
     /// Method to normalize vectors to a specific length by padding or truncating
     /// </summary>
     /// <param name="vector"></param>

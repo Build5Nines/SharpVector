@@ -21,7 +21,7 @@ The Build5Nines SharpVector project provides a lightweight in-memory Vector Data
 The `Build5Nines.SharpVector` library is available as a Nuget Package to easily include into your .NET projects:
 
 ```bash
-dotnet add package Build5Nines.SharpVector --version 0.9.8-beta
+dotnet add package Build5Nines.SharpVector
 ```
 
 You can view it on Nuget.org here: <https://www.nuget.org/packages/Build5Nines.SharpVector/>
@@ -119,6 +119,12 @@ Here's a screenshot of the test console app running:
 
 ## Change Log
 
+### v1.0.0 (2024-05-24)
+
+- Simplify object model by combining Async and non-Async classes, `BasicMemoryVectorDatabase` now support both synchronous and asynchronous operations.
+- Refactored to remove unnecessary classes where the `Async` versions will work just fine.
+- Improve async/await and multi-threading use
+
 ### v0.9.8-beta (2024-05-20)
 
 - Added `Async` version of classes to support multi-threading
@@ -142,7 +148,7 @@ Here's a screenshot of the test console app running:
 
 ### v0.8.0-beta (2024-05-17)
 
-- Initial release
+- Initial release - let's do this!
 
 ## Maintained By
 

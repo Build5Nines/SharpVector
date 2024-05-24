@@ -9,7 +9,7 @@ public class TextDataLoaderAsyncTests
     [TestMethod]
     public async Task TextDataLoaderAsync_Paragraphs_01()
     {
-        var vdb = new BasicMemoryVectorDatabaseAsync();
+        var vdb = new BasicMemoryVectorDatabase();
         
         // // Load Vector Database with some sample text
         var document = "The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna. \n\n" +
@@ -31,7 +31,7 @@ public class TextDataLoaderAsyncTests
         "Iron Man 2 is a 2010 action-adventure fantasy film about Tony Stark (Robert Downey Jr.), a billionaire inventor and superhero who must deal with declining health, government pressure, and a vengeful enemy. \n\n" +
         "";
 
-        var loader = new TextDataLoaderAsync<int, string>(vdb);
+        var loader = new TextDataLoader<int, string>(vdb);
         await loader.AddDocumentAsync(document, new TextChunkingOptions<string>
         {
             Method = TextChunkingMethod.Paragraph,

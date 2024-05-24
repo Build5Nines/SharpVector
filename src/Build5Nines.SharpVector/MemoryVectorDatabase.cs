@@ -21,7 +21,7 @@ public class MemoryVectorDatabase<TMetadata>
         IntIdGenerator,
         BasicTextPreprocessor,
         BagOfWordsVectorizer<string, int>,
-        CosineSimilarityVectorComparerAsync
+        CosineSimilarityVectorComparer
         >
 {
     public MemoryVectorDatabase()

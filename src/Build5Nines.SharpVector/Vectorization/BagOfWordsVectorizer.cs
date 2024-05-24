@@ -11,6 +11,11 @@ public class BagOfWordsVectorizer<TVocabularyKey, TVocabularyValue> : IVectorize
     where TVocabularyKey : notnull
     where TVocabularyValue : notnull
 {
+    public async Task<float[]> GenerateVectorFromTokensAsync(IVocabularyStore<TVocabularyKey, TVocabularyValue> vocabularyStore, IEnumerable<TVocabularyKey> tokens)
+    {
+        return await Task.Run(() => GenerateVectorFromTokens(vocabularyStore, tokens));
+    }
+
     /// <summary>
     /// Generates vectors from tokens using the vocabulary.
     /// </summary>

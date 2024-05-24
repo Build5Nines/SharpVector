@@ -61,11 +61,36 @@ public class TextDataLoader<TId, TMetadata>
         var words = text.Split(' ');
         var chunks = new List<string>();
 
+        const string space = " ";
         for (int i = 0; i < words.Length; i += chunkSize)
         {
-            chunks.Add(string.Join(" ", words.Skip(i).Take(chunkSize)));
+            chunks.Add(string.Join(space, words.Skip(i).Take(chunkSize)));
         }
 
         return chunks;
+    }
+
+    public async Task<IEnumerable<TId>> AddDocumentAsync(string document, TextChunkingOptions<TMetadata> chunkingOptions)
+    {
+        if (chunkingOptions.RetrieveMetadata == null)
+            throw new ValidationException("TextChunkingOptions.RetrieveMetadata must be set");
+
+        var chunks = await ChunkTextAsync(document, chunkingOptions);
+        var ids = new List<TId>();
+        object _lock = new object();
+        await Parallel.ForEachAsync(chunks, async (chunk, cancellationToken) =>
+        {
+            var id = await VectorDatabase.AddTextAsync(chunk, chunkingOptions.RetrieveMetadata.Invoke(chunk));
+            lock (_lock) {
+                ids.Add(id);
+            }
+        });
+
+        return ids;
+    }
+
+    private async Task<List<string>> ChunkTextAsync(string text, TextChunkingOptions<TMetadata> chunkingOptions)
+    {
+        return await Task.Run(() => ChunkText(text, chunkingOptions));
     }
 }

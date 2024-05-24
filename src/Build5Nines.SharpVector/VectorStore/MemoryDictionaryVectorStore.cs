@@ -1,17 +1,18 @@
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace Build5Nines.SharpVector.VectorStore;
 
 /// <summary>
-/// A simple in-memory database for storing and querying vectorized text items.
+/// A thread safe simple in-memory database for storing and querying vectorized text items.
 /// </summary>
 /// <typeparam name="TId"></typeparam>
 /// <typeparam name="TMetadata"></typeparam>
 public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMetadata>
     where TId : notnull
 {
-    private Dictionary<TId, IVectorTextItem<TMetadata>> _database;
+    private ConcurrentDictionary<TId, IVectorTextItem<TMetadata>> _database;
 
     /// <summary>
     /// The number of items in the database
@@ -19,7 +20,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     public int Count => _database.Count;
 
     public MemoryDictionaryVectorStore() {
-        _database = new Dictionary<TId, IVectorTextItem<TMetadata>>();
+        _database = new ConcurrentDictionary<TId, IVectorTextItem<TMetadata>>();
     }
 
     /// <summary>
@@ -30,7 +31,16 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     /// <exception cref="KeyNotFoundException"></exception>
     public void Set(TId id, IVectorTextItem<TMetadata> item)
     {
-        _database[id] = item;
+        _database.AddOrUpdate(id, item, (key, oldValue) => item);
+    }
+
+    /// <summary>
+    /// Gets all the Ids for every text.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<TId> GetIds()
+    {
+        return _database.Keys;
     }
 
     /// <summary>
@@ -63,13 +73,17 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     /// Deletes a text by its ID
     /// </summary>
     /// <param name="id"></param>
+    /// <returns>The removed text item</returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    public void Delete(TId id)
+    public IVectorTextItem<TMetadata> Delete(TId id)
     {
         if (_database.ContainsKey(id))
         {
-            IVectorTextItem<TMetadata> itemRemoved;
+            IVectorTextItem<TMetadata>? itemRemoved;
             _database.Remove(id, out itemRemoved);
+#pragma warning disable CS8603 // Possible null reference return.
+            return itemRemoved;
+#pragma warning restore CS8603 // Possible null reference return.
         }
         else
         {
@@ -95,5 +109,15 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
     {
         return _database.GetEnumerator();
+    }
+
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+    public async IAsyncEnumerator<KeyValuePair<TId, IVectorTextItem<TMetadata>>> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+    {
+        foreach (var item in _database)
+        {
+            yield return item;
+        }
     }
 }
