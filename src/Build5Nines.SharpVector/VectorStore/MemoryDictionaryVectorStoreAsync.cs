@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace Build5Nines.SharpVector.VectorStore;
 
@@ -68,7 +69,7 @@ public class MemoryDictionaryVectorStoreAsync<TId, TMetadata> : IVectorStoreAsyn
     {
         if (_database.ContainsKey(id))
         {
-            IVectorTextItem<TMetadata> itemRemoved;
+            IVectorTextItem<TMetadata>? itemRemoved;
             _database.Remove(id, out itemRemoved);
         }
         else
@@ -95,5 +96,15 @@ public class MemoryDictionaryVectorStoreAsync<TId, TMetadata> : IVectorStoreAsyn
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
     {
         return _database.GetEnumerator();
+    }
+
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+    public async IAsyncEnumerator<KeyValuePair<TId, IVectorTextItem<TMetadata>>> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+    {
+        foreach (var item in _database)
+        {
+            yield return item;
+        }
     }
 }

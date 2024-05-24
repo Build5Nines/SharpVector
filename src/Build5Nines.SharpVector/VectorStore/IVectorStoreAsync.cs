@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace Build5Nines.SharpVector.VectorStore;
 
-public interface IVectorStoreAsync<TId, TMetadata> : IVectorStore<TId, TMetadata> //IEnumerable<KeyValuePair<TId, IVectorTextItem<TMetadata>>>, IEnumerable, IReadOnlyCollection<KeyValuePair<TId, IVectorTextItem<TMetadata>>>
+public interface IVectorStoreAsync<TId, TMetadata> : IVectorStore<TId, TMetadata>, IAsyncEnumerable<KeyValuePair<TId, IVectorTextItem<TMetadata>>>
 {
     /// <summary>
     /// Retrieves a text and metadata by its ID asynchronously

@@ -1,13 +1,14 @@
 namespace Build5Nines.SharpVector.Data;
 
 public class TextChunkingOptions<TMetadata>
-    where TMetadata : notnull
 {
     public TextChunkingOptions()
     {
         Method = TextChunkingMethod.Paragraph;
         ChunkSize = 100;
+#pragma warning disable CS8603 // Possible null reference return.
         RetrieveMetadata = (chunk) => default;
+#pragma warning restore CS8603 // Possible null reference return.
     }
 
     /// <summary>

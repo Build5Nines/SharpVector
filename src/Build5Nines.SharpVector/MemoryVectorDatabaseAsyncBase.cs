@@ -4,6 +4,7 @@ using Build5Nines.SharpVector.Vocabulary;
 using Build5Nines.SharpVector.Vectorization;
 using Build5Nines.SharpVector.VectorCompare;
 using Build5Nines.SharpVector.VectorStore;
+using System.Collections.Concurrent;
 
 namespace Build5Nines.SharpVector;
 
@@ -165,21 +166,7 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
     /// <returns></returns>
     public IVectorTextResult<TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
-        var similarities = CalculateVectorComparisonAsync(queryText, threshold).Result;
-        
-        similarities = _vectorComparer.Sort(similarities);
-
-        var totalCountFoundInSearch = similarities.Count();
-
-        IEnumerable<VectorTextResultItem<TMetadata>> resultsToReturn;
-        if (pageCount != null && pageCount >= 0 && pageIndex >= 0) {
-            resultsToReturn = similarities.Skip(pageIndex * pageCount.Value).Take(pageCount.Value);
-        } else {
-            // no paging specified, return all results
-            resultsToReturn = similarities;
-        }
-
-        return new VectorTextResult<TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
+        return SearchAsync(queryText, threshold, pageIndex, pageCount).Result;
     }
 
     /// <summary>
@@ -222,19 +209,17 @@ public abstract class MemoryVectorDatabaseAsyncBase<TId, TMetadata, TVectorStore
             throw new InvalidOperationException("The database is empty.");
         }
 
-        var similarities = new List<VectorTextResultItem<TMetadata>>();
-
-        foreach (var kvp in VectorStore)
+        var results = new ConcurrentBag<VectorTextResultItem<TMetadata>>();
+        await foreach (var kvp in VectorStore)
         {
             var item = kvp.Value;
             float vectorComparisonValue = await _vectorComparer.CalculateAsync(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
 
             if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
             {
-                similarities.Add(new VectorTextResultItem<TMetadata>(item, vectorComparisonValue));
+                results.Add(new VectorTextResultItem<TMetadata>(item, vectorComparisonValue));
             }
         }
-
-        return similarities;
+        return results;
     }
 }
