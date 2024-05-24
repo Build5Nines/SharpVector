@@ -1,6 +1,6 @@
 namespace Build5Nines.SharpVector.VectorCompare;
 
-public class EuclideanDistanceVectorComparerAsync : IVectorComparer, IVectorComparerAsync
+public class EuclideanDistanceVectorComparer : IVectorComparer
 {
     /// <summary>
     /// Calculates the Euclidean distance between two vectors.

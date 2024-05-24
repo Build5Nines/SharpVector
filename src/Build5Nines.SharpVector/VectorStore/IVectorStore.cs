@@ -2,7 +2,11 @@ using System.Collections;
 
 namespace Build5Nines.SharpVector.VectorStore;
 
-public interface IVectorStore<TId, TMetadata> : IEnumerable<KeyValuePair<TId, IVectorTextItem<TMetadata>>>, IEnumerable, IReadOnlyCollection<KeyValuePair<TId, IVectorTextItem<TMetadata>>>
+public interface IVectorStore<TId, TMetadata>
+    : IEnumerable<KeyValuePair<TId, IVectorTextItem<TMetadata>>>,
+    IReadOnlyCollection<KeyValuePair<TId, IVectorTextItem<TMetadata>>>,
+    IEnumerable,
+    IAsyncEnumerable<KeyValuePair<TId, IVectorTextItem<TMetadata>>>
 {
     /// <summary>
     /// Retrieves a text and metadata by its ID
@@ -19,6 +23,14 @@ public interface IVectorStore<TId, TMetadata> : IEnumerable<KeyValuePair<TId, IV
     /// <returns></returns>
     /// <exception cref="KeyNotFoundException"></exception>
     void Set(TId id, IVectorTextItem<TMetadata> item);
+
+    /// <summary>
+    /// Retrieves a text and metadata by its ID asynchronously
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    Task SetAsync(TId id, IVectorTextItem<TMetadata> item);
 
     /// <summary>
     /// Deletes a text by its ID

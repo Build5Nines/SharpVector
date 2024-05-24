@@ -2,7 +2,7 @@ using System.Reflection;
 
 namespace Build5Nines.SharpVector.VectorCompare;
 
-public class CosineSimilarityVectorComparerAsync : IVectorComparer, IVectorComparerAsync
+public class CosineSimilarityVectorComparer : IVectorComparer
 {
     /// <summary>
     /// Calculates the cosine similarity between two vectors.

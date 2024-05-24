@@ -121,7 +121,9 @@ Here's a screenshot of the test console app running:
 
 ### vTBD
 
+- Simplify object model by combining Async and non-Async classes, `BasicMemoryVectorDatabase` now support both synchronous and asynchronous operations.
 - Refactored to remove unnecessary classes where the `Async` versions will work just fine.
+- Improve async/await and multi-threading use
 
 ### v0.9.8-beta (2024-05-20)
 

@@ -6,12 +6,12 @@ namespace Build5Nines.SharpVector.Vocabulary;
 /// A thread safe simple in-memory database for storing and querying vectorized text items.
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
-public class DictionaryVocabularyStoreAsync<TKey> : IVocabularyStoreAsync<TKey, int>
+public class DictionaryVocabularyStore<TKey> : IVocabularyStore<TKey, int>
     where TKey : notnull
 {
     private ConcurrentDictionary<TKey, int> _vocabulary;
 
-    public DictionaryVocabularyStoreAsync()
+    public DictionaryVocabularyStore()
     {
         _vocabulary = new ConcurrentDictionary<TKey, int>();
     }

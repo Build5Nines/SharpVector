@@ -7,7 +7,7 @@ using Build5Nines.SharpVector.Vocabulary;
 /// </summary>
 /// <typeparam name="TVocabularyKey"></typeparam>
 /// <typeparam name="TVocabularyValue"></typeparam>
-public class BagOfWordsVectorizerAsync<TVocabularyKey, TVocabularyValue> : IVectorizerAsync<TVocabularyKey, TVocabularyValue>
+public class BagOfWordsVectorizer<TVocabularyKey, TVocabularyValue> : IVectorizer<TVocabularyKey, TVocabularyValue>
     where TVocabularyKey : notnull
     where TVocabularyValue : notnull
 {

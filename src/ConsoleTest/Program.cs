@@ -10,22 +10,22 @@ using Build5Nines.SharpVector.Vectorization;
 using Build5Nines.SharpVector.VectorCompare;
 
 
-public class EuclideanDistanceVectorComparerAsyncMemoryVectorDatabaseAsync<TMetadata>
-    : MemoryVectorDatabaseAsyncBase<
+public class EuclideanDistanceVectorComparerMemoryVectorDatabase<TMetadata>
+    : MemoryVectorDatabaseBase<
     int, 
     TMetadata,
-    MemoryDictionaryVectorStoreAsync<int, TMetadata>,
-    DictionaryVocabularyStoreAsync<string>,
+    MemoryDictionaryVectorStore<int, TMetadata>,
+    DictionaryVocabularyStore<string>,
     IntIdGenerator,
     BasicTextPreprocessor,
-    BagOfWordsVectorizerAsync<string, int>,
-    EuclideanDistanceVectorComparerAsync
+    BagOfWordsVectorizer<string, int>,
+    EuclideanDistanceVectorComparer
     >
 {
-    public EuclideanDistanceVectorComparerAsyncMemoryVectorDatabaseAsync()
+    public EuclideanDistanceVectorComparerMemoryVectorDatabase()
         : base(
-            new MemoryDictionaryVectorStoreAsync<int, TMetadata>(),
-            new DictionaryVocabularyStoreAsync<string>()
+            new MemoryDictionaryVectorStore<int, TMetadata>(),
+            new DictionaryVocabularyStore<string>()
             )
     { }
 }
@@ -35,10 +35,8 @@ public static class Program
     public static async Task Main(string[] args)
     {
         // Create a Vector Database with metadata of type string
-        // var vdb = new EuclideanDistanceVectorComparerAsyncMemoryVectorDatabaseAsync<string>();
-        var vdb = new BasicMemoryVectorDatabaseAsync();
-
-// forget his secret identity. However, things go wrong, and villains from 
+        // var vdb = new EuclideanDistanceVectorCompareMemoryVectorDatabase<string>();
+        var vdb = new BasicMemoryVectorDatabase();
 
         // Parse Movie JSON data and add it to the Vector Database
         Console.WriteLine("Importing Movie data into Vector Database...");

@@ -54,18 +54,29 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <returns></returns>
     public TId AddText(string text, TMetadata? metadata = default(TMetadata))
     {
+        return AddTextAsync(text, metadata).Result;
+    }
+
+    /// <summary>
+    /// Adds a new text with Metadata to the database and returns its ID
+    /// </summary>
+    /// <param name="metadata"></param>
+    /// <param name="text"></param>
+    /// <returns></returns>
+    public async Task<TId> AddTextAsync(string text, TMetadata? metadata = default(TMetadata))
+    {
         // Perform preprocessing asynchronously
-        var tokens = _textPreprocessor.TokenizeAndPreprocess(text);
+        var tokens = await _textPreprocessor.TokenizeAndPreprocessAsync(text);
         
         // Update the vocabulary store asynchronously
-        VocabularyStore.Update(tokens);
+        await VocabularyStore.UpdateAsync(tokens);
         
         // Generate the vector asynchronously
-        float[] vector = _vectorizer.GenerateVectorFromTokens(VocabularyStore, tokens);
+        float[] vector = await _vectorizer.GenerateVectorFromTokensAsync(VocabularyStore, tokens);
         
         // Generate the ID and store the vector text item asynchronously
         TId id = _idGenerator.NewId();
-        VectorStore.Set(id, new VectorTextItem<TMetadata>(text, metadata, vector));
+        await VectorStore.SetAsync(id, new VectorTextItem<TMetadata>(text, metadata, vector));
         
         return id;
     }
@@ -161,9 +172,22 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <returns></returns>
     public IVectorTextResult<TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
-        var similarities = CalculateVectorComparison(queryText, threshold);
+        return SearchAsync(queryText, threshold, pageIndex, pageCount).Result;
+    }
 
-        similarities = _vectorComparer.Sort(similarities);
+    /// <summary>
+    /// Performs an asynchronous search vector search to find the top N most similar texts to the given text
+    /// </summary>
+    /// <param name="queryText">The query prompt to search by.</param>
+    /// <param name="threshold">The similarity threshold to filter by.</param>
+    /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
+    /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
+    /// <returns></returns>
+    public async Task<IVectorTextResult<TMetadata>> SearchAsync(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    {
+        var similarities = await CalculateVectorComparisonAsync(queryText, threshold);
+
+        similarities = await _vectorComparer.SortAsync(similarities);
 
         var totalCountFoundInSearch = similarities.Count();
 
@@ -178,7 +202,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         return new VectorTextResult<TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
     }
 
-    private IEnumerable<VectorTextResultItem<TMetadata>> CalculateVectorComparison(string queryText, float? threshold = null)
+    private async Task<IEnumerable<VectorTextResultItem<TMetadata>>> CalculateVectorComparisonAsync(string queryText, float? threshold = null)
     {
         var queryTokens = _textPreprocessor.TokenizeAndPreprocess(queryText);
         float[] queryVector = _vectorizer.GenerateVectorFromTokens(VocabularyStore, queryTokens);
@@ -191,16 +215,17 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
             throw new InvalidOperationException("The database is empty.");
         }
 
-        // var similarities = new List<VectorTextResultItem<TMetadata>>();
-        foreach (var kvp in VectorStore)
+        var results = new ConcurrentBag<VectorTextResultItem<TMetadata>>();
+        await foreach (var kvp in VectorStore)
         {
             var item = kvp.Value;
-            float vectorComparisonValue = _vectorComparer.Calculate(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
+            float vectorComparisonValue = await _vectorComparer.CalculateAsync(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
 
             if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
             {
-                yield return new VectorTextResultItem<TMetadata>(item, vectorComparisonValue);
+                results.Add(new VectorTextResultItem<TMetadata>(item, vectorComparisonValue));
             }
         }
+        return results;
     }
 }

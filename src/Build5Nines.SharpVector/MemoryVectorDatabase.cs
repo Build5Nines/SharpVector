@@ -16,18 +16,18 @@ public class MemoryVectorDatabase<TMetadata>
      : MemoryVectorDatabaseBase<
         int, 
         TMetadata,
-        MemoryDictionaryVectorStoreAsync<int, TMetadata>,
-        DictionaryVocabularyStoreAsync<string>,
+        MemoryDictionaryVectorStore<int, TMetadata>,
+        DictionaryVocabularyStore<string>,
         IntIdGenerator,
         BasicTextPreprocessor,
-        BagOfWordsVectorizerAsync<string, int>,
-        CosineSimilarityVectorComparerAsync
+        BagOfWordsVectorizer<string, int>,
+        CosineSimilarityVectorComparer
         >
 {
     public MemoryVectorDatabase()
         : base(
-            new MemoryDictionaryVectorStoreAsync<int, TMetadata>(),
-            new DictionaryVocabularyStoreAsync<string>()
+            new MemoryDictionaryVectorStore<int, TMetadata>(),
+            new DictionaryVocabularyStore<string>()
             )
     { }
 }

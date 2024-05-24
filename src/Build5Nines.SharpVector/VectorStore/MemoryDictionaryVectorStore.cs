@@ -9,7 +9,7 @@ namespace Build5Nines.SharpVector.VectorStore;
 /// </summary>
 /// <typeparam name="TId"></typeparam>
 /// <typeparam name="TMetadata"></typeparam>
-public class MemoryDictionaryVectorStoreAsync<TId, TMetadata> : IVectorStoreAsync<TId, TMetadata>
+public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMetadata>
     where TId : notnull
 {
     private ConcurrentDictionary<TId, IVectorTextItem<TMetadata>> _database;
@@ -19,7 +19,7 @@ public class MemoryDictionaryVectorStoreAsync<TId, TMetadata> : IVectorStoreAsyn
     /// </summary>
     public int Count => _database.Count;
 
-    public MemoryDictionaryVectorStoreAsync() {
+    public MemoryDictionaryVectorStore() {
         _database = new ConcurrentDictionary<TId, IVectorTextItem<TMetadata>>();
     }
 
