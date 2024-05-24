@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Build5Nines.SharpVector" Version="0.9.8-beta" />
+    <PackageReference Include="Build5Nines.SharpVector" Version="1.0.0" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.17.3" />
     <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI" Version="0.2.0-rc7" />
     <PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI.Cuda" Version="0.2.0-rc7" />
