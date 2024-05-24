@@ -35,8 +35,10 @@ public static class Program
     public static async Task Main(string[] args)
     {
         // Create a Vector Database with metadata of type string
-        var vdb = new EuclideanDistanceVectorComparerAsyncMemoryVectorDatabaseAsync<string>(); //BasicMemoryVectorDatabaseAsync();
+        // var vdb = new EuclideanDistanceVectorComparerAsyncMemoryVectorDatabaseAsync<string>();
+        var vdb = new BasicMemoryVectorDatabaseAsync();
 
+// forget his secret identity. However, things go wrong, and villains from 
 
         // Parse Movie JSON data and add it to the Vector Database
         Console.WriteLine("Importing Movie data into Vector Database...");
@@ -46,6 +48,8 @@ public static class Program
         var importTimer = new Stopwatch();
         importTimer.Start();    
 
+
+        for (var i = 0; i < 10; i++){
         using (JsonDocument document = JsonDocument.Parse(jsonString))
         {
             JsonElement root = document.RootElement;
@@ -73,7 +77,8 @@ public static class Program
             //     }
             // }
         }
-        
+        }
+
         importTimer.Stop();
         Console.WriteLine("Movie data imported into Vector Database.");
         Console.WriteLine($"Import took {importTimer.ElapsedMilliseconds} ms");
@@ -160,8 +165,8 @@ public static class Program
                 var pageSize = 3;
                 // result = await vdb.Search(newPrompt,
                 result = await vdb.SearchAsync(newPrompt,
-                    //threshold: 0.001f, // 0.2f, // Cosine Similarity - Only return results with similarity greater than this threshold
-                    threshold: (float)1.4f, // Euclidean Distance - Only return results with distance less than this threshold
+                    threshold: 0.001f, // 0.2f, // Cosine Similarity - Only return results with similarity greater than this threshold
+                    // threshold: (float)1.4f, // Euclidean Distance - Only return results with distance less than this threshold
 
                     //pageIndex: 0, // Page index of the search results (default is 0; the first page)
                     pageCount: pageSize // Number of search results per page or max number to return

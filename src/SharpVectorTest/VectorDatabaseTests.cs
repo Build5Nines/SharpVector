@@ -388,18 +388,18 @@ public class EuclideanDistanceVectorComparerAsyncMemoryVectorDatabase<TMetadata>
      : MemoryVectorDatabaseBase<
         int, 
         TMetadata,
-        MemoryDictionaryVectorStore<int, TMetadata>,
-        DictionaryVocabularyStore<string>,
+        MemoryDictionaryVectorStoreAsync<int, TMetadata>,
+        DictionaryVocabularyStoreAsync<string>,
         IntIdGenerator,
         BasicTextPreprocessor,
-        BagOfWordsVectorizer<string, int>,
+        BagOfWordsVectorizerAsync<string, int>,
         EuclideanDistanceVectorComparerAsync
         >
 {
     public EuclideanDistanceVectorComparerAsyncMemoryVectorDatabase()
         : base(
-            new MemoryDictionaryVectorStore<int, TMetadata>(),
-            new DictionaryVocabularyStore<string>()
+            new MemoryDictionaryVectorStoreAsync<int, TMetadata>(),
+            new DictionaryVocabularyStoreAsync<string>()
             )
     { }
 }

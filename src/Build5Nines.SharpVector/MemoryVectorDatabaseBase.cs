@@ -4,6 +4,7 @@ using Build5Nines.SharpVector.Vocabulary;
 using Build5Nines.SharpVector.Vectorization;
 using Build5Nines.SharpVector.VectorCompare;
 using Build5Nines.SharpVector.VectorStore;
+using System.Collections.Concurrent;
 
 namespace Build5Nines.SharpVector;
 
@@ -190,9 +191,8 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
             throw new InvalidOperationException("The database is empty.");
         }
 
-        var similarities = new List<VectorTextResultItem<TMetadata>>();
-
-        foreach (var kvp in VectorStore)
+        var similarities = new ConcurrentBag<VectorTextResultItem<TMetadata>>();
+        Parallel.ForEach(VectorStore, kvp =>
         {
             var item = kvp.Value;
             float vectorComparisonValue = _vectorComparer.Calculate(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
@@ -201,7 +201,19 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
             {
                 similarities.Add(new VectorTextResultItem<TMetadata>(item, vectorComparisonValue));
             }
-        }
+        });
+
+        // var similarities = new List<VectorTextResultItem<TMetadata>>();
+        // foreach (var kvp in VectorStore)
+        // {
+        //     var item = kvp.Value;
+        //     float vectorComparisonValue = _vectorComparer.Calculate(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
+
+        //     if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
+        //     {
+        //         similarities.Add(new VectorTextResultItem<TMetadata>(item, vectorComparisonValue));
+        //     }
+        // }
 
         return similarities;
     }

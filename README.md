@@ -119,6 +119,10 @@ Here's a screenshot of the test console app running:
 
 ## Change Log
 
+### vTBD
+
+- Refactored to remove unnecessary classes where the `Async` versions will work just fine.
+
 ### v0.9.8-beta (2024-05-20)
 
 - Added `Async` version of classes to support multi-threading
