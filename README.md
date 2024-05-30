@@ -16,6 +16,20 @@ The Build5Nines SharpVector project provides a lightweight in-memory Vector Data
 - **Custom Metadata**: Store additional metadata with each text entry stored in the vector database.
 - **Supports async/await**: Async methods for scalable and non-blocking database operations.
 
+## Use Cases
+
+An in-memory vector databases like `Build5Nines.SharpVector` provides several advantages over a traditional vector database server, particularly in scenarios that might demand high performance, low latency, and efficient resource usage.
+
+Here's a list of several usage scenarios where `Build5Nines.SharpVector` can be useful:
+
+- **Development and Testing**: Developers can rapidly prototype and test without the overhead of setting up and managing a server; leading to faster iteration cycles.
+- **Small to Medium Scale Applications**: For applications with manageable datasets that fit into memory, in-memory databases offer a simpler and more efficient solution.
+- **Low Latency Requirements**: In-memory operations eliminate network latency, providing much lower latency query responses, which is crucial for certain real-time applications.
+- **Offline or Edge Computing**: In environments with limited or no internet connectivity, such as remote locations or edge devices, in-memory databases ensure continued functionality.
+- **Simplified Deployment**: Integrating an in-memory database directly into a .NET application simplifies deployment and reduces the complexity of the infrastructure.
+- **Lower Resource Usage**: In-memory databases can operate with fewer resources, making them ideal for applications with limited compute resources.
+- **Experimentation and Research**: In-memory databases can be easier to experiment when trying out new features and algorithms in a controlled and flexible environment.
+
 ## Nuget Package
 
 The `Build5Nines.SharpVector` library is available as a Nuget Package to easily include into your .NET projects:
