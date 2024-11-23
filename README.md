@@ -8,7 +8,7 @@ While there are lots of large databases that can be used to build Vector Databas
 
 The Build5Nines SharpVector project provides a lightweight in-memory Vector Database for use in any .NET application.
 
-> _"An excellent open-source project by Chris Pietschmann. SharpVector makes it easy to store and retrieve vectorized data, making it an ideal choice for our sample RAG implementation."_
+> _"For the in-memory vector database, we're using Build5Nines.SharpVector, an excellent open-source project by Chris Pietschmann. SharpVector makes it easy to store and retrieve vectorized data, making it an ideal choice for our sample RAG implementation."_
 >
 > — [Tulika Chaudharie, Principal Product Manager at Microsoft for Azure App Service](https://azure.github.io/AppService/2024/09/03/Phi3-vector.html)
 
