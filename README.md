@@ -1,12 +1,10 @@
-# Build5Nines SharpVector - a lightweight, in-memory Vector Database for any C# / .NET Applications
+# Build5Nines SharpVector - a lightweight, in-memory Text Vector Database for any C# / .NET Applications
 
 `Build5Nines.SharpVector` is an in-memory vector database library designed for .NET applications. It allows you to store, search, and manage text data using vector representations. The library is customizable and extensible, enabling support for different vector comparison methods, preprocessing techniques, and vectorization strategies.
 
-Vector databases are used with Generative AI solutions augmenting the LLM (Large Language Model) with the ability to load additional context data with the AI prompt using the RAG (Retrieval-Augmented Generation) design pattern.
+Vector databases are used with [Generative AI](https://build5nines.com/what-is-generative-ai/) solutions augmenting the LLM (Large Language Model) with the ability to load additional context data with the AI prompt using the [RAG (Retrieval-Augmented Generation)](https://build5nines.com/what-is-retrieval-augmented-generation-rag/) design pattern.
 
-While there are lots of large databases that can be used to build Vector Databases (like Azure CosmosDB, PostgreSQL w/ pgvector, Azure AI Search, Elasticsearch, and more), there are not many options for a lightweight vector database that can be embedded into any .NET application.
-
-The Build5Nines SharpVector project provides a lightweight in-memory Vector Database for use in any .NET application.
+While there are lots of large databases that can be used to build Vector Databases (like Azure CosmosDB, PostgreSQL w/ pgvector, Azure AI Search, Elasticsearch, and more), there are not many options for a lightweight vector database that can be embedded into any .NET application. Build5Nines SharpVector is the lightweight in-memory Text Vector Database for use in any .NET application that you're looking for!
 
 > _"For the in-memory vector database, we're using Build5Nines.SharpVector, an excellent open-source project by Chris Pietschmann. SharpVector makes it easy to store and retrieve vectorized data, making it an ideal choice for our sample RAG implementation."_
 >
@@ -178,4 +176,4 @@ Here's a screenshot of the test console app running:
 
 ## Maintained By
 
-The **Build5Nines.SharpVector** project is maintained by [Chris Pietschmann](https://pietschsoft.com), founder of [Build5Nines](https://build5nines.com), Microsoft MVP, HashiCorp Ambassador, and Microsoft Certified Trainer (MCT).
+The **Build5Nines SharpVector** project is maintained by [Chris Pietschmann](https://pietschsoft.com), founder of [Build5Nines](https://build5nines.com), Microsoft MVP, HashiCorp Ambassador, and Microsoft Certified Trainer (MCT).
