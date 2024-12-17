@@ -178,4 +178,4 @@ Here's a screenshot of the test console app running:
 
 ## Maintained By
 
-The [Build5Nines](https://build5nines.com) SharpVector project is maintained by [Chris Pietschmann](https://pietschsoft.com), Microsoft MVP, HashiCorp Ambassador.
+The **Build5Nines.SharpVector** project is maintained by [Chris Pietschmann](https://pietschsoft.com), founder of [Build5Nines](https://build5nines.com), Microsoft MVP, HashiCorp Ambassador, and Microsoft Certified Trainer (MCT).
