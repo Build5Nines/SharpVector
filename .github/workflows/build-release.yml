@@ -31,11 +31,17 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
     
-    - name: Publish
-      run: dotnet publish --configuration Release --output ./publish --no-build
+    # - name: Publish
+    #   run: dotnet publish --configuration Release --output ./publish --no-build
+
+    # - name: Upload artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: release-build
+    #     path: ./publish
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: release-build
-        path: ./publish
+        name: nuget-package
+        path: '**/*.nupkg'

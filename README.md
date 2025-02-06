@@ -50,10 +50,6 @@ dotnet add package Build5Nines.SharpVector
 
 You can view it on Nuget.org here: <https://www.nuget.org/packages/Build5Nines.SharpVector/>
 
-## Supports .NET 6 and greater
-
-For maximum compatibility, the `Build5Nines.SharpVector` library is built using no external dependencies other than what's available from .NET, and it's built to target .NET 6 and greater.
-
 ## Example Usage
 
 ### Loading and Searching Vector Database
@@ -142,6 +138,10 @@ Here's a screenshot of the test console app running:
 ![](assets/build5nines-sharpvector-console-screenshot.jpg)
 
 ## Change Log
+
+## v1.0.1 (2025-02-06)
+
+- Upgrade to .NET 8 or higher
 
 ### v1.0.0 (2024-05-24)
 
