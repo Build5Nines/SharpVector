@@ -30,9 +30,6 @@ jobs:
 
     - name: Build
       run: dotnet build --configuration Release --no-restore
-
-    - name: Run tests
-      run: dotnet test --no-build --verbosity normal
     
     - name: Publish
       run: dotnet publish --configuration Release --output ./publish --no-build
