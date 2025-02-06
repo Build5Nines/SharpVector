@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpVectorTest", "SharpVec
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Build5Nines.SharpVector.OpenAI", "Build5Nines.SharpVector.OpenAI\Build5Nines.SharpVector.OpenAI.csproj", "{CABF1DBE-8FE1-4EDF-B5DD-B1BFB88D93C3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpVectorOpenAITest", "SharpVectorOpenAITest\SharpVectorOpenAITest.csproj", "{04E08FA2-C4B4-47B4-ABB0-6FD57EA5FFFB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{CABF1DBE-8FE1-4EDF-B5DD-B1BFB88D93C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CABF1DBE-8FE1-4EDF-B5DD-B1BFB88D93C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CABF1DBE-8FE1-4EDF-B5DD-B1BFB88D93C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04E08FA2-C4B4-47B4-ABB0-6FD57EA5FFFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04E08FA2-C4B4-47B4-ABB0-6FD57EA5FFFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04E08FA2-C4B4-47B4-ABB0-6FD57EA5FFFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04E08FA2-C4B4-47B4-ABB0-6FD57EA5FFFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

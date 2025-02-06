@@ -10,7 +10,7 @@ namespace Build5Nines.SharpVector.OpenAI;
 /// This database uses OpenAI to generate embeddings, and performs Cosine similarity search.
 /// </summary>
 /// <typeparam name="TMetadata">Defines the data type for the Metadata stored with the Text.</typeparam>
-public class MemoryVectorDatabase<TMetadata>
+public class OpenAIMemoryVectorDatabase<TMetadata>
      : MemoryVectorDatabaseBase<
         int,
         TMetadata,
@@ -19,7 +19,7 @@ public class MemoryVectorDatabase<TMetadata>
         CosineSimilarityVectorComparer
         >
 {
-    public MemoryVectorDatabase(EmbeddingClient embeddingClient)
+    public OpenAIMemoryVectorDatabase(EmbeddingClient embeddingClient)
         : base(
             embeddingClient,
             new MemoryDictionaryVectorStore<int, TMetadata>()

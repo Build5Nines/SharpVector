@@ -6,7 +6,7 @@ using OpenAI.Embeddings;
 
 namespace Build5Nines.SharpVector.OpenAI;
 
-public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenerator, TVectorComparer>
+public abstract class OpenAIMemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenerator, TVectorComparer>
     : IVectorDatabase<TId, TMetadata>
     where TId : notnull
     where TVectorStore : IVectorStore<TId, TMetadata>
@@ -24,7 +24,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
 
     protected EmbeddingClient EmbeddingClient { get; private set; }
 
-    public MemoryVectorDatabaseBase(EmbeddingClient embeddingClient, TVectorStore vectorStore)
+    public OpenAIMemoryVectorDatabaseBase(EmbeddingClient embeddingClient, TVectorStore vectorStore)
     {
         this.EmbeddingClient = embeddingClient;
         VectorStore = vectorStore;
