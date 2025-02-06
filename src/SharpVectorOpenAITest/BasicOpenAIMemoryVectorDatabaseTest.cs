@@ -1,9 +1,12 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using OpenAI;
 using OpenAI.Embeddings;
 using Build5Nines.SharpVector.OpenAI;
-using System.Threading.Tasks;
 using System.ClientModel;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Build5Nines.SharpVector.OpenAI.Tests
 {
@@ -26,39 +29,5 @@ namespace Build5Nines.SharpVector.OpenAI.Tests
             Assert.IsNotNull(_database);
         }
 
-        // [TestMethod]
-        // public async Task TestGetVectors()
-        // {
-        //     // Arrange
-        //     var text = "sample text";
-        //     var expectedVector = new float[] { 0.1f, 0.2f, 0.3f };
-        //     _mockEmbeddingClient
-        //         .Setup(client => client.GenerateEmbeddingAsync(It.Is<string>(s => s.Equals(text)), It.IsAny<EmbeddingGenerationOptions>()))
-        //         .ReturnsAsync(new ClientResult<OpenAIEmbedding> { Data = expectedVector });
-
-        //     // Act
-        //     var result = await _database.GetVectors(text);
-
-        //     // Assert
-        //     CollectionAssert.AreEqual(expectedVector, result);
-        // }
-
-        // [TestMethod]
-        // public async Task TestAddVector()
-        // {
-        //     // Arrange
-        //     var text = "sample text";
-        //     var vector = new float[] { 0.1f, 0.2f, 0.3f };
-        //     _mockEmbeddingClient
-        //         .Setup(client => client.GenerateEmbeddingAsync(It.Is<string>(s => s == text), It.IsAny<EmbeddingGenerationOptions>()))
-        //         .ReturnsAsync(new ClientResult<OpenAIEmbedding> { Data = vector });
-
-        //     // Act
-        //     await _database.AddVector(text);
-
-        //     // Assert
-        //     var storedVector = await _database.GetVectors(text);
-        //     CollectionAssert.AreEqual(vector, storedVector);
-        // }
     }
 }

@@ -11,7 +11,7 @@ namespace Build5Nines.SharpVector.OpenAI;
 /// </summary>
 /// <typeparam name="TMetadata">Defines the data type for the Metadata stored with the Text.</typeparam>
 public class OpenAIMemoryVectorDatabase<TMetadata>
-     : MemoryVectorDatabaseBase<
+     : OpenAIMemoryVectorDatabaseBase<
         int,
         TMetadata,
         MemoryDictionaryVectorStore<int, TMetadata>,
