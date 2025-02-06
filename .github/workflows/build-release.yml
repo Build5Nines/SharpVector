@@ -23,7 +23,7 @@ jobs:
         dotnet-version: '6.0.x' # Adjust the version as needed
 
     - name: Restore dependencies
-      run: dotnet restore src
+      run: dotnet restore
 
     - name: Run tests
       run: dotnet test --no-build --verbosity normal
