@@ -25,5 +25,6 @@
 
   <ItemGroup>
       <PackageReference Include="Build5Nines.SharpVector" Version="1.0.1" />
+      <PackageReference Include="OpenAI" Version="2.1.0" />
   </ItemGroup>
 </Project>

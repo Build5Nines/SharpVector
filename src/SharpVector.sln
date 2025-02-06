@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Build5Nines.SharpVector", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpVectorTest", "SharpVectorTest\SharpVectorTest.csproj", "{AFF76051-E043-45EB-9B5F-05D9C45D0DC7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Build5Nines.SharpVector.AzureOpenAI", "Build5Nines.SharpVector.AzureOpenAI\Build5Nines.SharpVector.AzureOpenAI.csproj", "{CABF1DBE-8FE1-4EDF-B5DD-B1BFB88D93C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Build5Nines.SharpVector.OpenAI", "Build5Nines.SharpVector.OpenAI\Build5Nines.SharpVector.OpenAI.csproj", "{CABF1DBE-8FE1-4EDF-B5DD-B1BFB88D93C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
