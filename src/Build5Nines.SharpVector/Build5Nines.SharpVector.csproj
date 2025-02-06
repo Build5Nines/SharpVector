@@ -9,9 +9,9 @@
     <PackageId>Build5Nines.SharpVector</PackageId>
     <PackageProjectUrl>https://github.com/Build5Nines/SharpVector</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Build5Nines/SharpVector</RepositoryUrl>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Description>Lightweight In-memory Vector Database to embed in any .NET Applications</Description>
-    <Copyright>Copyright (c) 2024 Build5Nines LLC</Copyright>
+    <Copyright>Copyright (c) 2025 Build5Nines LLC</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseUrl>https://github.com/Build5Nines/SharpVector/blob/main/LICENSE</PackageLicenseUrl>
     <Authors>Chris Pietschmann</Authors>
