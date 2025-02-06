@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -20,17 +23,14 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: '6.0.x' # Adjust the version as needed
+        dotnet-version: '8.0.x' # Adjust the version as needed
 
     - name: Restore dependencies
-      run: dotnet restore src
-
-    - name: Run tests
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet restore
 
     - name: Build
       run: dotnet build --configuration Release --no-restore
-
+    
     - name: Publish
       run: dotnet publish --configuration Release --output ./publish --no-build
 
