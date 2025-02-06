@@ -4,7 +4,7 @@ using Build5Nines.SharpVector.VectorStore;
 using System.Collections.Concurrent;
 using OpenAI.Embeddings;
 
-namespace Build5Nines.SharpVector.AzureOpenAI;
+namespace Build5Nines.SharpVector.OpenAI;
 
 public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenerator, TVectorComparer>
     : IVectorDatabase<TId, TMetadata>

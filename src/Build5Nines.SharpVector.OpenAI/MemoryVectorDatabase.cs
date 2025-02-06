@@ -3,7 +3,7 @@ using Build5Nines.SharpVector.VectorCompare;
 using Build5Nines.SharpVector.VectorStore;
 using OpenAI.Embeddings;
 
-namespace Build5Nines.SharpVector.AzureOpenAI;
+namespace Build5Nines.SharpVector.OpenAI;
 
 /// <summary>
 /// A simple in-memory database for storing and querying vectorized text items.
