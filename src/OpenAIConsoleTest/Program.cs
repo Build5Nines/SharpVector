@@ -9,8 +9,9 @@ using Build5Nines.SharpVector.OpenAI;
 
 Console.WriteLine("Hello, World!");
 
-var openAIUri = new Uri("https://b59-knowledge-oai.openai.azure.com/");
-var openAIKey = "ae8f823052e74b5db7d6e95cc5af4109";
+//var openAIUri = new Uri("https://api.openai.com/");
+var openAIUri = new Uri("https://{name}.openai.azure.com/");
+var openAIKey = "xxxxxxxxxx";
 var modelName = "text-embedding-ada-002";
 
 var openAIClient = new AzureOpenAIClient(openAIUri, new AzureKeyCredential(openAIKey));
@@ -35,7 +36,7 @@ using (JsonDocument document = JsonDocument.Parse(jsonString))
     await Parallel.ForEachAsync(movies.EnumerateArray(), async (movie, cancellationToken) =>
     {
         Console.WriteLine($"Processing movie: {movie.GetProperty("title").GetString()}");
-        
+
         var text = movie.GetProperty("description").GetString();
         var metadata = movie.GetProperty("title").GetString();
 
