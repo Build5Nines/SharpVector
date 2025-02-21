@@ -12,6 +12,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     : IVectorDatabase<TId, TMetadata, TVocabularyKey>
     where TId : notnull
     where TVocabularyKey : notnull
+    where TVocabularyValue: notnull
     where TVectorStore : IVectorStoreWithVocabulary<TId, TMetadata, TVocabularyStore, TVocabularyKey, TVocabularyValue>
     where TVocabularyStore : IVocabularyStore<TVocabularyKey, TVocabularyValue>
     where TIdGenerator : IIdGenerator<TId>, new()

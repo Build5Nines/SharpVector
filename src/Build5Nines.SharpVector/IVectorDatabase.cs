@@ -87,4 +87,5 @@ public interface IVectorDatabase<TId, TMetadata, TDocument>
 
 public interface IVectorDatabase<TId, TMetadata>
  : IVectorDatabase<TId, TMetadata, string>
+ where TId : notnull
 { }
