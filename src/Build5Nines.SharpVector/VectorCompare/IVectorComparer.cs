@@ -17,6 +17,14 @@ public interface IVectorComparer
     /// <typeparam name="TMetadata"></typeparam>
     /// <param name="results"></param>
     /// <returns></returns>
+    IEnumerable<VectorTextResultItem<TDocument, TMetadata>> Sort<TDocument, TMetadata>(IEnumerable<VectorTextResultItem<TDocument, TMetadata>> results);
+
+    /// <summary>
+    /// Sorts the results of a comparison
+    /// </summary>
+    /// <typeparam name="TMetadata"></typeparam>
+    /// <param name="results"></param>
+    /// <returns></returns>
     IEnumerable<VectorTextResultItem<TMetadata>> Sort<TMetadata>(IEnumerable<VectorTextResultItem<TMetadata>> results);
 
     /// <summary>
@@ -42,5 +50,14 @@ public interface IVectorComparer
     /// <typeparam name="TMetadata"></typeparam>
     /// <param name="results"></param>
     /// <returns></returns>
+    Task<IEnumerable<VectorTextResultItem<TDocument, TMetadata>>> SortAsync<TDocument, TMetadata>(IEnumerable<VectorTextResultItem<TDocument, TMetadata>> results);
+
+    /// <summary>
+    /// Sorts the results of a comparison asynchronously    
+    /// </summary>
+    /// <typeparam name="TMetadata"></typeparam>
+    /// <param name="results"></param>
+    /// <returns></returns>
     Task<IEnumerable<VectorTextResultItem<TMetadata>>> SortAsync<TMetadata>(IEnumerable<VectorTextResultItem<TMetadata>> results);
 }
+

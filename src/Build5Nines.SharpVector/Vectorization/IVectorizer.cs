@@ -33,5 +33,5 @@ public interface IVectorizer<TVocabularyKey, TVocabularyValue>
     /// <param name="vector"></param>
     /// <param name="length"></param>
     /// <returns></returns>
-    float[] NormalizeVector(float[] vector, int length);
+    float[] NormalizeVector(float[] vector, TVocabularyValue length);
 }

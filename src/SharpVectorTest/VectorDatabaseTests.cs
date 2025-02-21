@@ -185,7 +185,7 @@ public class VectorDatabaseTests
         
         await Task.WhenAll(textTasks);
 
-        var searchTasks = new Task<IVectorTextResult<double>>[15];
+        var searchTasks = new Task<IVectorTextResult<string, double>>[15];
         searchTasks[0] = vdb.SearchAsync("Lion King", pageCount: 5);
         searchTasks[1] = vdb.SearchAsync("Lion King", pageCount: 5);
         searchTasks[2] = vdb.SearchAsync("Lion King", pageCount: 5);
@@ -388,8 +388,10 @@ public class EuclideanDistanceVectorComparerAsyncMemoryVectorDatabase<TMetadata>
      : MemoryVectorDatabaseBase<
         int, 
         TMetadata,
-        MemoryDictionaryVectorStore<int, TMetadata>,
+        MemoryDictionaryVectorStoreWithVocabulary<int, TMetadata, DictionaryVocabularyStore<string>, string, int>,
         DictionaryVocabularyStore<string>,
+        string,
+        int,
         IntIdGenerator,
         BasicTextPreprocessor,
         BagOfWordsVectorizer<string, int>,
@@ -398,8 +400,9 @@ public class EuclideanDistanceVectorComparerAsyncMemoryVectorDatabase<TMetadata>
 {
     public EuclideanDistanceVectorComparerAsyncMemoryVectorDatabase()
         : base(
-            new MemoryDictionaryVectorStore<int, TMetadata>(),
-            new DictionaryVocabularyStore<string>()
+            new MemoryDictionaryVectorStoreWithVocabulary<int, TMetadata, DictionaryVocabularyStore<string>, string, int>(
+                new DictionaryVocabularyStore<string>()
             )
+        )
     { }
 }

@@ -1,23 +1,35 @@
 namespace Build5Nines.SharpVector;
 
-public interface IVectorTextResultItem<TMetadata>
+public interface IVectorTextResultItem<TDocument, TMetadata>
 {
-    string Text{ get; }
+    TDocument Text{ get; }
     TMetadata? Metadata { get; }
 
     float VectorComparison { get; }
 }
 
-public class VectorTextResultItem<TMetadata> : IVectorTextResultItem<TMetadata>
+public interface IVectorTextResultItem<TMetadata>
+ : IVectorTextResultItem<string, TMetadata>
+{ }
+
+public class VectorTextResultItem<TDocument, TMetadata> : IVectorTextResultItem<TDocument, TMetadata>
 {
-    private IVectorTextItem<TMetadata> _item;
-    public VectorTextResultItem(IVectorTextItem<TMetadata> item, float vectorComparison)
+    private IVectorTextItem<TDocument, TMetadata> _item;
+    public VectorTextResultItem(IVectorTextItem<TDocument, TMetadata> item, float vectorComparison)
     {
         _item = item;
         VectorComparison = vectorComparison;
     }
     
-    public string Text { get => _item.Text; }
+    public TDocument Text { get => _item.Text; }
     public TMetadata? Metadata { get => _item.Metadata; }
     public float VectorComparison { get; private set; }
+}
+
+public class VectorTextResultItem<TMetadata>
+ : VectorTextResultItem<string, TMetadata>, IVectorTextResultItem<TMetadata>
+{
+    public VectorTextResultItem(IVectorTextItem<string, TMetadata> item, float vectorComparison)
+        : base(item, vectorComparison)
+    { }
 }

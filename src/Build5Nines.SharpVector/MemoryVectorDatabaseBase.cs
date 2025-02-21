@@ -8,14 +8,15 @@ using System.Collections.Concurrent;
 
 namespace Build5Nines.SharpVector;
 
-public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabularyStore, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorComparer>
-    : IVectorDatabase<TId, TMetadata>
+public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabularyStore, TVocabularyKey, TVocabularyValue, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorComparer>
+    : IVectorDatabase<TId, TMetadata, TVocabularyKey>
     where TId : notnull
-    where TVectorStore : IVectorStore<TId, TMetadata>
-    where TVocabularyStore : IVocabularyStore<string, int>
+    where TVocabularyKey : notnull
+    where TVectorStore : IVectorStoreWithVocabulary<TId, TMetadata, TVocabularyStore, TVocabularyKey, TVocabularyValue>
+    where TVocabularyStore : IVocabularyStore<TVocabularyKey, TVocabularyValue>
     where TIdGenerator : IIdGenerator<TId>, new()
-    where TTextPreprocessor : ITextPreprocessor, new()
-    where TVectorizer : IVectorizer<string, int>, new()
+    where TTextPreprocessor : ITextPreprocessor<TVocabularyKey>, new()
+    where TVectorizer : IVectorizer<TVocabularyKey, TVocabularyValue>, new()
     where TVectorComparer : IVectorComparer, new()
 {
     private TIdGenerator _idGenerator;
@@ -31,15 +32,9 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// </summary>
     protected TVectorStore VectorStore { get; private set; }
 
-    /// <summary>
-    /// The Vocabulary Store used to store the vocabulary of the database
-    /// </summary>
-    protected TVocabularyStore VocabularyStore { get; private set; }
-
-    public MemoryVectorDatabaseBase(TVectorStore vectorStore, TVocabularyStore vocabularyStore)
+    public MemoryVectorDatabaseBase(TVectorStore vectorStore)
     {
         VectorStore = vectorStore;
-        VocabularyStore = vocabularyStore;
         _idGenerator = new TIdGenerator();
         _textPreprocessor = new TTextPreprocessor();
         _vectorizer = new TVectorizer();
@@ -61,7 +56,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="metadata"></param>
     /// <param name="text"></param>
     /// <returns></returns>
-    public TId AddText(string text, TMetadata? metadata = default(TMetadata))
+    public TId AddText(TVocabularyKey text, TMetadata? metadata = default(TMetadata))
     {
         return AddTextAsync(text, metadata).Result;
     }
@@ -72,20 +67,20 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="metadata"></param>
     /// <param name="text"></param>
     /// <returns></returns>
-    public async Task<TId> AddTextAsync(string text, TMetadata? metadata = default(TMetadata))
+    public async Task<TId> AddTextAsync(TVocabularyKey text, TMetadata? metadata = default(TMetadata))
     {
         // Perform preprocessing asynchronously
         var tokens = await _textPreprocessor.TokenizeAndPreprocessAsync(text);
         
         // Update the vocabulary store asynchronously
-        await VocabularyStore.UpdateAsync(tokens);
+        await VectorStore.VocabularyStore.UpdateAsync(tokens);
         
         // Generate the vector asynchronously
-        float[] vector = await _vectorizer.GenerateVectorFromTokensAsync(VocabularyStore, tokens);
+        float[] vector = await _vectorizer.GenerateVectorFromTokensAsync(VectorStore.VocabularyStore, tokens);
         
         // Generate the ID and store the vector text item asynchronously
         TId id = _idGenerator.NewId();
-        await VectorStore.SetAsync(id, new VectorTextItem<TMetadata>(text, metadata, vector));
+        await VectorStore.SetAsync(id, new VectorTextItem<TVocabularyKey, TMetadata>(text, metadata, vector));
         
         return id;
     }
@@ -96,7 +91,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="id"></param>
     /// <returns></returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    public IVectorTextItem<TMetadata> GetText(TId id)
+    public IVectorTextItem<TVocabularyKey, TMetadata> GetText(TId id)
     {
         return VectorStore.Get(id);
     }
@@ -106,7 +101,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// </summary>
     /// <param name="id"></param>
     /// <exception cref="KeyNotFoundException"></exception>
-    public IVectorTextItem<TMetadata> DeleteText(TId id)
+    public IVectorTextItem<TVocabularyKey, TMetadata> DeleteText(TId id)
     {
         return VectorStore.Delete(id);
     }
@@ -117,15 +112,15 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="id"></param>
     /// <param name="text"></param>
     /// <exception cref="KeyNotFoundException"></exception>
-    public void UpdateText(TId id, string text)
+    public void UpdateText(TId id, TVocabularyKey text)
     {
         if (VectorStore.ContainsKey(id))
         {
             var tokens = _textPreprocessor.TokenizeAndPreprocess(text);
-            VocabularyStore.Update(tokens);
-            float[] vector = _vectorizer.GenerateVectorFromTokens(VocabularyStore, tokens);
+            VectorStore.VocabularyStore.Update(tokens);
+            float[] vector = _vectorizer.GenerateVectorFromTokens(VectorStore.VocabularyStore, tokens);
             var metadata = VectorStore.Get(id).Metadata;
-            VectorStore.Set(id, new VectorTextItem<TMetadata>(text, metadata, vector));
+            VectorStore.Set(id, new VectorTextItem<TVocabularyKey, TMetadata>(text, metadata, vector));
         }
         else
         {
@@ -157,14 +152,14 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="id"></param>
     /// <param name="text"></param>
     /// <param name="metadata"></param>
-    public void UpdateTextAndMetadata(TId id, string text, TMetadata metadata)
+    public void UpdateTextAndMetadata(TId id, TVocabularyKey text, TMetadata metadata)
     {
         if (VectorStore.ContainsKey(id))
         {
             var tokens = _textPreprocessor.TokenizeAndPreprocess(text);
-            VocabularyStore.Update(tokens);
-            float[] vector = _vectorizer.GenerateVectorFromTokens(VocabularyStore, tokens);
-            VectorStore.Set(id, new VectorTextItem<TMetadata>(text, metadata, vector));
+            VectorStore.VocabularyStore.Update(tokens);
+            float[] vector = _vectorizer.GenerateVectorFromTokens(VectorStore.VocabularyStore, tokens);
+            VectorStore.Set(id, new VectorTextItem<TVocabularyKey, TMetadata>(text, metadata, vector));
         }
         else
         {
@@ -179,7 +174,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="topN">The highest number of results to show.</param>
     /// <param name="threshold">The similarity threshold. Only return items greater or equal to the threshold. Null returns all.</param>
     /// <returns></returns>
-    public IVectorTextResult<TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    public IVectorTextResult<TVocabularyKey, TMetadata> Search(TVocabularyKey queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
         return SearchAsync(queryText, threshold, pageIndex, pageCount).Result;
     }
@@ -192,7 +187,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
     /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
     /// <returns></returns>
-    public async Task<IVectorTextResult<TMetadata>> SearchAsync(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    public async Task<IVectorTextResult<TVocabularyKey, TMetadata>> SearchAsync(TVocabularyKey queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
         var similarities = await CalculateVectorComparisonAsync(queryText, threshold);
 
@@ -200,7 +195,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
         var totalCountFoundInSearch = similarities.Count();
 
-        IEnumerable<VectorTextResultItem<TMetadata>> resultsToReturn;
+        IEnumerable<VectorTextResultItem<TVocabularyKey, TMetadata>> resultsToReturn;
         if (pageCount != null && pageCount >= 0 && pageIndex >= 0) {
             resultsToReturn = similarities.Skip(pageIndex * pageCount.Value).Take(pageCount.Value);
         } else {
@@ -208,23 +203,23 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
             resultsToReturn = similarities;
         }
 
-        return new VectorTextResult<TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
+        return new VectorTextResult<TVocabularyKey, TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
     }
 
-    private async Task<IEnumerable<VectorTextResultItem<TMetadata>>> CalculateVectorComparisonAsync(string queryText, float? threshold = null)
+    private async Task<IEnumerable<VectorTextResultItem<TVocabularyKey, TMetadata>>> CalculateVectorComparisonAsync(TVocabularyKey queryText, float? threshold = null)
     {
         var queryTokens = _textPreprocessor.TokenizeAndPreprocess(queryText);
-        float[] queryVector = _vectorizer.GenerateVectorFromTokens(VocabularyStore, queryTokens);
+        float[] queryVector = _vectorizer.GenerateVectorFromTokens(VectorStore.VocabularyStore, queryTokens);
 
         // Method to get the maximum vector length in the database
-        int desiredLength = VocabularyStore.Count;
+        var desiredLength = VectorStore.VocabularyStore.Count;
 
         if (VectorStore.Count == 0)
         {
             throw new InvalidOperationException("The database is empty.");
         }
 
-        var results = new ConcurrentBag<VectorTextResultItem<TMetadata>>();
+        var results = new ConcurrentBag<VectorTextResultItem<TVocabularyKey, TMetadata>>();
         await foreach (var kvp in VectorStore)
         {
             var item = kvp.Value;
@@ -232,7 +227,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
             if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
             {
-                results.Add(new VectorTextResultItem<TMetadata>(item, vectorComparisonValue));
+                results.Add(new VectorTextResultItem<TVocabularyKey, TMetadata>(item, vectorComparisonValue));
             }
         }
         return results;

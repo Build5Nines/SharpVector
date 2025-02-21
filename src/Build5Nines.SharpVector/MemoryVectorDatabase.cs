@@ -14,20 +14,22 @@ namespace Build5Nines.SharpVector;
 /// <typeparam name="TMetadata">Defines the data type for the Metadata stored with the Text.</typeparam>
 public class MemoryVectorDatabase<TMetadata>
      : MemoryVectorDatabaseBase<
-        int, 
+        int,
         TMetadata,
-        MemoryDictionaryVectorStore<int, TMetadata>,
+        MemoryDictionaryVectorStoreWithVocabulary<int, TMetadata, DictionaryVocabularyStore<string>, string, int>,
         DictionaryVocabularyStore<string>,
+        string, int,
         IntIdGenerator,
         BasicTextPreprocessor,
         BagOfWordsVectorizer<string, int>,
         CosineSimilarityVectorComparer
-        >
+        >, IVectorDatabase<int, TMetadata>
 {
     public MemoryVectorDatabase()
         : base(
-            new MemoryDictionaryVectorStore<int, TMetadata>(),
-            new DictionaryVocabularyStore<string>()
+            new MemoryDictionaryVectorStoreWithVocabulary<int, TMetadata, DictionaryVocabularyStore<string>, string, int>(
+                new DictionaryVocabularyStore<string>()
             )
+        )
     { }
 }

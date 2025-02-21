@@ -9,10 +9,10 @@ namespace Build5Nines.SharpVector.VectorStore;
 /// </summary>
 /// <typeparam name="TId"></typeparam>
 /// <typeparam name="TMetadata"></typeparam>
-public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMetadata>
+public class MemoryDictionaryVectorStore<TId, TMetadata, TDocument> : IVectorStore<TId, TMetadata, TDocument>
     where TId : notnull
 {
-    private ConcurrentDictionary<TId, IVectorTextItem<TMetadata>> _database;
+    private ConcurrentDictionary<TId, IVectorTextItem<TDocument, TMetadata>> _database;
 
     /// <summary>
     /// The number of items in the database
@@ -20,7 +20,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     public int Count => _database.Count;
 
     public MemoryDictionaryVectorStore() {
-        _database = new ConcurrentDictionary<TId, IVectorTextItem<TMetadata>>();
+        _database = new ConcurrentDictionary<TId, IVectorTextItem<TDocument, TMetadata>>();
     }
 
     /// <summary>
@@ -29,7 +29,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     /// <param name="id"></param>
     /// <returns></returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    public void Set(TId id, IVectorTextItem<TMetadata> item)
+    public void Set(TId id, IVectorTextItem<TDocument, TMetadata> item)
     {
         _database.AddOrUpdate(id, item, (key, oldValue) => item);
     }
@@ -49,7 +49,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     /// <param name="id"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public async Task SetAsync(TId id, IVectorTextItem<TMetadata> item)
+    public async Task SetAsync(TId id, IVectorTextItem<TDocument, TMetadata> item)
     {
         await Task.Run(() => Set(id, item));
     }
@@ -60,7 +60,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     /// <param name="id"></param>
     /// <returns></returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    public IVectorTextItem<TMetadata> Get(TId id)
+    public IVectorTextItem<TDocument, TMetadata> Get(TId id)
     {
         if (_database.TryGetValue(id, out var entry))
         {
@@ -75,11 +75,11 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     /// <param name="id"></param>
     /// <returns>The removed text item</returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    public IVectorTextItem<TMetadata> Delete(TId id)
+    public IVectorTextItem<TDocument, TMetadata> Delete(TId id)
     {
         if (_database.ContainsKey(id))
         {
-            IVectorTextItem<TMetadata>? itemRemoved;
+            IVectorTextItem<TDocument, TMetadata>? itemRemoved;
             _database.Remove(id, out itemRemoved);
 #pragma warning disable CS8603 // Possible null reference return.
             return itemRemoved;
@@ -101,7 +101,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
 
 
 
-    public IEnumerator<KeyValuePair<TId, IVectorTextItem<TMetadata>>> GetEnumerator()
+    public IEnumerator<KeyValuePair<TId, IVectorTextItem<TDocument, TMetadata>>> GetEnumerator()
     {
         return _database.GetEnumerator();
     }
@@ -112,7 +112,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
     }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    public async IAsyncEnumerator<KeyValuePair<TId, IVectorTextItem<TMetadata>>> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+    public async IAsyncEnumerator<KeyValuePair<TId, IVectorTextItem<TDocument, TMetadata>>> GetAsyncEnumerator(CancellationToken cancellationToken = default)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     {
         foreach (var item in _database)
@@ -121,3 +121,8 @@ public class MemoryDictionaryVectorStore<TId, TMetadata> : IVectorStore<TId, TMe
         }
     }
 }
+
+public class MemoryDictionaryVectorStore<TId, TMetadata>
+    : MemoryDictionaryVectorStore<TId, TMetadata, string>
+    where TId : notnull
+{ }
