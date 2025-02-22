@@ -34,16 +34,7 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Run tests with code coverage
-      run: dotnet test --no-build --verbosity normal --logger trx --results-directory "./TestResults/Coverage/" --collect:"XPlat Code Coverage" 
-      
-    - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      if: always()
-      with:
-        files: |
-          ./TestResults/**/*.xml
-          ./TestResults/**/*.trx
-          ./TestResults/**/*.json
+      run: dotnet test --no-build --verbosity normal --results-directory "./TestResults/Coverage/" --collect:"XPlat Code Coverage" 
 
     - name: Upload test results artifact
       uses: actions/upload-artifact@v4
