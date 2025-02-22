@@ -30,6 +30,9 @@ jobs:
 
     - name: Build
       run: dotnet build --configuration Release --no-restore
+
+    - name: Performance
+      run: dotnet run --project src/SharpVectorPerformance --configuration Release
     
     # - name: Publish
     #   run: dotnet publish --configuration Release --output ./publish --no-build
@@ -40,7 +43,13 @@ jobs:
     #     name: release-build
     #     path: ./publish
 
-    - name: Upload artifact
+    - name: Upload Performance artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-results
+        path: 'src/SharpVectorPerformance/BenchmarkDotNet.Artifacts/results/SharpVectorPerformance.MemoryVectorDatabasePerformance-report-github.md'
+
+    - name: Upload Nuget artifact
       uses: actions/upload-artifact@v4
       with:
         name: nuget-package
