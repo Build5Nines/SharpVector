@@ -43,6 +43,9 @@ jobs:
     #     name: release-build
     #     path: ./publish
 
+    - name: List Files
+      run: ls -R
+
     - name: Upload Performance artifact
       uses: actions/upload-artifact@v4
       with:
