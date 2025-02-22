@@ -43,14 +43,14 @@ jobs:
     #     name: release-build
     #     path: ./publish
 
-    - name: List Files
-      run: ls -R
+    # - name: List Files
+    #   run: ls -R
 
     - name: Upload Performance artifact
       uses: actions/upload-artifact@v4
       with:
         name: performance-results
-        path: './BenchmarkDotNet.Artifacts/results/SharpVectorPerformance.MemoryVectorDatabasePerformance-report-github.md'
+        path: './src/BenchmarkDotNet.Artifacts/results/SharpVectorPerformance.MemoryVectorDatabasePerformance-report-github.md'
 
     - name: Upload Nuget artifact
       uses: actions/upload-artifact@v4
