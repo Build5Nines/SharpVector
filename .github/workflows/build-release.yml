@@ -46,7 +46,7 @@ jobs:
     #     path: ./publish
 
     - name: Performance Results
-      run: cat ./src/BenchmarkDotNet.Artifacts/results/SharpVectorPerformance.MemoryVectorDatabasePerformance-report-github.md >> $GITHUB_STEP_SUMMARY
+      run: cat ./BenchmarkDotNet.Artifacts/results/SharpVectorPerformance.MemoryVectorDatabasePerformance-report-github.md >> $GITHUB_STEP_SUMMARY
 
     - name: Upload Performance artifact
       uses: actions/upload-artifact@v4
