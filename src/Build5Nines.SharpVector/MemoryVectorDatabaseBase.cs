@@ -255,13 +255,11 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
         using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
         {
-            var entryDatabaseType = archive.CreateEntry("Database.json");
+            var entryDatabaseType = archive.CreateEntry("database.json");
             using (var entryStream = entryDatabaseType.Open())
             {
-                var databaseInfo = new DatabaseInfo {
-                    Version = "1.0.0",
-                    VectorDatabaseClassType = this.GetType().FullName
-                };
+                var databaseInfo = new DatabaseInfo(this.GetType().FullName);
+
                 var databaseInfoJson = JsonSerializer.Serialize(databaseInfo);
 
                 if (databaseInfoJson != null)
@@ -275,7 +273,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
                     throw new InvalidOperationException("Type name cannot be null.");
                 }
             }
-            var entryVectorStore = archive.CreateEntry("VectorStore.json");
+            var entryVectorStore = archive.CreateEntry("vectorstore.json");
             using (var entryStream = entryVectorStore.Open())
             {
                 streamVectorStore.Position = 0;
@@ -283,7 +281,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
                 await entryStream.FlushAsync();
             }
 
-            var entryVocabularyStore = archive.CreateEntry("VocabularyStore.json");
+            var entryVocabularyStore = archive.CreateEntry("vocabularystore.json");
             using (var entryStream = entryVocabularyStore.Open())
             {
                 streamVocabularyStore.Position = 0;
@@ -313,7 +311,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
         using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
         {
-            var entryDatabaseType = archive.GetEntry("Database.json");
+            var entryDatabaseType = archive.GetEntry("database.json");
             if (entryDatabaseType != null)
             {
                 using (var entryStream = entryDatabaseType.Open())
@@ -330,31 +328,32 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
                     if (databaseInfo == null)
                     {
-                        throw new InvalidOperationException("Database info entry is null.");
+                        throw new DatabaseFileInfoException("Database info entry is null.");
                     }
 
-                    if (databaseInfo.Schema != "Build5Nines.SharpVector")
+                    if (databaseInfo.Schema != DatabaseInfo.SupportedSchema)
                     {
-                        throw new InvalidOperationException("The database schema does not match the expected schema.");
+                        throw new DatabaseFileSchemaException($"The database schema does not match the expected schema (Expected: {DatabaseInfo.SupportedSchema} - Actual: {databaseInfo.Schema})."); 
                     }
 
-                    if (databaseInfo.Version != "1.0.0")
+                    if (databaseInfo.Version != DatabaseInfo.SupportedVersion)
                     {
-                        throw new InvalidOperationException($"The database version does not match the expected version (Expected: 1.0.0 - Actual: {databaseInfo.Version}).");
+                        throw new DatabaseFileVersionException($"The database version does not match the expected version (Expected: {DatabaseInfo.SupportedVersion} - Actual: {databaseInfo.Version}).");
                     }
 
-                    if (databaseInfo.VectorDatabaseClassType != this.GetType().FullName)
+                    if (databaseInfo.ClassType != this.GetType().FullName)
                     {
-                        throw new InvalidOperationException($"The database type does not match the expected type [Expected: {databaseInfo.VectorDatabaseClassType}] ");
+                        throw new DatabaseFileClassTypeException($"The database class type does not match the expected type (Expected: {this.GetType().FullName} - Actual: {databaseInfo.ClassType})");
                     }
                 }
             }
             else
             {
-                throw new InvalidOperationException("Database type entry not found.");
+                throw new DatabaseFileMissingEntryException("Database info entry not found.", "database");
             }
 
-            var entryVectorStore = archive.GetEntry("VectorStore.json");
+
+            var entryVectorStore = archive.GetEntry("vectorstore.json");
             if (entryVectorStore != null)
             {
                 using (var entryStream = entryVectorStore.Open())
@@ -364,10 +363,10 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
             }
             else
             {
-                throw new InvalidOperationException("Vector Store entry not found.");
+                throw new DatabaseFileMissingEntryException("Vector Store entry not found.", "vectorstore");
             }
 
-            var entryVocabularyStore = archive.GetEntry("VocabularyStore.json");
+            var entryVocabularyStore = archive.GetEntry("vocabularystore.json");
             if (entryVocabularyStore != null)
             {
                 using (var entryStream = entryVocabularyStore.Open())
@@ -377,8 +376,9 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
             }
             else
             {
-                throw new InvalidOperationException("Vocabulary Store entry not found.");
+                throw new DatabaseFileMissingEntryException("Vocabulary Store entry not found.", "vocabularystore");
             }
+
         }
     }
 
