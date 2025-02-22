@@ -34,24 +34,17 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Run tests with code coverage
-      run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage" 
-
-    - name: Code Coverage Results
-      run: |
-        # Install the ReportGenerator global tool if not already installed
-        dotnet tool install -g dotnet-reportgenerator-globaltool || true
-        export PATH="$PATH:~/.dotnet/tools"
-
-        # Generate a Markdown summary from the coverage file
-        dotnet reportgenerator \
-          -reports:./coverage.cobertura.xml \
-          -targetdir:./coverage-output \
-          -reporttypes:MarkdownSummary
-
-        # Write header and append the generated report to the GitHub Step Summary
-        echo "## Code Coverage" > $GITHUB_STEP_SUMMARY
-        cat ./coverage-output/Report.md >> $GITHUB_STEP_SUMMARY
+      run: dotnet test --no-build --verbosity normal --logger trx --results-directory "./TestResults/Coverage/" --collect:"XPlat Code Coverage" 
       
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        files: |
+          TestResults/**/*.xml
+          TestResults/**/*.trx
+          TestResults/**/*.json
+
     - name: Upload test results artifact
       uses: actions/upload-artifact@v4
       with:
