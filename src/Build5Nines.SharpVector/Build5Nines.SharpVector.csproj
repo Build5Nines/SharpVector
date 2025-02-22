@@ -13,6 +13,7 @@
     <Description>Lightweight In-memory Vector Database to embed in any .NET Applications</Description>
     <Copyright>Copyright (c) 2025 Build5Nines LLC</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <!-- <PackageLicenseExpression>MIT</PackageLicenseExpression> -->
     <PackageLicenseUrl>https://github.com/Build5Nines/SharpVector/blob/main/LICENSE</PackageLicenseUrl>
     <Authors>Chris Pietschmann</Authors>
     <Company>Build5Nines LLC</Company>
