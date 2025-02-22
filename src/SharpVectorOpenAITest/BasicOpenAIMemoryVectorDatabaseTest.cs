@@ -13,8 +13,8 @@ namespace Build5Nines.SharpVector.OpenAI.Tests
     [TestClass]
     public class BasicMemoryVectorDatabaseTest
     {
-        private Mock<EmbeddingClient> _mockEmbeddingClient;
-        private BasicOpenAIMemoryVectorDatabase _database;
+        private Mock<EmbeddingClient>? _mockEmbeddingClient;
+        private BasicOpenAIMemoryVectorDatabase? _database;
 
         [TestInitialize]
         public void Setup()

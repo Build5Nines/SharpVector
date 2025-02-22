@@ -44,10 +44,11 @@ public class BagOfWordsVectorizer<TVocabularyKey, TVocabularyValue> : IVectorize
     /// <param name="vector"></param>
     /// <param name="length"></param>
     /// <returns></returns>
-    public float[] NormalizeVector(float[] vector, int length)
+    public float[] NormalizeVector(float[] vector, TVocabularyValue length)
     {
-        float[] normalizedVector = new float[length];
-        Array.Copy(vector, normalizedVector, Math.Min(vector.Length, length));
+        var intLength = Convert.ToInt32(length);
+        float[] normalizedVector = new float[intLength];
+        Array.Copy(vector, normalizedVector, (long)Math.Min(vector.Length, intLength));
         
         // Normalize the vector
         float magnitude = (float)Math.Sqrt(normalizedVector.Sum(v => v * v));

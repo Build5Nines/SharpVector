@@ -140,6 +140,17 @@ Here's a screenshot of the test console app running:
 
 ## Change Log
 
+## v2.0.0 (In Progress)
+
+Feature:
+- Add data persistence capability
+ 
+Breaking Change:
+- Refactor `IVocabularyStore` to be used within `MemoryDictionaryVectorStoreWithVocabulary`. This simplifies implementation of `MemoryVectorDatabaseBase`, and helps to enable data persistence capability.
+
+Notes:
+- The breaking change only applies if the base classes are being used. If the `BasicMemoryVectorDatabase` is being used, this will likely not break applications that depend on this library. However, in some instances where explicitly depending on `VectorTextResult` it's properties (without using `var` in consuming code) there might be minor code changes needed when migrating from previous versions of the library.
+
 ## v1.0.1 (2025-02-06)
 
 - Upgrade to .NET 8 or higher

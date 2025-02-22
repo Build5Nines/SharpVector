@@ -3,7 +3,7 @@ namespace Build5Nines.SharpVector.Preprocessing;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 
-public class BasicTextPreprocessor : ITextPreprocessor
+public class BasicTextPreprocessor : ITextPreprocessor<string>
 {
     public IEnumerable<string> TokenizeAndPreprocess(string text)
     {

@@ -56,9 +56,19 @@ public class CosineSimilarityVectorComparer : IVectorComparer
         return dotProduct / (magnitudeA * magnitudeB);
     }
 
+    public IEnumerable<VectorTextResultItem<TDocument, TMetadata>> Sort<TDocument, TMetadata>(IEnumerable<VectorTextResultItem<TDocument, TMetadata>> results)
+    {
+        return results.OrderByDescending(s => s.VectorComparison);
+    }
+
     public IEnumerable<VectorTextResultItem<TMetadata>> Sort<TMetadata>(IEnumerable<VectorTextResultItem<TMetadata>> results)
     {
         return results.OrderByDescending(s => s.VectorComparison);
+    }
+
+    public async Task<IEnumerable<VectorTextResultItem<TDocument, TMetadata>>> SortAsync<TDocument, TMetadata>(IEnumerable<VectorTextResultItem<TDocument, TMetadata>> results)
+    {
+        return await Task.Run(() => Sort(results));
     }
 
     public async Task<IEnumerable<VectorTextResultItem<TMetadata>>> SortAsync<TMetadata>(IEnumerable<VectorTextResultItem<TMetadata>> results)

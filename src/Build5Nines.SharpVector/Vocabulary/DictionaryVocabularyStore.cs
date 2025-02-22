@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Text.Json;
 
 namespace Build5Nines.SharpVector.Vocabulary;
 
@@ -41,5 +42,24 @@ public class DictionaryVocabularyStore<TKey> : IVocabularyStore<TKey, int>
     public bool TryGetValue(TKey token, out int index)
     {
         return _vocabulary.TryGetValue(token, out index);
+    }
+
+    public async Task SerializeToJsonStreamAsync(Stream stream)
+    {
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+        await JsonSerializer.SerializeAsync<ConcurrentDictionary<TKey, int>>(stream, _vocabulary);
+    }
+
+    public async Task DeserializeFromJsonStreamAsync(Stream stream)
+    {
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+
+        this._vocabulary = await JsonSerializer.DeserializeAsync<ConcurrentDictionary<TKey, int>>(stream) ?? new ConcurrentDictionary<TKey, int>();
     }
 }

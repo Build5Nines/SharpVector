@@ -1,7 +1,7 @@
 namespace Build5Nines.SharpVector.Preprocessing;
 
-public interface ITextPreprocessor
+public interface ITextPreprocessor<TToken>
 {
-    IEnumerable<string> TokenizeAndPreprocess(string text);
-    Task<IEnumerable<string>> TokenizeAndPreprocessAsync(string text);
+    IEnumerable<TToken> TokenizeAndPreprocess(TToken text);
+    Task<IEnumerable<TToken>> TokenizeAndPreprocessAsync(TToken text);
 }

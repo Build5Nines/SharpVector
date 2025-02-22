@@ -49,6 +49,16 @@ public class EuclideanDistanceVectorComparer : IVectorComparer
         return await Task.Run(() => Sort(results));
     }
 
+    public IEnumerable<VectorTextResultItem<TDocument, TMetadata>> Sort<TDocument, TMetadata>(IEnumerable<VectorTextResultItem<TDocument, TMetadata>> results)
+    {
+        return results.OrderBy(s => s.VectorComparison);
+    }
+
+    public async Task<IEnumerable<VectorTextResultItem<TDocument, TMetadata>>> SortAsync<TDocument, TMetadata>(IEnumerable<VectorTextResultItem<TDocument, TMetadata>> results)
+    {
+        return await Task.Run(() => Sort(results));
+    }
+
     public bool IsWithinThreshold(float? threshold, float vectorComparisonValue)
     {
         if (threshold == null)
