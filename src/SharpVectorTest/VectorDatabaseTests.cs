@@ -479,6 +479,11 @@ public class VectorDatabaseTests
 
         // Compare both results
         Assert.AreEqual(firstResult.Texts.Count(), secondResult.Texts.Count());
+
+        databaseTwo.AddText("NewNewNew", 4.5);
+        var thirdResult = await databaseTwo.SearchAsync("NewNewNew", pageCount: 5);
+        Assert.AreEqual("NewNewNew", thirdResult.Texts.First().Text);
+        Assert.AreEqual(4.5, thirdResult.Texts.First().Metadata);
     }
 }
 

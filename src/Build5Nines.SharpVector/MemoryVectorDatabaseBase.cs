@@ -22,7 +22,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     where TVectorizer : IVectorizer<TVocabularyKey, TVocabularyValue>, new()
     where TVectorComparer : IVectorComparer, new()
 {
-    private TIdGenerator _idGenerator;
+    protected TIdGenerator _idGenerator;
 
     private TTextPreprocessor _textPreprocessor;
 
@@ -242,7 +242,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="stream"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public async Task SerializeToJsonStreamAsync(Stream stream)
+    public virtual async Task SerializeToJsonStreamAsync(Stream stream)
     {
         var streamVectorStore = new MemoryStream();
         var streamVocabularyStore = new MemoryStream();
@@ -289,7 +289,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         await stream.FlushAsync();
     }
 
-    public void SerializeToJsonStream(Stream stream)
+    public virtual void SerializeToJsonStream(Stream stream)
     {
         if (stream == null)
         {
@@ -298,7 +298,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         SerializeToJsonStreamAsync(stream).Wait();
     }
 
-    public async Task DeserializeFromJsonStreamAsync(Stream stream)
+    public virtual async Task DeserializeFromJsonStreamAsync(Stream stream)
     {
         if (stream == null)
         {
@@ -359,7 +359,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         }
     }
 
-    public void DeserializeFromJsonStream(Stream stream)
+    public virtual void DeserializeFromJsonStream(Stream stream)
     {
         if (stream == null)
         {

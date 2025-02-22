@@ -32,4 +32,20 @@ public class MemoryVectorDatabase<TMetadata>
             )
         )
     { }
+
+    public override async Task DeserializeFromJsonStreamAsync(Stream stream)
+    {
+        await base.DeserializeFromJsonStreamAsync(stream);
+
+        // Re-initialize the IdGenerator with the max Id value from the VectorStore
+        _idGenerator = new IntIdGenerator(VectorStore.GetIds().Max());
+    }
+
+    public override void DeserializeFromJsonStream(Stream stream)
+    {
+        base.DeserializeFromJsonStream(stream);
+
+        // Re-initialize the IdGenerator with the max Id value from the VectorStore
+        _idGenerator = new IntIdGenerator(VectorStore.GetIds().Max());
+    }
 }
