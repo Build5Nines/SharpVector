@@ -305,6 +305,62 @@ public class VectorDatabaseTests
     }
 
     [TestMethod]
+    public void Text_Update_01_Chinese()
+    {
+        var vdb = new MemoryVectorDatabase<string>();
+        
+        // Load Vector Database with Chinese sample text and JSON metadata
+        var id = vdb.AddText("狮子王是一部1994年的迪士尼动画电影，讲述一个小狮子辛巴必将继承非洲大草原王位的故事。", "{ value: \"元数据初始值\" }");
+        
+        // Verify that search returns the expected text
+        var results = vdb.Search("狮子");
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.IsTrue(results.Texts.First().Text.Contains("狮子王"));
+        
+        // Update the text
+        vdb.UpdateText(id, "狮子王是一部非常棒的电影！");
+        
+        // Verify that the text is updated but the metadata remains unchanged
+        results = vdb.Search("狮子");
+        Assert.AreEqual("狮子王是一部非常棒的电影！", results.Texts.First().Text);
+        Assert.AreEqual("{ value: \"元数据初始值\" }", results.Texts.First().Metadata);
+    }
+
+    [TestMethod]
+    public void Text_Update_01_English_and_Chinese()
+    {
+        var vdb = new MemoryVectorDatabase<string>();
+
+        // Load the Vector Database with some initial sample texts.
+        vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", "{ value: \"Lion King Metadata\" }");
+        vdb.AddText("Aladdin is a 2019 live-action Disney adaptation of the 1992 animated classic about a street urchin who finds a magic lamp.", "{ value: \"Aladdin Metadata\" }");
+        vdb.AddText("The Little Mermaid is a 2023 live-action adaptation of Disney's classic animated film about Ariel.", "{ value: \"Little Mermaid Metadata\" }");
+
+        // Add additional texts to the database.
+        vdb.AddText("Mulan is an epic tale of bravery and honor in ancient China.", "{ value: \"Mulan Metadata\" }");
+        vdb.AddText("Crouching Tiger, Hidden Dragon is a martial arts masterpiece with breathtaking scenes.", "{ value: \"Crouching Metadata\" }");
+        vdb.AddText("In the Mood for Love is a visually stunning film about forbidden romance.", "{ value: \"In the Mood Metadata\" }");
+        
+        // Add more Chinese texts.
+        vdb.AddText("大闹天宫是一部经典的中国动画电影，讲述孙悟空大闹天宫的故事。", "{ value: \"元数据新增1\" }");
+        vdb.AddText("霸王别姬是一部关于爱与背叛的中国史诗电影。", "{ value: \"元数据新增2\" }");
+
+        // Verify that a search for "Lion King" returns the expected result.
+        var lionResults = vdb.Search("Lion King");
+        Assert.IsTrue(lionResults.Texts.Any(t => t.Text.Contains("Lion King")));
+        Assert.AreEqual("{ value: \"Lion King Metadata\" }", lionResults.Texts.First().Metadata);
+
+        // Verify that the Chinese texts were added.
+        var daNaoResults = vdb.Search("大闹天宫");
+        Assert.IsTrue(daNaoResults.Texts.Any(t => t.Text.Contains("大闹天宫")));
+        Assert.AreEqual("{ value: \"元数据新增1\" }", daNaoResults.Texts.First().Metadata);
+
+        var baiJieResults = vdb.Search("霸王别姬");
+        Assert.IsTrue(baiJieResults.Texts.Any(t => t.Text.Contains("霸王别姬")));
+        Assert.AreEqual("{ value: \"元数据新增2\" }", baiJieResults.Texts.First().Metadata);
+    }
+
+    [TestMethod]
     public void Text_Metadata_String_01()
     {
         var vdb = new MemoryVectorDatabase<string>();
