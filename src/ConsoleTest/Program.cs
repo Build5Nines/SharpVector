@@ -12,21 +12,23 @@ using Build5Nines.SharpVector.VectorCompare;
 
 public class EuclideanDistanceVectorComparerMemoryVectorDatabase<TMetadata>
     : MemoryVectorDatabaseBase<
-    int, 
+    int,
     TMetadata,
-    MemoryDictionaryVectorStore<int, TMetadata>,
+    MemoryDictionaryVectorStoreWithVocabulary<int, TMetadata, DictionaryVocabularyStore<string>, string, int>,
     DictionaryVocabularyStore<string>,
+    string, int,
     IntIdGenerator,
     BasicTextPreprocessor,
     BagOfWordsVectorizer<string, int>,
     EuclideanDistanceVectorComparer
-    >
+    >, IVectorDatabase<int, TMetadata>
 {
     public EuclideanDistanceVectorComparerMemoryVectorDatabase()
         : base(
-            new MemoryDictionaryVectorStore<int, TMetadata>(),
-            new DictionaryVocabularyStore<string>()
+            new MemoryDictionaryVectorStoreWithVocabulary<int, TMetadata, DictionaryVocabularyStore<string>, string, int>(
+                new DictionaryVocabularyStore<string>()
             )
+        )
     { }
 }
 
@@ -154,7 +156,7 @@ public static class Program
             Console.WriteLine(string.Empty);
 
             if (newPrompt != null) {
-                IVectorTextResult<string> result;
+                IVectorTextResult<string, string> result;
                 
                 var timer = new Stopwatch();
                 timer.Start();
