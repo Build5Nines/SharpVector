@@ -32,7 +32,7 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Performance
-      run: dotnet run --project src/SharpVectorPerformance/SharpVectorPerformance.csproj --configuration Release
+      run: dotnet run --project SharpVectorPerformance --configuration Release
     
     # - name: Publish
     #   run: dotnet publish --configuration Release --output ./publish --no-build
