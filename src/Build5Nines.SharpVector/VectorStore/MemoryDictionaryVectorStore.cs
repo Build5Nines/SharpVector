@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text;
+using System.Text.Json;
 
 namespace Build5Nines.SharpVector.VectorStore;
 
@@ -12,7 +14,7 @@ namespace Build5Nines.SharpVector.VectorStore;
 public class MemoryDictionaryVectorStore<TId, TMetadata, TDocument> : IVectorStore<TId, TMetadata, TDocument>
     where TId : notnull
 {
-    private ConcurrentDictionary<TId, IVectorTextItem<TDocument, TMetadata>> _database;
+    private ConcurrentDictionary<TId, VectorTextItem<TDocument, TMetadata>> _database;
 
     /// <summary>
     /// The number of items in the database
@@ -20,7 +22,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata, TDocument> : IVectorSto
     public int Count => _database.Count;
 
     public MemoryDictionaryVectorStore() {
-        _database = new ConcurrentDictionary<TId, IVectorTextItem<TDocument, TMetadata>>();
+        _database = new ConcurrentDictionary<TId, VectorTextItem<TDocument, TMetadata>>();
     }
 
     /// <summary>
@@ -29,7 +31,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata, TDocument> : IVectorSto
     /// <param name="id"></param>
     /// <returns></returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    public void Set(TId id, IVectorTextItem<TDocument, TMetadata> item)
+    public void Set(TId id, VectorTextItem<TDocument, TMetadata> item)
     {
         _database.AddOrUpdate(id, item, (key, oldValue) => item);
     }
@@ -49,7 +51,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata, TDocument> : IVectorSto
     /// <param name="id"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public async Task SetAsync(TId id, IVectorTextItem<TDocument, TMetadata> item)
+    public async Task SetAsync(TId id, VectorTextItem<TDocument, TMetadata> item)
     {
         await Task.Run(() => Set(id, item));
     }
@@ -60,7 +62,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata, TDocument> : IVectorSto
     /// <param name="id"></param>
     /// <returns></returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    public IVectorTextItem<TDocument, TMetadata> Get(TId id)
+    public VectorTextItem<TDocument, TMetadata> Get(TId id)
     {
         if (_database.TryGetValue(id, out var entry))
         {
@@ -75,11 +77,11 @@ public class MemoryDictionaryVectorStore<TId, TMetadata, TDocument> : IVectorSto
     /// <param name="id"></param>
     /// <returns>The removed text item</returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    public IVectorTextItem<TDocument, TMetadata> Delete(TId id)
+    public VectorTextItem<TDocument, TMetadata> Delete(TId id)
     {
         if (_database.ContainsKey(id))
         {
-            IVectorTextItem<TDocument, TMetadata>? itemRemoved;
+            VectorTextItem<TDocument, TMetadata>? itemRemoved;
             _database.Remove(id, out itemRemoved);
 #pragma warning disable CS8603 // Possible null reference return.
             return itemRemoved;
@@ -101,7 +103,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata, TDocument> : IVectorSto
 
 
 
-    public IEnumerator<KeyValuePair<TId, IVectorTextItem<TDocument, TMetadata>>> GetEnumerator()
+    public IEnumerator<KeyValuePair<TId, VectorTextItem<TDocument, TMetadata>>> GetEnumerator()
     {
         return _database.GetEnumerator();
     }
@@ -112,13 +114,33 @@ public class MemoryDictionaryVectorStore<TId, TMetadata, TDocument> : IVectorSto
     }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    public async IAsyncEnumerator<KeyValuePair<TId, IVectorTextItem<TDocument, TMetadata>>> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+    public async IAsyncEnumerator<KeyValuePair<TId, VectorTextItem<TDocument, TMetadata>>> GetAsyncEnumerator(CancellationToken cancellationToken = default)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     {
         foreach (var item in _database)
         {
             yield return item;
         }
+    }
+
+    public virtual async Task SerializeToJsonStreamAsync(Stream stream)
+    {
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+
+        await JsonSerializer.SerializeAsync<ConcurrentDictionary<TId, VectorTextItem<TDocument, TMetadata>>>(stream, _database);
+    }
+
+    public virtual async Task DeserializeFromJsonStreamAsync(Stream stream)
+    {
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+
+        this._database = await JsonSerializer.DeserializeAsync<ConcurrentDictionary<TId, VectorTextItem<TDocument, TMetadata>>>(stream) ?? new ConcurrentDictionary<TId, VectorTextItem<TDocument, TMetadata>>();
     }
 }
 

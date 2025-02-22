@@ -5,6 +5,8 @@ using Build5Nines.SharpVector.Vectorization;
 using Build5Nines.SharpVector.VectorCompare;
 using Build5Nines.SharpVector.VectorStore;
 using System.Collections.Concurrent;
+using System.IO.Compression;
+using System.Runtime.CompilerServices;
 
 namespace Build5Nines.SharpVector;
 
@@ -232,5 +234,137 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
             }
         }
         return results;
+    }
+
+    /// <summary>
+    /// Serializes the Vector Database to a JSON stream
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public async Task SerializeToJsonStreamAsync(Stream stream)
+    {
+        var streamVectorStore = new MemoryStream();
+        var streamVocabularyStore = new MemoryStream();
+
+        var taskVectorStore = VectorStore.SerializeToJsonStreamAsync(streamVectorStore);
+        var taskVocabularyStore = VectorStore.VocabularyStore.SerializeToJsonStreamAsync(streamVocabularyStore);
+
+        await Task.WhenAll(taskVectorStore, taskVocabularyStore);
+
+        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
+        {
+            var entryDatabaseType = archive.CreateEntry("DatabaseType.txt");
+            using (var entryStream = entryDatabaseType.Open())
+            {
+                var typeName = this.GetType().FullName;
+                if (typeName != null)
+                {
+                    var databaseTypeBytes = System.Text.Encoding.UTF8.GetBytes(typeName);
+                    await entryStream.WriteAsync(databaseTypeBytes);
+                    await entryStream.FlushAsync();
+                }
+                else
+                {
+                    throw new InvalidOperationException("Type name cannot be null.");
+                }
+            }
+            var entryVectorStore = archive.CreateEntry("VectorStore.json");
+            using (var entryStream = entryVectorStore.Open())
+            {
+                streamVectorStore.Position = 0;
+                await streamVectorStore.CopyToAsync(entryStream);
+                await entryStream.FlushAsync();
+            }
+
+            var entryVocabularyStore = archive.CreateEntry("VocabularyStore.json");
+            using (var entryStream = entryVocabularyStore.Open())
+            {
+                streamVocabularyStore.Position = 0;
+                await streamVocabularyStore.CopyToAsync(entryStream);
+                await entryStream.FlushAsync();
+            }
+        }
+
+        await stream.FlushAsync();
+    }
+
+    public void SerializeToJsonStream(Stream stream)
+    {
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+        SerializeToJsonStreamAsync(stream).Wait();
+    }
+
+    public async Task DeserializeFromJsonStreamAsync(Stream stream)
+    {
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+
+        using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
+        {
+            var entryDatabaseType = archive.GetEntry("DatabaseType.txt");
+            if (entryDatabaseType != null)
+            {
+                using (var entryStream = entryDatabaseType.Open())
+                {
+                    var databaseTypeStream = new MemoryStream();
+                    await entryStream.CopyToAsync(databaseTypeStream);
+                    databaseTypeStream.Position = 0;
+
+                    var databaseTypeBytes = new byte[databaseTypeStream.Length];
+                    await databaseTypeStream.ReadAsync(databaseTypeBytes);
+                    var databaseType = System.Text.Encoding.UTF8.GetString(databaseTypeBytes);
+
+                    if (databaseType != this.GetType().FullName)
+                    {
+                        throw new InvalidOperationException($"The database type does not match the expected type [Expected: {databaseType}] ");
+                    }
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Database type entry not found.");
+            }
+
+            var entryVectorStore = archive.GetEntry("VectorStore.json");
+            if (entryVectorStore != null)
+            {
+                using (var entryStream = entryVectorStore.Open())
+                {
+                    await VectorStore.DeserializeFromJsonStreamAsync(entryStream);
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Vector Store entry not found.");
+            }
+
+            var entryVocabularyStore = archive.GetEntry("VocabularyStore.json");
+            if (entryVocabularyStore != null)
+            {
+                using (var entryStream = entryVocabularyStore.Open())
+                {
+                    await VectorStore.VocabularyStore.DeserializeFromJsonStreamAsync(entryStream);
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Vocabulary Store entry not found.");
+            }
+        }
+    }
+
+    public void DeserializeFromJsonStream(Stream stream)
+    {
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+        DeserializeFromJsonStreamAsync(stream).Wait();
     }
 }

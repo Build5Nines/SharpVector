@@ -83,6 +83,35 @@ public interface IVectorDatabase<TId, TMetadata, TDocument>
     /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
     /// <returns></returns>
     Task<IVectorTextResult<TDocument, TMetadata>> SearchAsync(TDocument queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null);
+
+
+    /// <summary>
+    /// Serializes the Database to a JSON stream
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
+    Task SerializeToJsonStreamAsync(Stream stream);
+
+    /// <summary>
+    /// Serializes the Database to a JSON stream
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
+    void SerializeToJsonStream(Stream stream);
+
+    /// <summary>
+    /// Deserializes the Database from a JSON stream
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
+    Task DeserializeFromJsonStreamAsync(Stream stream);
+
+    /// <summary>
+    /// Deserializes the Database from a JSON stream
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
+    void DeserializeFromJsonStream(Stream stream);
 }
 
 public interface IVectorDatabase<TId, TMetadata>
