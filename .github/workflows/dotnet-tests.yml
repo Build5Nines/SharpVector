@@ -41,9 +41,9 @@ jobs:
       if: always()
       with:
         files: |
-          TestResults/**/*.xml
-          TestResults/**/*.trx
-          TestResults/**/*.json
+          ./TestResults/**/*.xml
+          ./TestResults/**/*.trx
+          ./TestResults/**/*.json
 
     - name: Upload test results artifact
       uses: actions/upload-artifact@v4
