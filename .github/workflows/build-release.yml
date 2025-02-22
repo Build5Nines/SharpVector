@@ -30,7 +30,7 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
 
-    - name: Performance
+    - name: Performance Test
       run: dotnet run --project SharpVectorPerformance --configuration Release
     
     # - name: Publish
@@ -41,9 +41,6 @@ jobs:
     #   with:
     #     name: release-build
     #     path: ./publish
-
-    # - name: List Files
-    #   run: ls -R
 
     - name: Performance Results
       run: echo ./src/BenchmarkDotNet.Artifacts/results/SharpVectorPerformance.MemoryVectorDatabasePerformance-report-github.md >> $GITHUB_STEP_SUMMARY
