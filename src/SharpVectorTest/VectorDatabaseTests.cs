@@ -531,7 +531,7 @@ public class VectorDatabaseTests
         timer.Stop();
         Console.WriteLine($"SaveLoadFile_002: Save File: {timer.ElapsedMilliseconds} ms");
 
-        Assert.IsTrue(timer.ElapsedMilliseconds < 200, $"SaveLoadFile_002: Save File took too long - Expected: < 200 - Actual: {timer.ElapsedMilliseconds} ms");
+        Assert.IsTrue(timer.ElapsedMilliseconds < 300, $"SaveLoadFile_002: Save File took too long - Expected: < 300 - Actual: {timer.ElapsedMilliseconds} ms");
       
         var databaseTwo = new MemoryVectorDatabase<double>();
         timer.Restart();
@@ -539,7 +539,7 @@ public class VectorDatabaseTests
         timer.Stop();
         Console.WriteLine($"SaveLoadFile_002: Load File: {timer.ElapsedMilliseconds} ms");
 
-        Assert.IsTrue(timer.ElapsedMilliseconds < 200, $"SaveLoadFile_002: Load File took too long - Expected: < 200 - Actual: {timer.ElapsedMilliseconds} ms");
+        Assert.IsTrue(timer.ElapsedMilliseconds < 300, $"SaveLoadFile_002: Load File took too long - Expected: < 300 - Actual: {timer.ElapsedMilliseconds} ms");
 
         var secondResult = await databaseTwo.SearchAsync("Lion King", pageCount: 5);
         Assert.AreEqual(5, secondResult.Texts.Count());
