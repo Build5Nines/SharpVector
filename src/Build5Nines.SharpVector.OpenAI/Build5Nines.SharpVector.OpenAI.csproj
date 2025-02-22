@@ -9,7 +9,7 @@
     <PackageId>Build5Nines.SharpVector.OpenAI</PackageId>
     <PackageProjectUrl>https://github.com/Build5Nines/SharpVector</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Build5Nines/SharpVector</RepositoryUrl>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Description>Lightweight In-memory Vector Database to embed in any .NET Applications</Description>
     <Copyright>Copyright (c) 2025 Build5Nines LLC</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-      <PackageReference Include="Build5Nines.SharpVector" Version="1.0.1" />
+      <PackageReference Include="Build5Nines.SharpVector" Version="[1.0.0,2.0.0)" />
       <PackageReference Include="OpenAI" Version="2.1.0" />
   </ItemGroup>
 </Project>
