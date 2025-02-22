@@ -7,6 +7,7 @@ using Build5Nines.SharpVector.VectorStore;
 using System.Collections.Concurrent;
 using System.IO.Compression;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace Build5Nines.SharpVector;
 
@@ -254,13 +255,18 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
         using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
         {
-            var entryDatabaseType = archive.CreateEntry("DatabaseType.txt");
+            var entryDatabaseType = archive.CreateEntry("Database.json");
             using (var entryStream = entryDatabaseType.Open())
             {
-                var typeName = this.GetType().FullName;
-                if (typeName != null)
+                var databaseInfo = new DatabaseInfo {
+                    Version = "1.0.0",
+                    VectorDatabaseClassType = this.GetType().FullName
+                };
+                var databaseInfoJson = JsonSerializer.Serialize(databaseInfo);
+
+                if (databaseInfoJson != null)
                 {
-                    var databaseTypeBytes = System.Text.Encoding.UTF8.GetBytes(typeName);
+                    var databaseTypeBytes = System.Text.Encoding.UTF8.GetBytes(databaseInfoJson);
                     await entryStream.WriteAsync(databaseTypeBytes);
                     await entryStream.FlushAsync();
                 }
@@ -307,7 +313,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
         using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
         {
-            var entryDatabaseType = archive.GetEntry("DatabaseType.txt");
+            var entryDatabaseType = archive.GetEntry("Database.json");
             if (entryDatabaseType != null)
             {
                 using (var entryStream = entryDatabaseType.Open())
@@ -318,11 +324,28 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
                     var databaseTypeBytes = new byte[databaseTypeStream.Length];
                     await databaseTypeStream.ReadAsync(databaseTypeBytes);
-                    var databaseType = System.Text.Encoding.UTF8.GetString(databaseTypeBytes);
+                    var databaseInfoJson = System.Text.Encoding.UTF8.GetString(databaseTypeBytes);
 
-                    if (databaseType != this.GetType().FullName)
+                    var databaseInfo = JsonSerializer.Deserialize<DatabaseInfo>(databaseInfoJson);
+
+                    if (databaseInfo == null)
                     {
-                        throw new InvalidOperationException($"The database type does not match the expected type [Expected: {databaseType}] ");
+                        throw new InvalidOperationException("Database info entry is null.");
+                    }
+
+                    if (databaseInfo.Schema != "Build5Nines.SharpVector")
+                    {
+                        throw new InvalidOperationException("The database schema does not match the expected schema.");
+                    }
+
+                    if (databaseInfo.Version != "1.0.0")
+                    {
+                        throw new InvalidOperationException($"The database version does not match the expected version (Expected: 1.0.0 - Actual: {databaseInfo.Version}).");
+                    }
+
+                    if (databaseInfo.VectorDatabaseClassType != this.GetType().FullName)
+                    {
+                        throw new InvalidOperationException($"The database type does not match the expected type [Expected: {databaseInfo.VectorDatabaseClassType}] ");
                     }
                 }
             }
