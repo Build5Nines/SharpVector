@@ -1,9 +1,14 @@
 name: .NET Core Tests
 
 on:
+  push:
+    branches:
+      - main
+      - dev
   pull_request:
     branches:
       - main
+      - dev
   workflow_dispatch:
 
 jobs:
@@ -28,5 +33,27 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
 
-    - name: Run tests
-      run: dotnet test --no-build --verbosity normal
+    - name: Run tests with code coverage
+      run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage" 
+
+    - name: Code Coverage Results
+      run: |
+        # Install the ReportGenerator global tool if not already installed
+        dotnet tool install -g dotnet-reportgenerator-globaltool || true
+        export PATH="$PATH:~/.dotnet/tools"
+
+        # Generate a Markdown summary from the coverage file
+        dotnet reportgenerator \
+          -reports:./coverage.cobertura.xml \
+          -targetdir:./coverage-output \
+          -reporttypes:MarkdownSummary
+
+        # Write header and append the generated report to the GitHub Step Summary
+        echo "## Code Coverage" > $GITHUB_STEP_SUMMARY
+        cat ./coverage-output/Report.md >> $GITHUB_STEP_SUMMARY
+      
+    - name: Upload test results artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: '**/TestResults/**'
