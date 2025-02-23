@@ -248,4 +248,137 @@ public abstract class OpenAIMemoryVectorDatabaseBase<TId, TMetadata, TVectorStor
         }
         return results;
     }
+
+        /// <summary>
+    /// Serializes the Vector Database to a JSON stream
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public virtual async Task SerializeToJsonStreamAsync(Stream stream)
+    {
+        var streamVectorStore = new MemoryStream();
+        var streamVocabularyStore = new MemoryStream();
+
+        var taskVectorStore = VectorStore.SerializeToJsonStreamAsync(streamVectorStore);
+        var taskVocabularyStore = VectorStore.VocabularyStore.SerializeToJsonStreamAsync(streamVocabularyStore);
+
+        await Task.WhenAll(taskVectorStore, taskVocabularyStore);
+
+        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
+        {
+            var entryDatabaseType = archive.CreateEntry("database.json");
+            using (var entryStream = entryDatabaseType.Open())
+            {
+                var databaseInfo = new DatabaseInfo(this.GetType().FullName);
+
+                var databaseInfoJson = JsonSerializer.Serialize(databaseInfo);
+
+                if (databaseInfoJson != null)
+                {
+                    var databaseTypeBytes = System.Text.Encoding.UTF8.GetBytes(databaseInfoJson);
+                    await entryStream.WriteAsync(databaseTypeBytes);
+                    await entryStream.FlushAsync();
+                }
+                else
+                {
+                    throw new InvalidOperationException("Type name cannot be null.");
+                }
+            }
+            var entryVectorStore = archive.CreateEntry("vectorstore.json");
+            using (var entryStream = entryVectorStore.Open())
+            {
+                streamVectorStore.Position = 0;
+                await streamVectorStore.CopyToAsync(entryStream);
+                await entryStream.FlushAsync();
+            }
+        }
+
+        await stream.FlushAsync();
+    }
+
+    public virtual void SerializeToJsonStream(Stream stream)
+    {
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+        SerializeToJsonStreamAsync(stream).Wait();
+    }
+
+    public virtual async Task DeserializeFromJsonStreamAsync(Stream stream)
+    {
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+
+        using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
+        {
+            var entryDatabaseType = archive.GetEntry("database.json");
+            if (entryDatabaseType != null)
+            {
+                using (var entryStream = entryDatabaseType.Open())
+                {
+                    var databaseTypeStream = new MemoryStream();
+                    await entryStream.CopyToAsync(databaseTypeStream);
+                    databaseTypeStream.Position = 0;
+
+                    var databaseTypeBytes = new byte[databaseTypeStream.Length];
+                    await databaseTypeStream.ReadAsync(databaseTypeBytes);
+                    var databaseInfoJson = System.Text.Encoding.UTF8.GetString(databaseTypeBytes);
+
+                    var databaseInfo = JsonSerializer.Deserialize<DatabaseInfo>(databaseInfoJson);
+
+                    if (databaseInfo == null)
+                    {
+                        throw new DatabaseFileInfoException("Database info entry is null.");
+                    }
+
+                    if (databaseInfo.Schema != DatabaseInfo.SupportedSchema)
+                    {
+                        throw new DatabaseFileSchemaException($"The database schema does not match the expected schema (Expected: {DatabaseInfo.SupportedSchema} - Actual: {databaseInfo.Schema})."); 
+                    }
+
+                    if (databaseInfo.Version != DatabaseInfo.SupportedVersion)
+                    {
+                        throw new DatabaseFileVersionException($"The database version does not match the expected version (Expected: {DatabaseInfo.SupportedVersion} - Actual: {databaseInfo.Version}).");
+                    }
+
+                    if (databaseInfo.ClassType != this.GetType().FullName)
+                    {
+                        throw new DatabaseFileClassTypeException($"The database class type does not match the expected type (Expected: {this.GetType().FullName} - Actual: {databaseInfo.ClassType})");
+                    }
+                }
+            }
+            else
+            {
+                throw new DatabaseFileMissingEntryException("Database info entry not found.", "database");
+            }
+
+
+            var entryVectorStore = archive.GetEntry("vectorstore.json");
+            if (entryVectorStore != null)
+            {
+                using (var entryStream = entryVectorStore.Open())
+                {
+                    await VectorStore.DeserializeFromJsonStreamAsync(entryStream);
+                }
+            }
+            else
+            {
+                throw new DatabaseFileMissingEntryException("Vector Store entry not found.", "vectorstore");
+            }
+        }
+    }
+
+    public virtual void DeserializeFromJsonStream(Stream stream)
+    {
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+        DeserializeFromJsonStreamAsync(stream).Wait();
+    }
+
 }
