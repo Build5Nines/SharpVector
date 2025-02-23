@@ -162,11 +162,12 @@ class Program
             var generatorParams = new GeneratorParams(model);
             generatorParams.SetSearchOption("max_length", maxPromptLength);
             generatorParams.SetSearchOption("past_present_share_buffer", false);
-            generatorParams.SetInputSequences(tokens);
+            //generatorParams.SetInputSequences(tokens);
 
             // Generate the response
             Console.WriteLine("AI is thinking...");
             var generator = new Generator(model, generatorParams);
+            generator.AppendTokenSequences(tokens);
 
             // show in console that the assistant is responding
             Console.WriteLine("");
@@ -174,7 +175,7 @@ class Program
 
             // Output response as each token in generated
             while (!generator.IsDone()) {
-                generator.ComputeLogits();
+                //generator.ComputeLogits();
                 generator.GenerateNextToken();
                 var output = GetOutputTokens(generator, tokenizer);
                 Console.Write(output);
