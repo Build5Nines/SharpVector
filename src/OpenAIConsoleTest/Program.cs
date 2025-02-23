@@ -77,15 +77,12 @@ while(true) {
     Console.WriteLine(string.Empty);
 
     if (newPrompt != null) {
-        IVectorTextResult<string> result;
-        
         var timer = new Stopwatch();
         timer.Start();
 
-
         var pageSize = 3;
         // result = await vdb.Search(newPrompt,
-        result = await vdb.SearchAsync(newPrompt,
+        var result = await vdb.SearchAsync(newPrompt,
             threshold: 0.001f, // 0.2f, // Cosine Similarity - Only return results with similarity greater than this threshold
             // threshold: (float)1.4f, // Euclidean Distance - Only return results with distance less than this threshold
 

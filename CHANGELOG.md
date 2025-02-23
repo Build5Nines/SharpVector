@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v2.0.0 (In Progress)
+## v2.0.0
 
 Added:
 
-- Add data persistence capability to save/load from a file or to/from a `Stream`
+- Add data persistence capability to save/load from a file or to/from a `Stream` (Both SharpVector and SharpVector.OpenAI)
 - Add Chinese language/character support
 
 Breaking Change:
