@@ -1,9 +1,14 @@
 name: .NET Core Tests
 
 on:
+  push:
+    branches:
+      - main
+      - dev
   pull_request:
     branches:
       - main
+      - dev
   workflow_dispatch:
 
 jobs:
@@ -28,5 +33,11 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
 
-    - name: Run tests
-      run: dotnet test --no-build --verbosity normal
+    - name: Run tests with code coverage
+      run: dotnet test --no-build --verbosity normal --results-directory "./TestResults/Coverage/" --collect:"XPlat Code Coverage" 
+
+    - name: Upload test results artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: '**/TestResults/**'

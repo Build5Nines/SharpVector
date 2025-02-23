@@ -45,11 +45,11 @@ public static class Program
 
         var jsonString = await File.ReadAllTextAsync("movies.json");
 
-        var importTimer = new Stopwatch();
-        importTimer.Start();    
+        var timer = new Stopwatch();
+        timer.Start();    
 
 
-        for (var i = 0; i < 10; i++){
+        //for (var i = 0; i < 10; i++){
         using (JsonDocument document = JsonDocument.Parse(jsonString))
         {
             JsonElement root = document.RootElement;
@@ -65,29 +65,30 @@ public static class Program
                     await vdb.AddTextAsync(text, metadata);
                 }
             });
-
-            // foreach (JsonElement movie in movies.EnumerateArray())
-            // {
-            //     var text = movie.GetProperty("description").GetString();
-            //     var metadata = movie.GetProperty("title").GetString();
-                
-            //     if (!string.IsNullOrWhiteSpace(text) && !string.IsNullOrWhiteSpace(metadata))
-            //     {
-            //         await vdb.AddTextAsync(text, metadata);
-            //     }
-            // }
         }
-        }
+        //}
 
-        importTimer.Stop();
-        Console.WriteLine("Movie data imported into Vector Database.");
-        Console.WriteLine($"Import took {importTimer.ElapsedMilliseconds} ms");
-
+        timer.Stop();
+        Console.WriteLine($"Movie data imported into Vector Database (Elapsed: {timer.ElapsedMilliseconds} ms)");
 
 
 
+        Console.WriteLine("Saving Vector Database to file...");
+        timer.Restart();
+
+        await vdb.SaveToFileAsync("movies.b59vdb");
+
+        timer.Stop();
+        Console.WriteLine($"Vector Database saved to file (Elapsed: {timer.ElapsedMilliseconds} ms)");
 
 
+        Console.WriteLine("Loading Vector Database from file...");
+        timer.Restart();
+
+        await vdb.LoadFromFileAsync("movies.b59vdb");
+
+        timer.Stop();
+        Console.WriteLine($"Vector Database loaded from file (Elapsed: {timer.ElapsedMilliseconds} ms)");
 
 
         // Paths to the large text files
@@ -158,9 +159,7 @@ public static class Program
             if (newPrompt != null) {
                 IVectorTextResult<string, string> result;
                 
-                var timer = new Stopwatch();
-                timer.Start();
-
+                timer.Restart();
 
                 var pageSize = 3;
                 // result = await vdb.Search(newPrompt,

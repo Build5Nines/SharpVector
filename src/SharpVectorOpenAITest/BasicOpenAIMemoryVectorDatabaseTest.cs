@@ -29,5 +29,14 @@ namespace Build5Nines.SharpVector.OpenAI.Tests
             Assert.IsNotNull(_database);
         }
 
+        [TestMethod]
+        public async Task Test_SaveLoad_01()
+        {
+            var filename = "openai_test_saveload_01.b59vdb";
+            await _database.SaveToFileAsync(filename);
+
+            await _database.LoadFromFileAsync(filename);
+        }
+
     }
 }

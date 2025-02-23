@@ -3,3 +3,6 @@ obj
 bin
 
 .DS_Store
+
+BenchmarkDotNet.Artifacts/
+TestResults/

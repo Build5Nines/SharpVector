@@ -16,7 +16,7 @@
     <PackageLicenseUrl>https://github.com/Build5Nines/SharpVector/blob/main/LICENSE</PackageLicenseUrl>
     <Authors>Chris Pietschmann</Authors>
     <Company>Build5Nines LLC</Company>
-    <PackageTags>vector;search;database;data;rag</PackageTags>
+    <PackageTags>vector;search;database;data;rag;search;llm;generative ai;ai;genai</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
