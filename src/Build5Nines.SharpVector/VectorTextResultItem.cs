@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 namespace Build5Nines.SharpVector;
 
 public interface IVectorTextResultItem<TDocument, TMetadata>
@@ -23,6 +25,9 @@ public class VectorTextResultItem<TDocument, TMetadata> : IVectorTextResultItem<
     
     public TDocument Text { get => _item.Text; }
     public TMetadata? Metadata { get => _item.Metadata; }
+
+    public ImmutableArray<float> Vectors { get => ImmutableArray.Create(_item.Vector); }
+
     public float VectorComparison { get; private set; }
 }
 
