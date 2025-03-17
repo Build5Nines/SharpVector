@@ -1,0 +1,173 @@
+﻿@page "/"
+@inject IJSRuntime JS
+
+<PageTitle>Build5Nines.SharpVector Playground</PageTitle>
+
+<p>Welcome to Build5Nines.SharpVector Playground where you can write C# code and test out SharpVector right within the browser.</p>
+
+<h3>Code Editor</h3>
+<StandaloneCodeEditor id="playgroundEditor" @ref="_playgroundEditor" ConstructionOptions="EditorConstructionOptions" />
+
+<button class="btn btn-primary" @onclick="RunCode" disabled="@_isRunning">Run Code</button>
+
+<h3>Console Output</h3>
+<textarea id="consoleOutput" rows="10" class="form-control" readonly>@ConsoleOutput</textarea>
+
+@code {
+    private StandaloneCodeEditor _playgroundEditor;
+
+    private string ConsoleOutput { get; set; } = string.Empty;
+    
+    private bool _isRunning = false;
+
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            AutomaticLayout = true,
+            Language = "csharp",
+            Value = @"
+// Welcome to the Build5Nines.SharpVector Playground!
+// Edit the code here, then click 'Run Code' below to test it out. :)
+
+using System;
+using Build5Nines.SharpVector;
+
+// Create a Vector Database with metadata of type string
+var vdb = new BasicMemoryVectorDatabase();
+// The Metadata is declared using generics, so you can store whatever data you need there.
+
+// Load Vector Database with some sample text data
+// Text is the movie description, and Metadata is the movie title with release year in this example
+Console.WriteLine(""Loading documents..."");
+vdb.AddText(""Iron Man"", ""Iron Man (2008)"");
+//vdb.AddText(""The Lion King"", ""The Lion King (1994)"");
+//vdb.AddText(""Aladdin"", ""Alladin (2019)"");
+//vdb.AddText(""The Little Mermaid"", ""The Little Mermaid"");
+//vdb.AddText(""Frozen"", ""Frozen (2013)"");
+Console.WriteLine(""Documents loaded and vectorized."");
+
+Console.WriteLine(""Searching database..."");
+// Perform a Vector Search
+var result = vdb.Search(""Iron Man"", pageCount: 5); // return the first 5 results
+
+Console.WriteLine(""Search complete"");
+if (!result.IsEmpty)
+{
+    Console.WriteLine(""Similar Text Found:"");
+    foreach (var item in result.Texts)
+    {
+        Console.WriteLine(item.Metadata);
+        Console.WriteLine(item.Text);
+    }
+} else {
+    Console.WriteLine(""No results found."");
+}
+
+            "
+        };
+    }
+
+    // Custom TextWriter to update the UI as new text is written.
+    private class BlazorConsoleWriter : TextWriter
+    {
+        private readonly Action<string> _updateConsoleOutput;
+        public BlazorConsoleWriter(Action<string> updateConsoleOutput)
+        {
+            _updateConsoleOutput = updateConsoleOutput;
+        }
+
+        public override System.Text.Encoding Encoding => System.Text.Encoding.UTF8;
+
+        public override void Write(char value)
+        {
+            _updateConsoleOutput(value.ToString());
+        }
+
+        public override void Write(string value)
+        {
+            _updateConsoleOutput(value);
+        }
+
+        public override void WriteLine(string value)
+        {
+            _updateConsoleOutput(value + "\n");
+        }
+
+        public void WriteDebug(string value)
+        {
+            _updateConsoleOutput($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}] {value}\n");
+        }
+    }
+
+    // Called when the user clicks the 'Run' button.
+    private async Task RunCode()
+    {
+        // Retrieve the latest code from the Monaco editor via JS interop.
+        var code = await _playgroundEditor.GetValue();
+
+        // Clear previous console output.
+        _isRunning = true;
+        StateHasChanged();
+
+        // Redirect Console output to capture the result.
+        var consoleWriter = new BlazorConsoleWriter(AppendConsoleOutput);
+        consoleWriter.WriteDebug("Preparing to run code...");
+        var originalOut = Console.Out;
+        Console.SetOut(consoleWriter);
+
+        try
+        {
+            // Create script options that include a reference to the Build5Nines.SharpVector assembly
+            var scriptOptions = Microsoft.CodeAnalysis.Scripting.ScriptOptions.Default
+                .AddReferences(typeof(Build5Nines.SharpVector.BasicMemoryVectorDatabase).Assembly)
+                .AddImports("Build5Nines.SharpVector");
+
+            // Execute the code using Roslyn scripting.
+            // This example assumes the code is self-contained and has valid entry logic.
+            //var result = await Microsoft.CodeAnalysis.CSharp.Scripting.CSharpScript.RunAsync(code, scriptOptions);
+
+            var script = Microsoft.CodeAnalysis.CSharp.Scripting.CSharpScript.Create(code, scriptOptions);
+            consoleWriter.WriteDebug("Compiling code...");
+            var diagnostics = script.Compile();
+
+            if (diagnostics.Any(d => d.Severity == Microsoft.CodeAnalysis.DiagnosticSeverity.Error))
+            {
+                consoleWriter.WriteDebug("Compilation failed with errors:");
+                foreach (var diag in diagnostics.Where(d => d.Severity == Microsoft.CodeAnalysis.DiagnosticSeverity.Error))
+                {
+                    consoleWriter.WriteDebug(diag.ToString());
+                }
+            }
+            else
+            {
+                consoleWriter.WriteDebug("Running code...");
+                consoleWriter.WriteLine(string.Empty); // add a space before app output
+                var result = await script.RunAsync();
+            }
+
+            consoleWriter.WriteLine(string.Empty); // add a space after app output
+            consoleWriter.WriteDebug("Code execution complete.");
+        }
+        catch (Exception ex)
+        {
+            consoleWriter.WriteDebug("Error: " + ex.Message);
+        }
+        finally
+        {
+            // Flush the output and restore the original Console output.
+            Console.Out.Flush();
+            Console.SetOut(originalOut);
+        }
+
+        _isRunning = false;
+        StateHasChanged();
+    }
+
+    // Append output and update the UI.
+    private void AppendConsoleOutput(string value)
+    {
+        ConsoleOutput += value;
+        InvokeAsync(StateHasChanged);
+    }
+}
