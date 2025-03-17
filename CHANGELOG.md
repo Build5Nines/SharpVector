@@ -5,7 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v2.0.0
+## 2.0.1 (2025-03-17)
+
+Added:
+
+- Expose internal vector array of `VectorTextItem` from `VectorTextResultItem.Vectors` property, to make vector array accessible for consuming code in cases where access is required. This is mostly for more flexible usage of the library.
+- Added Overlapping Window text chunking (`TextChunkingMethod.OverlappingWindow`) to `TextDataLoader` for enhanced document segmentation with overlapping content, improving metadata extraction and search result relevance.
+
+Fixed:
+
+- When using `Data.TextDataLoader` with `TextChunkingMethod.FixedLength` it was splitting on a space character which wouldn't work correctly with Chinese text characters. This is now fixed to work correctly with Chinese characters too.
+
+## v2.0.0 (2025-02-23)
 
 Added:
 

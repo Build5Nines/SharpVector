@@ -13,5 +13,9 @@ public enum TextChunkingMethod
     /// <summary>
     /// Split the text into fixed length chunks
     /// </summary>
-    FixedLength
+    FixedLength,
+    /// <summary>
+    /// Split the text into overlapping windows
+    /// </summary>
+    OverlappingWindow
 }
