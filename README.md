@@ -73,7 +73,7 @@ As you can see with the following example usage of the `Build5Nines.SharpVector`
     // Perform a Vector Search
     var result = vdb.Search(newPrompt, pageCount: 5); // return the first 5 results
 
-    if (result.HasResults)
+    if (!result.IsEmpty)
     {
         Console.WriteLine("Similar Text Found:");
         foreach (var item in result.Texts)
@@ -81,6 +81,8 @@ As you can see with the following example usage of the `Build5Nines.SharpVector`
             Console.WriteLine(item.Metadata);
             Console.WriteLine(item.Text);
         }
+    } else {
+        Console.WriteLine("No results found.");
     }
 ```
 
