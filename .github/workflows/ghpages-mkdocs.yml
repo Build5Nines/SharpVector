@@ -1,0 +1,42 @@
+name: MKDocs to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - docs/**
+  pull_request:
+    branches:
+      - main
+    paths:
+      - docs/**
+  workflow_dispatch:
+    
+jobs:
+    build:
+        runs-on: ubuntu-latest
+    
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+    
+        - name: Set up Python
+          uses: actions/setup-python@v4
+          with:
+            python-version: '3.x'  # Use the latest version of Python 3
+    
+        - name: Install dependencies
+          run: |
+            python -m pip install --upgrade pip
+            pip install mkdocs
+    
+        - name: Build documentation
+          run: mkdocs build --site-dir gh-pages
+    
+        - name: Deploy to GitHub Pages
+          uses: peaceiris/actions-gh-pages@v3
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            publish_dir: ./gh-pages
+            publish_branch: gh-pages
