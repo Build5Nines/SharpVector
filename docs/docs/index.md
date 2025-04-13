@@ -1,24 +1,44 @@
-# Build5Nines.SharpVector Documentation
+# Build5Nines.SharpVector
 
-_Work in progress..._
+**SharpVector** is a lightweight, in-memory text vector database built for .NET applications. It enables fast and flexible vector-based similarity search for text data — ideal for search engines, recommendation systems, semantic analysis, and AI-enhanced features.
+
+[![NuGet](https://img.shields.io/nuget/v/Build5Nines.SharpVector.svg)](https://www.nuget.org/packages/Build5Nines.SharpVector/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 > "For the in-memory vector database, we're using Build5Nines.SharpVector, an excellent open-source project by Chris Pietschmann. SharpVector makes it easy to store and retrieve vectorized data, making it an ideal choice for our sample RAG implementation."
 >
 > _- [Tulika Chaudharie, Principal Product Manager at Microsoft for Azure App Service](https://azure.github.io/AppService/2024/09/03/Phi3-vector.html)_
 
+---
 
-<!-- For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+## 🚀 Key Features
 
-## Commands
+- 🔍 **Text Embedding & Search** – Store and search documents using vector similarity (cosine, Euclidean, etc.)
+- 🧠 **Pluggable Embeddings** – Works with your own vectorizer (like OpenAI, HuggingFace, or custom)
+- ⚡ **In-Memory Performance** – Designed for speed in local or embedded applications
+- 🛠️ **Lightweight & Easy to Use** – Minimal dependencies, simple API
+- 📦 **.NET Standard Support** – Compatible with .NET 8+
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+---
 
-## Project layout
+## 🧠 Use Cases
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files. -->
+SharpVector is great for:
+
+- Embedding search within desktop or server .NET applications
+
+- Building semantic search over notes or documents
+
+- Powering recommendation features based on text similarity
+
+- Integrating with OpenAI or local embeddings for intelligent querying
+
+---
+
+## 🙌 Get Involved
+
+We welcome contributions, feedback, and new ideas. Whether it's a bug report or a pull request, head over to our GitHub repository to start collaborating!
+
+---
+
+SharpVector is built by [Chris Pietschmann](https://pietschsoft.com). Happy vector searching!
