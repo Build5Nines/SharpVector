@@ -45,7 +45,7 @@ jobs:
     
         - name: Build documentation
           # Outputs to the './_site' directory by default
-          run: mkdocs build --site-dir "{{ steps.pages.outputs.base_path}}""
+          run: mkdocs build --site-dir "{{ steps.pages.outputs.base_path}}"
           
         - name: Upload artifact
           # Automatically upload an artifact from the './_site' directory by default
