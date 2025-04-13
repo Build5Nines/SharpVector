@@ -1,4 +1,4 @@
-name: MKDocs to GitHub Pages
+name: Deploy MKDocs site to Pages
 
 on:
   push:
@@ -9,11 +9,14 @@ on:
       - mkdocs.yml
   workflow_dispatch:
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
     contents: read
     pages: write
     id-token: write
-
+  
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
     group: "pages"
     cancel-in-progress: false
@@ -26,6 +29,10 @@ jobs:
         - name: Checkout code
           uses: actions/checkout@v2
     
+        - name: Setup pages
+          id: pages
+          uses: actions/configure-pages@v5
+
         - name: Set up Python
           uses: actions/setup-python@v4
           with:
@@ -37,17 +44,12 @@ jobs:
             pip install mkdocs
     
         - name: Build documentation
-          run: mkdocs build --site-dir _site
-  
-        - name: Setup pages
-          uses: actions/configure-pages@v5
+          # Outputs to the './_site' directory by default
+          run: mkdocs build --site-dir "{{ steps.pages.outputs.base_path}}""
           
         - name: Upload artifact
-          uses: actions/upload-artifact@v4
-          with:
-            name: github-pages
-            path: _site/
-
+          # Automatically upload an artifact from the './_site' directory by default
+          uses: actions/upload-pages-artifact@v3
 
     deploy:
         runs-on: ubuntu-latest
@@ -56,26 +58,6 @@ jobs:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
         steps:
-        - name: Remove hard links and symlinks
-          run: |
-            echo "Removing symlinks..."
-            find . -type l -exec rm -f {} +
-            echo "Checking for remaining symlinks..."
-            find . -type l -exec echo "Symlink found: {}" \;
-
-        - name: Check artifact size
-          run: |
-            echo "Calculating artifact size..."
-            size=$(du -sh . | cut -f1)
-            echo "Artifact size: $size"
-            if [ $(du -s . | cut -f1) -gt $((10 * 1024 * 1024)) ]; then
-            echo "Artifact exceeds 10GB size limit." >&2
-            exit 1
-            fi
-
         - name: Deploy to GitHub Pages
           id: deployment
           uses: actions/deploy-pages@v4
-          with:
-            artifact_name: github-pages
-            path: ./
