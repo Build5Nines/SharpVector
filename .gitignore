@@ -6,3 +6,5 @@ bin
 
 BenchmarkDotNet.Artifacts/
 TestResults/
+
+docs/site
