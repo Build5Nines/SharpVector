@@ -1,5 +1,21 @@
 site_name: Build5Nines.SharpVector
-theme: mkdocs
+site_url: https://sharpvector.build5nines.com
+site_author: Chris Pietschmann
+
+theme:
+  name: material # null
+#  custom_dir: themes/material
+
+repo_name: Build5Nines/SharpVector
+repo_url: https://github.com/Build5Nines/SharpVector
+edit_uri: edit/main/docs/docs/
+
+copyright: '&copy; 2025 Build5Nines LLC'
 nav:
   - Home: index.md
   - License: license.md
+
+extra:
+  palette:
+    primary: 'indigo'
+    accent: 'light blue'
