@@ -39,6 +39,19 @@ jobs:
         - name: Build documentation
           run: mkdocs build --site-dir _site
   
+        - name: Remove hard links and symlinks
+          run: |
+            find _site -type l -exec rm -f {} +
+
+        - name: Check artifact size
+          run: |
+            size=$(du -sh _site | cut -f1)
+            echo "Artifact size: $size"
+            if [ $(du -s _site | cut -f1) -gt $((10 * 1024 * 1024)) ]; then
+              echo "Artifact exceeds 10GB size limit." >&2
+              exit 1
+            fi
+
         - name: Setup pages
           uses: actions/configure-pages@v5
           
@@ -56,10 +69,8 @@ jobs:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
         steps:    
-        - name: Download artifact
-          uses: actions/download-artifact@v4
-
         - name: Deploy to GitHub Pages
           id: deployment
           uses: actions/deploy-pages@v4
-          
+          with:
+            artifact_name: github-pages
