@@ -1,2 +1,3 @@
 site_name: Build5Nines.SharpVector Documentation
-
+nav:
+  - Home: index.md
