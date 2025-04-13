@@ -5,10 +5,16 @@ on:
     branches:
       - main
       - dev
+    paths-ignore:
+      - 'docs/**'
+      - mkdocs.yml
   pull_request:
     branches:
       - main
       - dev
+    paths-ignore:
+      - 'docs/**'
+      - mkdocs.yml
   workflow_dispatch:
 
 jobs:

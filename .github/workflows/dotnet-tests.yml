@@ -5,10 +5,14 @@ on:
     branches:
       - main
       - dev
+    paths-ignore:
+      - 'docs/**'
   pull_request:
     branches:
       - main
       - dev
+    paths-ignore:
+      - 'docs/**'
   workflow_dispatch:
 
 jobs:
