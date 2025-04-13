@@ -48,7 +48,7 @@ jobs:
         - name: Build documentation
           # Outputs to the './_site' directory by default
           run: |
-            mkdocs build --site-dir ./_site --docs-dir ./docs --config-file ./docs/mkdocs.yml
+            mkdocs build --site-dir ./_site --config-file ./docs/mkdocs.yml
           
         - name: Upload artifact
           # Automatically upload an artifact from the './_site' directory by default
