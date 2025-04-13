@@ -1,3 +1,5 @@
-site_name: Build5Nines.SharpVector Documentation
+site_name: Build5Nines.SharpVector
+theme: mkdocs
 nav:
   - Home: index.md
+  - License: license.md
