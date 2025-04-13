@@ -5,17 +5,65 @@ site_author: Chris Pietschmann
 theme:
   name: material # null
 #  custom_dir: themes/material
+  features:
+    - tabs
+    - content.code.copy
+    - content.code.annotate
+    
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/link
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch-off
+        name: Switch to system preference
 
 repo_name: Build5Nines/SharpVector
 repo_url: https://github.com/Build5Nines/SharpVector
 edit_uri: edit/main/docs/docs/
 
 copyright: '&copy; 2025 Build5Nines LLC'
-nav:
-  - Home: index.md
-  - License: license.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.snippets
 
 extra:
-  palette:
-    primary: 'indigo'
-    accent: 'light blue'
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Build5Nines
+    - icon: fontawesome/brands/bluesky
+      link: https://bsky.app/profile/build5nines.bsky.social
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/build5nines
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/build5nines
+    - icon: fontawesome/brands/youtube
+      link: https://www.youtube.com/@build5nines
+    
+nav:
+  - Home: index.md
+  - Get Started: get-started.md
+  - Concepts: concepts.md
+  - Text Chunking: text-chunking.md
+  - OpenAI Embeddings: openai-embeddings.md
+  - License: license.md
