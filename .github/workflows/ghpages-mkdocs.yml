@@ -4,8 +4,15 @@ on:
   push:
     branches:
       - main
+    paths:
+      - docs/**
+  pull_request:
+    branches:
+      - main
+    paths:
+      - docs/**
   workflow_dispatch:
-
+    
 jobs:
     build:
         runs-on: ubuntu-latest
