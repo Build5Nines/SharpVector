@@ -80,9 +80,9 @@ plugins:
       show_email_address: false
 
 extra:
-  # analytics:
-  #   provider: google
-  #   property: G-???
+  analytics:
+    provider: google
+    property: G-7KST9RSCN3
   generator: false
   social:
     - icon: fontawesome/brands/github
