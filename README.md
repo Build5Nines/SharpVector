@@ -16,7 +16,7 @@ Vector databases are used with [Generative AI](https://build5nines.com/what-is-g
 
 While there are lots of large databases that can be used to build Vector Databases (like Azure CosmosDB, PostgreSQL w/ pgvector, Azure AI Search, Elasticsearch, and more), there are not many options for a lightweight vector database that can be embedded into any .NET application. Build5Nines SharpVector is the lightweight in-memory Text Vector Database for use in any .NET application that you're looking for!
 
-### [Read Documentation](https://sharpvector.build5nines.com)
+### [Documentation](https://sharpvector.build5nines.com) | [Get Started](https://sharpvector.build5nines.com/get-started/) | [Samples](https://sharpvector.build5nines.com/samples/)
 
 ## Nuget Package
 
