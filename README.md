@@ -4,6 +4,8 @@
 
 Vector databases are used with [Generative AI](https://build5nines.com/what-is-generative-ai/?utm_source=github&utm_medium=sharpvector) solutions augmenting the LLM (Large Language Model) with the ability to load additional context data with the AI prompt using the [RAG (Retrieval-Augmented Generation)](https://build5nines.com/what-is-retrieval-augmented-generation-rag/?utm_source=github&utm_medium=sharpvector) design pattern.
 
+[Read Documentation](https://sharpvector.build5nines.com)
+
 While there are lots of large databases that can be used to build Vector Databases (like Azure CosmosDB, PostgreSQL w/ pgvector, Azure AI Search, Elasticsearch, and more), there are not many options for a lightweight vector database that can be embedded into any .NET application. Build5Nines SharpVector is the lightweight in-memory Text Vector Database for use in any .NET application that you're looking for!
 
 > _"For the in-memory vector database, we're using Build5Nines.SharpVector, an excellent open-source project by Chris Pietschmann. SharpVector makes it easy to store and retrieve vectorized data, making it an ideal choice for our sample RAG implementation."_
@@ -31,15 +33,6 @@ Here's a list of several usage scenarios where `Build5Nines.SharpVector` can be 
 - **Simplified Deployment**: Integrating an in-memory database directly into a .NET application simplifies deployment and reduces the complexity of the infrastructure.
 - **Lower Resource Usage**: In-memory databases can operate with fewer resources, making them ideal for applications with limited compute resources.
 - **Experimentation and Research**: In-memory databases can be easier to experiment when trying out new features and algorithms in a controlled and flexible environment.
-
-## Tutorials
-
-Here's a couple helpful tutorial links with additional documentation and examples on using `Build5Nines.SharpVector` in your own projects:
-
-- [Perform Vector Database Similarity Search in .NET Apps using Build5Nines.SharpVector](https://build5nines.com/using-build5nines-sharpvector-for-vector-similarity-search-in-net-applications/?utm_source=github&utm_medium=sharpvector) by Chris Pietschmann
-- [Enhanced In-Memory Text Vector Search in .NET with SharpVector and OpenAI Embeddings](https://build5nines.com/enhanced-in-memory-text-vector-search-in-net-with-sharpvector-and-openai-embeddings/?utm_source=github&utm_medium=sharpvector) by Chris Pietschmann
-- [Build a Generative AI + RAG App in C# with Phi-3, ONNX, and SharpVector](https://build5nines.com/build-a-generative-ai-rag-app-in-c-with-phi-3-onnx-and-sharpvector/?utm_source=github&utm_medium=sharpvector) by Chris Pietschmann
-- [Implementing Local RAG using Phi-3 ONNX Runtime and Sidecar Pattern on Linux App Service](https://azure.github.io/AppService/2024/09/03/Phi3-vector.html) by Tulika Chaudharie (Principal Product Manager at Microsoft for Azure App Service)
 
 ## Nuget Package
 

@@ -50,3 +50,5 @@ if (!result.IsEmpty)
     Console.WriteLine("No results found.");
 }
 ```
+
+🚀 You are now using an in-memory vector database to implement semantic text searching within your app!
