@@ -1,4 +1,6 @@
 mkdocs
 mkdocs-material
+mkdocs-material[imaging]
 pymdown-extensions
 markdown-include
+mkdocs-git-authors-plugin

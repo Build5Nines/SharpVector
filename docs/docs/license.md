@@ -1,5 +1,6 @@
 ---
 title: License
+description: Review the MIT license terms for using and contributing to the SharpVector open-source project.
 date: 2025-04-13
 ---
 

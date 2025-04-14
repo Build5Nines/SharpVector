@@ -1,3 +1,8 @@
+---
+title: Samples
+description: Explore real-world code samples to see SharpVector in action. Build search engines, intelligent note apps, and more.
+---
+
 # Samples
 
 ## Sample Console App
