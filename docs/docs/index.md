@@ -1,10 +1,10 @@
 ---
 title: Discover SharpVector
-description: A lightweight, in-memory text vector database for .NET that powers intelligent search and recommendation features.
+description: The lightweight, in-memory text vector database for .NET that powers intelligent search and recommendation features.
 ---
 # Build5Nines.SharpVector
 
-**SharpVector** is a lightweight, in-memory text vector database built for .NET applications. It enables fast and flexible vector-based similarity search for text data — ideal for search engines, recommendation systems, semantic analysis, and AI-enhanced features.
+**Build5Nines.SharpVector** is the lightweight, in-memory text vector database built for .NET applications. It enables fast and flexible vector-based similarity search for text data — ideal for search engines, recommendation systems, semantic analysis, and AI-enhanced features.
 
 ![Tests: Passing](https://img.shields.io/github/actions/workflow/status/build5nines/sharpvector/dotnet-tests.yml?label=tests)
 ![Build: Passing](https://img.shields.io/github/actions/workflow/status/build5nines/sharpvector/build-release.yml)
