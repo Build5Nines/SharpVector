@@ -18,8 +18,6 @@ theme:
     - search.suggest
     - search.highlight
     
-    
-    
   palette:
     - media: "(prefers-color-scheme)"
       toggle:
@@ -58,10 +56,10 @@ markdown_extensions:
   - pymdownx.snippets
 
 plugins:
+  #- search
   - social
   - git-authors:
       show_email_address: false
-
 
 extra:
   # analytics:
