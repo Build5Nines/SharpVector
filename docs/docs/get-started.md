@@ -10,12 +10,12 @@ It's really easy to get started with using `Build5Nines.SharpVector`. Simply fol
 
 === ".NET CLI"
     ```bash
-    > dotnet add package Build5Nines.SharpVector
+    dotnet add package Build5Nines.SharpVector
     ```
 
 === "Package Manager"
     ```powershell
-    PM> Nuget\Install-Package Build5Nines.SharpVector
+    Nuget\Install-Package Build5Nines.SharpVector
     ```
 
 ## Basic example

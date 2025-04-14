@@ -5,6 +5,8 @@ site_author: Chris Pietschmann
 theme:
   name: material # null
 #  custom_dir: themes/material
+  favicon: images/favicon.png
+  logo: images/logo.png
   features:
     - tabs
     - content.code.copy
