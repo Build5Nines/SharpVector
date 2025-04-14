@@ -107,3 +107,19 @@ Normalizing vectors
 Managing memory usage
 
 Tips for batch processing -->
+
+## Retrieval Augmented Generation (RAG)
+
+A vector database plays a central role in [Retrieval Augmented Generation (RAG)](https://build5nines.com/what-is-retrieval-augmented-generation-rag/) — a technique where search is combined with generative AI models (like GPT or other LLMs) to produce more accurate, context-aware responses.
+
+In a typical RAG workflow:
+
+- A user's query is vectorized and used to search a vector database.
+
+- The most semantically relevant chunks of text are retrieved.
+
+- These retrieved results are then fed into a generative model as additional context.
+
+This process allows the LLM to generate responses grounded in real, domain-specific information that it may not have seen during training. It enhances factual accuracy and relevance — making AI-driven experiences more trustworthy and useful.
+
+`Build5Nines.SharpVector` makes it easy to build RAG-based workflows in .NET by enabling fast, in-memory vector search of documents, notes, or knowledge bases. Combined with an embedding service like OpenAI or Azure OpenAI, it’s a powerful foundation for building intelligent AI apps.

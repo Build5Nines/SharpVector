@@ -66,4 +66,6 @@ nav:
   - Concepts: concepts.md
   - Text Chunking: text-chunking.md
   - OpenAI Embeddings: openai-embeddings.md
+  - Samples: samples.md
+  - Resources: resources.md
   - License: license.md

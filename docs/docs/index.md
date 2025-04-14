@@ -41,4 +41,4 @@ We welcome contributions, feedback, and new ideas. Whether it's a bug report or 
 
 ---
 
-SharpVector is built by [Chris Pietschmann](https://pietschsoft.com). Happy vector searching!
+The **Build5Nines SharpVector** project is maintained by [Chris Pietschmann](https://pietschsoft.com?utm_source=github&utm_medium=sharpvector), founder of [Build5Nines](https://build5nines.com?utm_source=github&utm_medium=sharpvector), Microsoft MVP, HashiCorp Ambassador, and Microsoft Certified Trainer (MCT).
