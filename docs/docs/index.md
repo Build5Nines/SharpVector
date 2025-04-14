@@ -6,8 +6,19 @@ description: A lightweight, in-memory text vector database for .NET that powers 
 
 **SharpVector** is a lightweight, in-memory text vector database built for .NET applications. It enables fast and flexible vector-based similarity search for text data — ideal for search engines, recommendation systems, semantic analysis, and AI-enhanced features.
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Build5Nines/SharpVector/dotnet-tests.yml)
 [![NuGet](https://img.shields.io/nuget/v/Build5Nines.SharpVector.svg)](https://www.nuget.org/packages/Build5Nines.SharpVector/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+![Framework: .NET 8+](https://img.shields.io/badge/framework-.NET%208%2B-blue)
+![Semantic Search: Enabled](https://img.shields.io/badge/semantic%20search-enabled-purple)
+![Gen AI: Ready](https://img.shields.io/badge/Gen%20AI-ready-purple)
+
+<!--
+![GitHub contributors](https://img.shields.io/github/contributors/Build5Nines/SharpVector)
+<!-- https://buttons.github.io/ -->
+<!--
+<a class="github-button" href="https://github.com/Build5Nines/SharpVector" data-color-scheme="no-preference: light; light: light; dark: dark;" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star Build5Nines/SharpVector on GitHub">Star</a>
+-->
 
 > "For the in-memory vector database, we're using Build5Nines.SharpVector, an excellent open-source project by Chris Pietschmann. SharpVector makes it easy to store and retrieve vectorized data, making it an ideal choice for our sample RAG implementation."
 >

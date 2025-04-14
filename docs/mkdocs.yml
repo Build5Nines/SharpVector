@@ -5,6 +5,8 @@ site_author: Build5Nines LLC & Chris Pietschmann
 theme:
   name: material # null
 #  custom_dir: themes/material
+  custom_dir: overrides # add custom header scripts
+  language: en
   favicon: images/favicon.png
   logo: images/logo.png
   features:
@@ -13,10 +15,15 @@ theme:
     # - content.action.view
     - content.code.copy
     - content.code.annotate
+    - navigation.expand # sidebar collapsible sections open
     - navigation.footer
     - navigation.tabs
+    #- navigation.tabs.sticky # tabs stick when scrolling down page
     - search.suggest
     - search.highlight
+    - navigation.path # add bradcrumbs
+    - navigation.indexes # default 'index.md' in folder is section page
+    - content.tabs.link # Ensures site-wide switch to same tab name
     
   palette:
     - media: "(prefers-color-scheme)"
@@ -45,15 +52,26 @@ edit_uri: edit/main/docs/docs/
 copyright: '&copy; 2025 Build5Nines LLC'
 
 markdown_extensions:
+  - abbr
   - admonition
+  - attr_list
+  - toc:
+      permalink: true
+      toc_depth: 3
   - pymdownx.details
   - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji
+  - pymdownx.highlight:
+      auto_title: true
+      linenums: true
+  - pymdownx.snippets
   - pymdownx.tabbed:
       alternate_style: true
       slugify: !!python/object/apply:pymdownx.slugs.slugify
         kwds:
           case: lower
-  - pymdownx.snippets
 
 plugins:
   - search
