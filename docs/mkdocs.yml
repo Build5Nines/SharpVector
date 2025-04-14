@@ -56,7 +56,7 @@ markdown_extensions:
   - pymdownx.snippets
 
 plugins:
-  #- search
+  - search
   - social
   - git-authors:
       show_email_address: false
