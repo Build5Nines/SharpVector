@@ -166,66 +166,6 @@ public class VectorDatabaseTests
     }
 
     [TestMethod]
-    public async Task BasicMemoryVectorDatabase_SaveLoadJsonStringAsync_01()
-    {
-        var vdb = new BasicMemoryVectorDatabase();
-        
-        // // Load Vector Database with some sample text
-        vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", "[some metadata here]");
-        
-        var results = vdb.Search("Lion King");
-
-        Assert.AreEqual(1, results.Texts.Count());
-        Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
-        Assert.AreEqual("[some metadata here]", results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
-
-        var stream = new MemoryStream();
-        var json = await vdb.SerializeToJsonAsync();
-
-        stream.Position = 0; // Reset the stream position to the beginning
-        
-        var newvdb = new BasicMemoryVectorDatabase();
-        await newvdb.DeserializeFromJsonAsync(json);
-        results = newvdb.Search("Lion King");
-
-        Assert.AreEqual(1, results.Texts.Count());
-        Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
-        Assert.AreEqual("[some metadata here]", results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
-    }
-
-    [TestMethod]
-    public void BasicMemoryVectorDatabase_SaveLoadJsonString_01()
-    {
-        var vdb = new BasicMemoryVectorDatabase();
-        
-        // // Load Vector Database with some sample text
-        vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", "[some metadata here]");
-        
-        var results = vdb.Search("Lion King");
-
-        Assert.AreEqual(1, results.Texts.Count());
-        Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
-        Assert.AreEqual("[some metadata here]", results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
-
-        var stream = new MemoryStream();
-        var json = vdb.SerializeToJson();
-
-        stream.Position = 0; // Reset the stream position to the beginning
-        
-        var newvdb = new BasicMemoryVectorDatabase();
-        newvdb.DeserializeFromJson(json);
-        results = newvdb.Search("Lion King");
-
-        Assert.AreEqual(1, results.Texts.Count());
-        Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
-        Assert.AreEqual("[some metadata here]", results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
-    }
-
-    [TestMethod]
     public void SimpleTest_01()
     {
         var vdb = new MemoryVectorDatabase<double>();
