@@ -136,7 +136,7 @@ public class VectorDatabaseTests
     }
 
     [TestMethod]
-    public async Task BasicMemoryVectorDatabase_SaveLoadJsonStreamAsync_01()
+    public async Task BasicMemoryVectorDatabase_SaveLoadBinaryStreamAsync_01()
     {
         var vdb = new BasicMemoryVectorDatabase();
         
@@ -151,12 +151,12 @@ public class VectorDatabaseTests
         Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
 
         var stream = new MemoryStream();
-        await vdb.SerializeToJsonStreamAsync(stream);
+        await vdb.SerializeToBinaryStreamAsync(stream);
 
         stream.Position = 0; // Reset the stream position to the beginning
         
         var newvdb = new BasicMemoryVectorDatabase();
-        await newvdb.DeserializeFromJsonStreamAsync(stream);
+        await newvdb.DeserializeFromBinaryStreamAsync(stream);
         results = newvdb.Search("Lion King");
 
         Assert.AreEqual(1, results.Texts.Count());
@@ -564,12 +564,12 @@ public class VectorDatabaseTests
         Assert.AreEqual(0.3396831452846527, firstResult.Texts.First().VectorComparison);
 
         var stream = new MemoryStream();
-        databaseOne.SerializeToJsonStream(stream);
+        databaseOne.SerializeToBinaryStream(stream);
         
         stream.Position = 0; // move to beginning of stream
 
         var databaseTwo = new MemoryVectorDatabase<double>();
-        databaseTwo.DeserializeFromJsonStream(stream);
+        databaseTwo.DeserializeFromBinaryStream(stream);
 
         var secondResult = await databaseTwo.SearchAsync("Lion King", pageCount: 5);
         Assert.AreEqual(5, secondResult.Texts.Count());
@@ -733,7 +733,7 @@ public class VectorDatabaseTests
         var id = vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", "{ value: \"JSON Metadata Value\" }");
         
         var stream = new MemoryStream();
-        await vdb.SerializeToJsonStreamAsync(stream);
+        await vdb.SerializeToBinaryStreamAsync(stream);
         stream.Position = 0;
 
         var databaseInfo = await DatabaseFile.LoadDatabaseInfoAsync(stream);
@@ -752,7 +752,7 @@ public class VectorDatabaseTests
         var id = vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", "{ value: \"JSON Metadata Value\" }");
         
         var stream = new MemoryStream();
-        await vdb.SerializeToJsonStreamAsync(stream);
+        await vdb.SerializeToBinaryStreamAsync(stream);
         stream.Position = 0;
 
         vdb = await DatabaseFile.Load<MemoryVectorDatabase<string>, string>(stream);
@@ -779,7 +779,7 @@ public class VectorDatabaseTests
         var id = vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", "{ value: \"JSON Metadata Value\" }");
         
         var stream = new MemoryStream();
-        await vdb.SerializeToJsonStreamAsync(stream);
+        await vdb.SerializeToBinaryStreamAsync(stream);
         stream.Position = 0;
 
         vdb = await DatabaseFile.Load<string>(stream);

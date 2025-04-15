@@ -9,7 +9,7 @@ public static class IVectorDatabaseExtensions
     {
         using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
         {
-            await vectorDatabase.SerializeToJsonStreamAsync(stream);
+            await vectorDatabase.SerializeToBinaryStreamAsync(stream);
         }
     }
 
@@ -18,7 +18,7 @@ public static class IVectorDatabaseExtensions
     {
         using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
         {
-            vectorDatabase.SerializeToJsonStream(stream);
+            vectorDatabase.SerializeToBinaryStream(stream);
         }
     }
 
@@ -27,7 +27,7 @@ public static class IVectorDatabaseExtensions
     {
         using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
         {
-            await vectorDatabase.DeserializeFromJsonStreamAsync(stream);
+            await vectorDatabase.DeserializeFromBinaryStreamAsync(stream);
         }
     }
 
@@ -36,7 +36,7 @@ public static class IVectorDatabaseExtensions
     {
         using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
         {
-            vectorDatabase.DeserializeFromJsonStream(stream);
+            vectorDatabase.DeserializeFromBinaryStream(stream);
         }
     }
 }

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 2.0.2 (2025-04-15)
 
+Add:
+
+- Add `SerializeToBinaryStream` and `DeserializeFromBinaryStream` methods to replace (and mark obselete) `SerializeToJsonStream` and `DeserializeFromJsonStream` methods. They read/write binary zip file data, not json, so they were named incorrectly.
+
 Fixed:
 
 - Fixed `.LoadFromFile` method that was previously inaccessible.
