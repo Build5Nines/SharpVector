@@ -28,7 +28,7 @@ vdb.SaveToFile(filePath);
 ```
 
 !!! info
-    The file extension used in this example is `.b59vdb`, however this is arbitrary. The library doesn't look at the file extenions. It only reads the binary contents of the file; which is actually in ZIP file format.
+    The file extension used in this example is `.b59vdb`, however this is arbitrary. The library doesn't look at the file extension. It only reads the binary contents of the file; which is actually in ZIP file format.
 
 ### Load from File
 
