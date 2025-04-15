@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.0.2 (2025-04-15)
+
+Added:
+
+- Added `.SerializeToJson` and `.SerializeToJsonAsync` methods for easy serialization of vector database to a JSON string.
+- Added `.DeserializeFromJson` and `.DeserializeFromJsonAsync` methods for easy deserialization from a JSON string.
+
+Fixed:
+
+- Fixed `.LoadFromFile` method that was previously inaccessible.
+
 ## 2.0.1 (2025-03-17)
 
 Added:
