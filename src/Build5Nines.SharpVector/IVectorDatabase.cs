@@ -1,3 +1,5 @@
+using System.Reflection.Metadata;
+
 namespace Build5Nines.SharpVector;
 
 public interface IVectorDatabase<TId, TMetadata, TDocument>
@@ -85,33 +87,47 @@ public interface IVectorDatabase<TId, TMetadata, TDocument>
     Task<IVectorTextResult<TDocument, TMetadata>> SearchAsync(TDocument queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null);
 
 
-    /// <summary>
-    /// Serializes the Database to a JSON stream
-    /// </summary>
-    /// <param name="stream"></param>
-    /// <returns></returns>
+    [Obsolete("Use SerializeToBinaryStreamAsync Instead")]
     Task SerializeToJsonStreamAsync(Stream stream);
 
+    [Obsolete("Use SerializeToBinaryStream Instead")]
+    void SerializeToJsonStream(Stream stream);
+
+    [Obsolete("Use DeserializeToBinaryStreamAsync Instead")]
+    Task DeserializeFromJsonStreamAsync(Stream stream);
+
+    [Obsolete("Use DeserializeToBinaryStream Instead")]
+    void DeserializeFromJsonStream(Stream stream);
+
+
+    
     /// <summary>
     /// Serializes the Database to a JSON stream
     /// </summary>
     /// <param name="stream"></param>
     /// <returns></returns>
-    void SerializeToJsonStream(Stream stream);
+    Task SerializeToBinaryStreamAsync(Stream stream);
+
+    /// <summary>
+    /// Serializes the Database to a JSON stream
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
+    void SerializeToBinaryStream(Stream stream);
 
     /// <summary>
     /// Deserializes the Database from a JSON stream
     /// </summary>
     /// <param name="stream"></param>
     /// <returns></returns>
-    Task DeserializeFromJsonStreamAsync(Stream stream);
+    Task DeserializeFromBinaryStreamAsync(Stream stream);
 
     /// <summary>
     /// Deserializes the Database from a JSON stream
     /// </summary>
     /// <param name="stream"></param>
     /// <returns></returns>
-    void DeserializeFromJsonStream(Stream stream);
+    void DeserializeFromBinaryStream(Stream stream);
 }
 
 public interface IVectorDatabase<TId, TMetadata>

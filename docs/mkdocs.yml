@@ -101,6 +101,7 @@ nav:
   - Get Started: get-started.md
   - Concepts: concepts.md
   - Text Chunking: text-chunking.md
+  - Persistence: persistence.md
   - OpenAI Embeddings: openai-embeddings.md
   - Samples: samples.md
   - Resources: resources.md

@@ -237,13 +237,19 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         return results;
     }
 
+    [Obsolete("Use SerializeToBinaryStreamAsync instead.")]
+    public virtual async Task SerializeToJsonStreamAsync(Stream stream)
+    {
+        await SerializeToBinaryStreamAsync(stream);
+    }
+    
     /// <summary>
     /// Serializes the Vector Database to a JSON stream
     /// </summary>
     /// <param name="stream"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public virtual async Task SerializeToJsonStreamAsync(Stream stream)
+    public virtual async Task SerializeToBinaryStreamAsync(Stream stream)
     {
         var streamVectorStore = new MemoryStream();
         var streamVocabularyStore = new MemoryStream();
@@ -293,16 +299,27 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         await stream.FlushAsync();
     }
 
+    [Obsolete("Use SerializeToBinaryStream instead.")]
     public virtual void SerializeToJsonStream(Stream stream)
+    {
+        SerializeToBinaryStream(stream);    
+    }
+
+    public virtual void SerializeToBinaryStream(Stream stream)
     {
         if (stream == null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
-        SerializeToJsonStreamAsync(stream).Wait();
+        SerializeToBinaryStreamAsync(stream).Wait();
     }
 
-    public virtual async Task DeserializeFromJsonStreamAsync(Stream stream)
+    [Obsolete("Use DeserializeFromBinaryStreamAsync instead.")]
+    public virtual async Task DeserializeFromJsonStreamAsync(Stream stream) {
+        await DeserializeFromBinaryStreamAsync(stream);
+    }
+
+    public virtual async Task DeserializeFromBinaryStreamAsync(Stream stream)
     {
         if (stream == null)
         {
@@ -382,12 +399,18 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         }
     }
 
+    [Obsolete("Use DeserializeFromBinaryStream instead")]
     public virtual void DeserializeFromJsonStream(Stream stream)
+    {
+        DeserializeFromBinaryStream(stream);
+    }
+
+    public virtual void DeserializeFromBinaryStream(Stream stream)
     {
         if (stream == null)
         {
             throw new ArgumentNullException(nameof(stream));
         }
-        DeserializeFromJsonStreamAsync(stream).Wait();
+        DeserializeFromBinaryStreamAsync(stream).Wait();
     }
 }

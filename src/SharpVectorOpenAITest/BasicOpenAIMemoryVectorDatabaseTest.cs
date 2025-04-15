@@ -33,7 +33,9 @@ namespace Build5Nines.SharpVector.OpenAI.Tests
         public async Task Test_SaveLoad_01()
         {
             var filename = "openai_test_saveload_01.b59vdb";
+#pragma warning disable CS8604 // Possible null reference argument.
             await _database.SaveToFileAsync(filename);
+#pragma warning restore CS8604 // Possible null reference argument.
 
             await _database.LoadFromFileAsync(filename);
         }
