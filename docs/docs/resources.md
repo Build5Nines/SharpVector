@@ -1,3 +1,8 @@
+---
+title: Resources
+description: Dive deeper with curated resources, links, and tools for working with vector databases, semantic search, and SharpVector.
+---
+
 # Resources
 
 ## Tutorials

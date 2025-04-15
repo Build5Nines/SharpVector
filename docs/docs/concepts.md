@@ -1,3 +1,7 @@
+---
+title: Concepts
+description: Understand the core concepts behind SharpVector, from vector similarity to embedding strategies and in-memory architecture.
+---
 # Concepts
 
 ## What is a Vector Database?

@@ -8,3 +8,4 @@ BenchmarkDotNet.Artifacts/
 TestResults/
 
 docs/site
+.cache

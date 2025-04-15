@@ -1,3 +1,8 @@
+---
+title: OpenAI Embeddings
+description: Integrate OpenAI’s powerful embeddings with SharpVector to supercharge your semantic search and AI features in .NET apps.
+---
+
 # OpenAI Embeddings
 
 Integrating OpenAI embeddings with **Build5Nines.SharpVector** enhances the semantic search capabilities of your .NET applications. By leveraging models like `text-embedding-ada-002`, you can generate high-quality vector representations of text, leading to more accurate and contextually relevant search results.

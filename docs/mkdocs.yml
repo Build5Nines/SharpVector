@@ -1,16 +1,29 @@
 site_name: Build5Nines.SharpVector
 site_url: https://sharpvector.build5nines.com
-site_author: Chris Pietschmann
+site_author: Build5Nines LLC & Chris Pietschmann
 
 theme:
   name: material # null
 #  custom_dir: themes/material
+  custom_dir: overrides # add custom header scripts
+  language: en
   favicon: images/favicon.png
   logo: images/logo.png
   features:
     - tabs
+    - content.action.edit
+    # - content.action.view
     - content.code.copy
     - content.code.annotate
+    - navigation.expand # sidebar collapsible sections open
+    - navigation.footer
+    - navigation.tabs
+    #- navigation.tabs.sticky # tabs stick when scrolling down page
+    - search.suggest
+    - search.highlight
+    - navigation.path # add bradcrumbs
+    - navigation.indexes # default 'index.md' in folder is section page
+    - content.tabs.link # Ensures site-wide switch to same tab name
     
   palette:
     - media: "(prefers-color-scheme)"
@@ -19,17 +32,17 @@ theme:
         name: Switch to light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: indigo
-      accent: indigo
+      primary: blue
+      accent: blue
       toggle:
-        icon: material/toggle-switch
+        icon: material/weather-sunny
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: black
-      accent: indigo
+      accent: blue
       toggle:
-        icon: material/toggle-switch-off
+        icon: material/weather-night
         name: Switch to system preference
 
 repo_name: Build5Nines/SharpVector
@@ -39,17 +52,38 @@ edit_uri: edit/main/docs/docs/
 copyright: '&copy; 2025 Build5Nines LLC'
 
 markdown_extensions:
+  - abbr
   - admonition
+  - attr_list
+  - toc:
+      permalink: true
+      toc_depth: 3
   - pymdownx.details
   - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji
+  - pymdownx.highlight:
+      auto_title: true
+      linenums: true
+  - pymdownx.snippets
   - pymdownx.tabbed:
       alternate_style: true
       slugify: !!python/object/apply:pymdownx.slugs.slugify
         kwds:
           case: lower
-  - pymdownx.snippets
+
+plugins:
+  - search
+  - social
+  - git-authors:
+      show_email_address: false
 
 extra:
+  analytics:
+    provider: google
+    property: G-7KST9RSCN3
+  generator: false
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/Build5Nines

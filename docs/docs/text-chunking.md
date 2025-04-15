@@ -1,3 +1,7 @@
+---
+title: Text Chunking
+description: Learn how to break large documents into smaller chunks to improve vector search relevance and optimize embedding performance.
+---
 # Text Chunking
 
 **Text chunking** is the process of breaking up large documents into smaller segments ("chunks") before embedding and storing them in a vector database. This allows for more accurate semantic search and improves performance in applications that deal with large bodies of text.
