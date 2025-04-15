@@ -6,6 +6,9 @@ The `Build5Nines.SharpVector` library provides easy-to-use methods for saving a 
 
 `Build5Nines.SharpVector` supports persisting the vector database to a file.
 
+!!! info
+    This functionality is implemented as methods available to both the `Build5Nines.SharpVector.BasicMemoryVectorDatabase` and `Build5Nines.SharpVector.OpenAI.BasicOpenAIMemoryVectorDatabase`. These methods are actually extensions on the base `IVectorDatabase` interface, so all implementations of this interface will have this capability.
+
 ### Save to File
 
 To persist your `BasicMemoryVectorDatabase` to disk, use the `SaveToFile` or `SaveToFileAsync` methods:
