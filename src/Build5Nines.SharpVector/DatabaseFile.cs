@@ -53,7 +53,7 @@ public static class DatabaseFile
         where TVectorDatabase : IVectorDatabase<TId, TMetadata, TDocument>
         where TId : notnull
     {
-        await vdb.DeserializeFromJsonStreamAsync(stream);
+        await vdb.DeserializeFromBinaryStreamAsync(stream);
         return vdb;
     }
 
@@ -110,9 +110,11 @@ public static class DatabaseFile
 
     public static async Task<DatabaseInfo> LoadDatabaseInfoAsync(Stream stream)
     {
+        const string databaseFilename = "database.json";
+        
         using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
         {
-            var entryDatabaseType = archive.GetEntry("database.json");
+            var entryDatabaseType = archive.GetEntry(databaseFilename);
             if (entryDatabaseType != null)
             {
                 using (var entryStream = entryDatabaseType.Open())

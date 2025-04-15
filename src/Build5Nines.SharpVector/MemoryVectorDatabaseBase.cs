@@ -321,6 +321,10 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
     public virtual async Task DeserializeFromBinaryStreamAsync(Stream stream)
     {
+        const string databaseFileName = "database.json";
+        const string vectorStoreFileName = "vectorstore.json";
+        const string vocabularyStoreFilename = "vocabularystore.json";
+
         if (stream == null)
         {
             throw new ArgumentNullException(nameof(stream));
@@ -328,20 +332,18 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
         using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
         {
-            var entryDatabaseType = archive.GetEntry("database.json");
+            var entryDatabaseType = archive.GetEntry(databaseFileName);
             if (entryDatabaseType != null)
             {
                 using (var entryStream = entryDatabaseType.Open())
                 {
-                    var databaseTypeStream = new MemoryStream();
-                    await entryStream.CopyToAsync(databaseTypeStream);
-                    databaseTypeStream.Position = 0;
+                    // string databaseInfoJson = string.Empty;
+                    // using (var streamReader = new StreamReader(entryStream))
+                    // {
+                    //     databaseInfoJson = await streamReader.ReadToEndAsync();
+                    // }
 
-                    var databaseTypeBytes = new byte[databaseTypeStream.Length];
-                    await databaseTypeStream.ReadAsync(databaseTypeBytes);
-                    var databaseInfoJson = System.Text.Encoding.UTF8.GetString(databaseTypeBytes);
-
-                    var databaseInfo = JsonSerializer.Deserialize<DatabaseInfo>(databaseInfoJson);
+                    var databaseInfo = JsonSerializer.Deserialize<DatabaseInfo>(entryStream); //databaseInfoJson);
 
                     if (databaseInfo == null)
                     {
@@ -367,10 +369,9 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
             else
             {
                 throw new DatabaseFileMissingEntryException("Database info entry not found.", "database");
-            }
+            }        
 
-
-            var entryVectorStore = archive.GetEntry("vectorstore.json");
+            var entryVectorStore = archive.GetEntry(vectorStoreFileName);
             if (entryVectorStore != null)
             {
                 using (var entryStream = entryVectorStore.Open())
@@ -383,7 +384,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
                 throw new DatabaseFileMissingEntryException("Vector Store entry not found.", "vectorstore");
             }
 
-            var entryVocabularyStore = archive.GetEntry("vocabularystore.json");
+            var entryVocabularyStore = archive.GetEntry(vocabularyStoreFilename);
             if (entryVocabularyStore != null)
             {
                 using (var entryStream = entryVocabularyStore.Open())
@@ -396,8 +397,47 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
                 throw new DatabaseFileMissingEntryException("Vocabulary Store entry not found.", "vocabularystore");
             }
 
+            /*
+            // This didn't show any improvement in performance over the above, keeping just in case I want to test it again later
+            var entryVectorStore = archive.GetEntry(vectorStoreFileName);
+            Stream vectorStoreStream = new MemoryStream();
+            if (entryVectorStore != null)
+            {
+                using (var entryStream = entryVectorStore.Open())
+                {
+                    await entryStream.CopyToAsync(vectorStoreStream);
+                }
+            }
+            else
+            {
+                throw new DatabaseFileMissingEntryException("Vector Store entry not found.", "vectorstore");
+            }
+
+            var entryVocabularyStore = archive.GetEntry(vocabularyStoreFilename);
+            Stream vocabularyStoreStream = new MemoryStream();
+            if (entryVocabularyStore != null)
+            {
+                using (var entryStream = entryVocabularyStore.Open())
+                {
+                    await entryStream.CopyToAsync(vocabularyStoreStream);
+                }
+            }
+            else
+            {
+                throw new DatabaseFileMissingEntryException("Vocabulary Store entry not found.", "vocabularystore");
+            }
+
+            vectorStoreStream.Position = 0;
+            var taskVectorStore = VectorStore.DeserializeFromJsonStreamAsync(vectorStoreStream);
+
+            vocabularyStoreStream.Position = 0;
+            var taskVocabularyStore = VectorStore.VocabularyStore.DeserializeFromJsonStreamAsync(vocabularyStoreStream);
+            
+            await Task.WhenAll(taskVectorStore, taskVocabularyStore);
+            */
         }
     }
+
 
     [Obsolete("Use DeserializeFromBinaryStream instead")]
     public virtual void DeserializeFromJsonStream(Stream stream)
