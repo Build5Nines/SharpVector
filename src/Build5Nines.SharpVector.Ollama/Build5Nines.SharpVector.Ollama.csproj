@@ -20,6 +20,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+      <None Include="docs/README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Build5Nines.SharpVector\Build5Nines.SharpVector.csproj" />
   </ItemGroup>
 
