@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## vNext
 
+Add:
+
+- Added OpenAI.IOpenAIMemoryVectorDatabase interface
+
 Fixed:
 
 - Implement some performance tweaks in the code; adding `const string` and other best practices to help overall performance for handling larger amounts of data.

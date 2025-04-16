@@ -5,6 +5,11 @@ using OpenAI.Embeddings;
 
 namespace Build5Nines.SharpVector.OpenAI;
 
+/// <summary>
+/// An interface for a vector database that uses OpenAI for embedding generation.
+/// </summary>
+/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TMetadata"></typeparam>
 public interface IOpenAIMemoryVectorDatabase<TId, TMetadata> : IVectorDatabase<TId, TMetadata>
     where TId : notnull
 { }
