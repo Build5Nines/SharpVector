@@ -9,18 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Add:
 
-- Added OpenAI.IOpenAIMemoryVectorDatabase interface
+- Add Ollama support via `Build5Nines.SharpVector.Ollama` nuget package
+- Added `Build5Nines.SharpVector.Embeddings.IEmbeddingsGenerator` to support creating external embeddings providers
+- Added `Build5Nines.OpenAI.IOpenAIMemoryVectorDatabase` interface
 
 Fixed:
 
-- Implement some performance tweaks in the code; adding `const string` and other best practices to help overall performance for handling larger amounts of data.
 - Internal refactoring of save/load database persistence file code to make more maintainable and reusable going forward.
+- Implement some performance tweaks in the code; adding `const string` and other best practices to help overall performance for handling larger amounts of data.
 
 ## 2.0.2 (2025-04-15)
 
 Add:
 
-- Add `SerializeToBinaryStream` and `DeserializeFromBinaryStream` methods to replace (and mark obselete) `SerializeToJsonStream` and `DeserializeFromJsonStream` methods. They read/write binary zip file data, not json, so they were named incorrectly.
+- Add `SerializeToBinaryStream` and `DeserializeFromBinaryStream` methods to replace (and mark obsolete) `SerializeToJsonStream` and `DeserializeFromJsonStream` methods. They read/write binary zip file data, not json, so they were named incorrectly.
 
 Fixed:
 
