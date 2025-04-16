@@ -1,16 +1,14 @@
 
 using System.IO.Compression;
-using System.Runtime.InteropServices;
 using System.Text.Json;
-using Build5Nines.SharpVector.Id;
-using Build5Nines.SharpVector.Preprocessing;
-using Build5Nines.SharpVector.VectorCompare;
-using Build5Nines.SharpVector.Vectorization;
 using Build5Nines.SharpVector.VectorStore;
 using Build5Nines.SharpVector.Vocabulary;
 
 namespace Build5Nines.SharpVector;
 
+/// <summary>
+/// Static class with methods for load and save vector database functionality.
+/// </summary>
 public static class DatabaseFile
 {
     private const string databaseInfoFilename = "database.json";
