@@ -16,7 +16,7 @@ Console.WriteLine("");
 
 Console.WriteLine("Test BasicOllamaMemoryVectorDatabase");
 
-var vdb = new BasicOllamaMemoryVectorDatabase("http://localhost:11434/api/embeddings", "nomic-embed-text");
+var vdb = new BasicOllamaMemoryVectorDatabase("nomic-embed-text"); //"http://localhost:11434/api/embeddings", "nomic-embed-text");
 
 vdb.AddText("Hello World", "metadata");
 vdb.AddText("Hola", "metadata2");
