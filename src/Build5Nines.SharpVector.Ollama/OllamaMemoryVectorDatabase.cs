@@ -30,13 +30,13 @@ public class OllamaMemoryVectorDatabase<TMetadata>
 {
     public OllamaMemoryVectorDatabase(string model)
         : this(
-            new OllamaEmbeddingsGenerator(model)
+            new Embeddings.OllamaEmbeddingsGenerator(model)
             )
     { }
 
     public OllamaMemoryVectorDatabase(string ollamaEndpoint, string model)
         : this(
-            new OllamaEmbeddingsGenerator(ollamaEndpoint, model)
+            new Embeddings.OllamaEmbeddingsGenerator(ollamaEndpoint, model)
             )
     { }
 

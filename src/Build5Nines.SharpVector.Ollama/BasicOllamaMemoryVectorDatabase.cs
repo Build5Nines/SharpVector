@@ -9,13 +9,13 @@ public class BasicOllamaMemoryVectorDatabase : OllamaMemoryVectorDatabase<string
 {
     public BasicOllamaMemoryVectorDatabase(string model)
         : this(
-            new OllamaEmbeddingsGenerator(model)
+            new Embeddings.OllamaEmbeddingsGenerator(model)
             )
     { }
 
     public BasicOllamaMemoryVectorDatabase(string ollamaEndpoint, string model)
         : this(
-            new OllamaEmbeddingsGenerator(ollamaEndpoint, model)
+            new Embeddings.OllamaEmbeddingsGenerator(ollamaEndpoint, model)
             )
     { }
     

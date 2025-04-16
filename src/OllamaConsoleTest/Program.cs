@@ -1,5 +1,6 @@
 ﻿using Build5Nines.SharpVector;
 using Build5Nines.SharpVector.Ollama;
+using Build5Nines.SharpVector.Ollama.Embeddings;
 
 
 Console.WriteLine("Test OllamaEmbeddingsGenerator");

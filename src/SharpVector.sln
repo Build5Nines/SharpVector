@@ -17,9 +17,11 @@ Project("{d241a75f-12b7-476d-8ad0-3fc3eae491ea}") = "Build5Nines.SharpVector.Oll
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpVectorOpenAITest", "SharpVectorOpenAITest\SharpVectorOpenAITest.csproj", "{04E08FA2-C4B4-47B4-ABB0-6FD57EA5FFFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAIConsoleTest", "OpenAIConsoleTest\OpenAIConsoleTest.csproj", "{0B5B1D8C-9D1C-4779-880E-09B8F1BD1DD2}"
+Project("{953bc932-6273-4fcc-8789-50057e494d39}") = "OpenAIConsoleTest", "OpenAIConsoleTest\OpenAIConsoleTest.csproj", "{0B5B1D8C-9D1C-4779-880E-09B8F1BD1DD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Build5Nines.SharpVector.Playground", "Build5Nines.SharpVector.Playground\Build5Nines.SharpVector.Playground.csproj", "{DF4912BA-17B3-458B-B4D9-AD75287EAC45}"
+Project("{619c7671-0831-4096-b1bf-39c6ee0595a4}") = "OllamaConsoleTest", "OllamaConsoleTest\OllamaConsoleTest.csproj", "{e211095e-33d5-4ba4-a9f7-9d6057d807a7}"
+EndProject
+Project("{b170972d-92ac-48a4-af26-e44dff4801aa}") = "Build5Nines.SharpVector.Playground", "Build5Nines.SharpVector.Playground\Build5Nines.SharpVector.Playground.csproj", "{DF4912BA-17B3-458B-B4D9-AD75287EAC45}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{DF4912BA-17B3-458B-B4D9-AD75287EAC45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF4912BA-17B3-458B-B4D9-AD75287EAC45}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF4912BA-17B3-458B-B4D9-AD75287EAC45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{e211095e-33d5-4ba4-a9f7-9d6057d807a7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{e211095e-33d5-4ba4-a9f7-9d6057d807a7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{e211095e-33d5-4ba4-a9f7-9d6057d807a7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{e211095e-33d5-4ba4-a9f7-9d6057d807a7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
