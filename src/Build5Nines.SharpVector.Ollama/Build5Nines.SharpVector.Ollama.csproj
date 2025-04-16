@@ -1,13 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <PackageId>Build5Nines.SharpVector.Ollama</PackageId>
+    <PackageProjectUrl>https://sharpvector.build5nines.com</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Build5Nines/SharpVector</RepositoryUrl>
+    <Version>2.0.3</Version>
+    <Description>Lightweight In-memory Vector Database to embed in any .NET Applications that integrates with Ollama Embedding models for vector generation.</Description>
+    <Copyright>Copyright (c) 2025 Build5Nines LLC</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseUrl>https://github.com/Build5Nines/SharpVector/blob/main/LICENSE</PackageLicenseUrl>
+    <Authors>Chris Pietschmann</Authors>
+    <Company>Build5Nines LLC</Company>
+    <PackageTags>vector;search;database;data;rag;ollama;embeddings;azure;microsoft;</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Build5Nines.SharpVector\Build5Nines.SharpVector.csproj" />
   </ItemGroup>
+
+  <!-- <ItemGroup>
+      <PackageReference Include="Build5Nines.SharpVector" Version="[2.0.3,3.0.0)" />
+  </ItemGroup> -->
 
 </Project>
