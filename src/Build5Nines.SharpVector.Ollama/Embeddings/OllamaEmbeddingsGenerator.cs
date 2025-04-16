@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Build5Nines.SharpVector.Embeddings;
 
-namespace Build5Nines.SharpVector.Ollama;
+namespace Build5Nines.SharpVector.Ollama.Embeddings;
 
 public class OllamaEmbeddingsGenerator : IEmbeddingsGenerator
 {

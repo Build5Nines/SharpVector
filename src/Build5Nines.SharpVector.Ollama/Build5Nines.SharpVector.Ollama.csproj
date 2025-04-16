@@ -24,11 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Build5Nines.SharpVector\Build5Nines.SharpVector.csproj" />
-  </ItemGroup>
-
-  <!-- <ItemGroup>
       <PackageReference Include="Build5Nines.SharpVector" Version="[2.0.3,3.0.0)" />
-  </ItemGroup> -->
+  </ItemGroup>
 
 </Project>
