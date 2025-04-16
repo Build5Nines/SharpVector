@@ -325,6 +325,18 @@ public abstract class OpenAIMemoryVectorDatabaseBase<TId, TMetadata, TVectorStor
 
     public virtual async Task DeserializeFromBinaryStreamAsync(Stream stream)
     {
+
+        // NEW
+        // await DatabaseFile.LoadDatabaseFromZipArchiveAsync(
+        //     stream,
+        //     this.GetType().FullName,
+        //     async (archive) =>
+        //     {
+        //         await DatabaseFile.LoadVectorStoreAsync(archive, VectorStore);
+        //     }
+        // );
+
+        // OLD
         if (stream == null)
         {
             throw new ArgumentNullException(nameof(stream));

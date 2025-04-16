@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Fixed:
 
 - Implement some performance tweaks in the code; adding `const string` and other best practices to help overall performance for handling larger amounts of data.
+- Internal refactoring of save/load database persistence file code to make more maintainable and reusable going forward.
 
 ## 2.0.2 (2025-04-15)
 
