@@ -144,6 +144,12 @@ public class MemoryDictionaryVectorStore<TId, TMetadata, TDocument> : IVectorSto
     }
 }
 
+/// <summary>
+/// A thread safe simple in-memory database for storing and querying vectorized text items.
+/// This is a simplified version of the MemoryDictionaryVectorStore class that uses string as the Document type.
+/// </summary>
+/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TMetadata"></typeparam>
 public class MemoryDictionaryVectorStore<TId, TMetadata>
     : MemoryDictionaryVectorStore<TId, TMetadata, string>
     where TId : notnull
