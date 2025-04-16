@@ -2,6 +2,12 @@ using System.Reflection.Metadata;
 
 namespace Build5Nines.SharpVector;
 
+/// <summary>
+/// An interface for a vector database
+/// </summary>
+/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TMetadata"></typeparam>
+/// <typeparam name="TDocument"></typeparam>
 public interface IVectorDatabase<TId, TMetadata, TDocument>
     where TId : notnull
 {

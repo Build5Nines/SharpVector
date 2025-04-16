@@ -7,6 +7,10 @@ using Build5Nines.SharpVector.VectorStore;
 
 namespace Build5Nines.SharpVector;
 
+public interface IMemoryVectorDatabase<TId, TMetadata> : IVectorDatabase<TId, TMetadata>
+    where TId : notnull
+{ }
+
 /// <summary>
 /// A simple in-memory database for storing and querying vectorized text items.
 /// This database uses a Bag of Words vectorization strategy, with Cosine similarity, a dictionary vocabulary store, and a basic text preprocessor.
@@ -23,7 +27,7 @@ public class MemoryVectorDatabase<TMetadata>
         BasicTextPreprocessor,
         BagOfWordsVectorizer<string, int>,
         CosineSimilarityVectorComparer
-        >, IVectorDatabase<int, TMetadata>
+        >, IMemoryVectorDatabase<int, TMetadata>, IVectorDatabase<int, TMetadata>
 {
     public MemoryVectorDatabase()
         : base(

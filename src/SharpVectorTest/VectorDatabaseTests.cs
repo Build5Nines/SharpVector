@@ -736,7 +736,7 @@ public class VectorDatabaseTests
         await vdb.SerializeToBinaryStreamAsync(stream);
         stream.Position = 0;
 
-        var databaseInfo = await DatabaseFile.LoadDatabaseInfoAsync(stream);
+        var databaseInfo = await DatabaseFile.LoadDatabaseInfoFromZipArchiveAsync(stream);
 
         Assert.AreEqual("Build5Nines.SharpVector", databaseInfo.Schema);
         Assert.AreEqual("1.0.0", databaseInfo.Version);

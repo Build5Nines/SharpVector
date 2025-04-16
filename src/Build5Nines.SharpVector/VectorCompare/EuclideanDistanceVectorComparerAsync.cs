@@ -28,7 +28,7 @@ public class EuclideanDistanceVectorComparer : IVectorComparer
             throw new ArgumentException("Vectors must be of the same length.");
         }
 
-        float sumOfSquares = 0;
+        float sumOfSquares = 0f;
 
         for (int i = 0; i < vectorA.Length; i++)
         {

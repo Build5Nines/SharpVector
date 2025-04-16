@@ -2,8 +2,8 @@ namespace Build5Nines.SharpVector;
 
 public class DatabaseInfo
 {
-    internal static string SupportedVersion = "1.0.0";
-    internal static string SupportedSchema = "Build5Nines.SharpVector";
+    internal const string SupportedVersion = "1.0.0";
+    internal const string SupportedSchema = "Build5Nines.SharpVector";
 
     public DatabaseInfo()
         : this(null, null, null)

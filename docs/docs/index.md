@@ -1,5 +1,5 @@
 ---
-title: Discover SharpVector
+title: Discover
 description: The lightweight, in-memory text vector database for .NET that powers intelligent search and recommendation features.
 ---
 # Build5Nines.SharpVector

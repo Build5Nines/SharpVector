@@ -3,6 +3,12 @@ using System.Runtime.Serialization;
 
 namespace Build5Nines.SharpVector.VectorStore;
 
+/// <summary>
+/// Interface for a vector store.
+/// </summary>
+/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TMetadata"></typeparam>
+/// <typeparam name="TDocument"></typeparam>
 public interface IVectorStore<TId, TMetadata, TDocument>
     : IEnumerable<KeyValuePair<TId, VectorTextItem<TDocument, TMetadata>>>,
     IReadOnlyCollection<KeyValuePair<TId, VectorTextItem<TDocument, TMetadata>>>,

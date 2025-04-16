@@ -13,17 +13,20 @@ theme:
     - tabs
     - content.action.edit
     # - content.action.view
+    # - navigation.instant
     - content.code.copy
     - content.code.annotate
     - navigation.expand # sidebar collapsible sections open
     - navigation.footer
     - navigation.tabs
     #- navigation.tabs.sticky # tabs stick when scrolling down page
+    - navigation.path # add breadcrumbs
+    - navigation.indexes # default 'index.md' in folder is section page
+    - navigation.top
     - search.suggest
     - search.highlight
-    - navigation.path # add bradcrumbs
-    - navigation.indexes # default 'index.md' in folder is section page
     - content.tabs.link # Ensures site-wide switch to same tab name
+    - toc.follow
     
   palette:
     - media: "(prefers-color-scheme)"
@@ -97,12 +100,23 @@ extra:
       link: https://www.youtube.com/@build5nines
     
 nav:
-  - Home: index.md
-  - Get Started: get-started.md
-  - Concepts: concepts.md
-  - Text Chunking: text-chunking.md
-  - Persistence: persistence.md
-  - OpenAI Embeddings: openai-embeddings.md
-  - Samples: samples.md
-  - Resources: resources.md
-  - License: license.md
+  - Home:
+      - Overview: index.md
+  - Get Started:
+      - Overview: get-started/index.md
+  - Concepts:
+      - Overview: concepts/index.md
+  - Text Chunking:
+      - Overview: text-chunking/index.md
+  - Persistence:
+      - Overview: persistence/index.md
+  - Embeddings:
+      - Overview: embeddings/index.md
+      - OpenAI Embeddings: embeddings/openai
+      - Ollama Embeddings: embeddings/ollama
+  - Samples:
+      - Overview: samples/index.md
+  - Resources:
+      - Overview: resources/index.md
+  - License:
+      - Overview: license/index.md

@@ -32,7 +32,7 @@ public class RegressionTests
     public async Task LoadVectorDatabaseInfo_2_0_2_001()
     {
         var file = new FileStream("Regression/regression-vector-database-v2.0.2.b59vdb", FileMode.Open, FileAccess.Read);
-        var dbinfo = await DatabaseFile.LoadDatabaseInfoAsync(file);
+        var dbinfo = await DatabaseFile.LoadDatabaseInfoFromZipArchiveAsync(file);
 
         Assert.AreEqual("Build5Nines.SharpVector", dbinfo.Schema);
         Assert.AreEqual("1.0.0", dbinfo.Version);
