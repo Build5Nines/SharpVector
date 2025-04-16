@@ -4,8 +4,8 @@ using Build5Nines.SharpVector.VectorCompare;
 using Build5Nines.SharpVector.VectorStore;
 using Build5Nines.SharpVector.Embeddings;
 using Build5Nines.SharpVector.OpenAI.Embeddings;
-// using System.Collections.Concurrent;
 using OpenAI.Embeddings;
+// using System.Collections.Concurrent;
 // using System.IO.Compression;
 // using System.Text.Json;
 
