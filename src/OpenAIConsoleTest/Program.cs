@@ -21,7 +21,7 @@ var embeddingClient = openAIClient.GetEmbeddingClient(modelName);
 var vdb = new BasicOpenAIMemoryVectorDatabase(embeddingClient);
 
 
- var jsonString = await File.ReadAllTextAsync("OpenAIConsoleTest/movies.json");
+ var jsonString = await File.ReadAllTextAsync("movies.json");
 
 var importTimer = new Stopwatch();
 importTimer.Start();    
