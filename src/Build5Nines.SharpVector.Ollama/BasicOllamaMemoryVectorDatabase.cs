@@ -7,6 +7,12 @@ namespace Build5Nines.SharpVector.Ollama;
 /// </summary>
 public class BasicOllamaMemoryVectorDatabase : OllamaMemoryVectorDatabase<string>
 {
+    public BasicOllamaMemoryVectorDatabase(string model)
+        : this(
+            new OllamaEmbeddingsGenerator(model)
+            )
+    { }
+
     public BasicOllamaMemoryVectorDatabase(string ollamaEndpoint, string model)
         : this(
             new OllamaEmbeddingsGenerator(ollamaEndpoint, model)

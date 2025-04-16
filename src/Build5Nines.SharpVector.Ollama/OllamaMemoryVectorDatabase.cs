@@ -28,6 +28,12 @@ public class OllamaMemoryVectorDatabase<TMetadata>
         CosineSimilarityVectorComparer
         >, IOllamaMemoryVectorDatabase<int, TMetadata>
 {
+    public OllamaMemoryVectorDatabase(string model)
+        : this(
+            new OllamaEmbeddingsGenerator(model)
+            )
+    { }
+
     public OllamaMemoryVectorDatabase(string ollamaEndpoint, string model)
         : this(
             new OllamaEmbeddingsGenerator(ollamaEndpoint, model)

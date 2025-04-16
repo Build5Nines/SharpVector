@@ -4,7 +4,7 @@ using Build5Nines.SharpVector.Ollama;
 
 Console.WriteLine("Test OllamaEmbeddingsGenerator");
 
-var generator = new OllamaEmbeddingsGenerator("http://localhost:11434/api/embeddings", "nomic-embed-text");
+var generator = new OllamaEmbeddingsGenerator("nomic-embed-text");
 var embeddings = await generator.GenerateEmbeddingsAsync("Hello World");
 
 foreach (var item in embeddings)
