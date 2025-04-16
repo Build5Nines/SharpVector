@@ -5,7 +5,7 @@ using Build5Nines.SharpVector.VectorStore;
 using Build5Nines.SharpVector.Embeddings;
 using Build5Nines.SharpVector.OpenAI.Embeddings;
 // using System.Collections.Concurrent;
-// using OpenAI.Embeddings;
+using OpenAI.Embeddings;
 // using System.IO.Compression;
 // using System.Text.Json;
 
@@ -24,7 +24,7 @@ public abstract class OpenAIMemoryVectorDatabaseBase<TId, TMetadata, TVectorStor
     where TIdGenerator : IIdGenerator<TId>, new()
     where TVectorComparer : IVectorComparer, new()
 {
-    public OpenAIMemoryVectorDatabaseBase(OpenAI.Embeddings.EmbeddingClient embeddingClient, TVectorStore vectorStore)
+    public OpenAIMemoryVectorDatabaseBase(EmbeddingClient embeddingClient, TVectorStore vectorStore)
         : base(
             new OpenAIEmbeddingsGenerator(embeddingClient),
             vectorStore
