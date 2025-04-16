@@ -35,6 +35,43 @@ While there are lots of large databases that can be used to build Vector Databas
 
 ---
 
+## Basic Usage
+
+Here's a really simple usage of creating a vector database, adding some text to it, then performing a semantic search on the data.
+
+```csharp
+using Build5Nines.SharpVector;
+
+// Create new vector database
+var vdb = new BasicMemoryVectorDatabase();
+
+// Get text to vectorize
+string[] texts = LoadMultipleTexts();
+// Define metadata to store alongside the text vectors
+var metadata = "custom metadata";
+
+// Add multiple texts with metadata to vector database
+foreach(var t in texts)
+{
+    // vectorize the text
+    vdb.AddText(t, metadata);
+}
+
+// Perform semantic search using Cosine Similarity search on the text vectors in the database
+var result = vdb.Search("Build5Nines.SharpVector is awesome!");
+
+// Loop through search results
+foreach(var item in results.Texts)
+{
+    var itemText = item.Text;
+    var itemMetadata = item.Metadata;
+
+    // do something with the semantic search results
+}
+```
+
+---
+
 ## 🚀 Key Features
 
 - 🔍 **Text Embedding & Search** – Store and search documents using vector similarity (cosine, Euclidean, etc.)
