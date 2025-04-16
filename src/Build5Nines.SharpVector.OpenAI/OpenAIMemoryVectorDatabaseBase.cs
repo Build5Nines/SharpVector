@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace Build5Nines.SharpVector.OpenAI;
 
 public abstract class OpenAIMemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenerator, TVectorComparer>
-    : IVectorDatabase<TId, TMetadata>
+    : IOpenAIMemoryVectorDatabase<TId, TMetadata>, IVectorDatabase<TId, TMetadata>
     where TId : notnull
     where TVectorStore : IVectorStore<TId, TMetadata, string>
     where TIdGenerator : IIdGenerator<TId>, new()
