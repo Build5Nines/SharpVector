@@ -93,6 +93,7 @@ plugins:
   - social
   - git-committers:
       repository: Build5Nines/SharpVector
+      branch: main
 
 extra:
   analytics:
