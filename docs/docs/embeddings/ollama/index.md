@@ -3,7 +3,7 @@ title: Ollama Embeddings
 description: Integrate Ollama embedding models with SharpVector to supercharge your semantic search and AI features in .NET apps.
 ---
 
-# Ollama Embeddings
+# :simple-ollama: Ollama Embeddings
 
 Integrating [Ollama](https://ollama.com) embedding modes with `Build5Nines.SharpVector` enhances the semantic search capabilities of your .NET applications. By leveraging models like `nomic-embed-text` or others, you can generate higher quality vector representations of text, leading to more accurate and contextually relevant search results.
 
