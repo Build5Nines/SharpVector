@@ -94,7 +94,6 @@ plugins:
   - git-committers: # mkdocs-git-committers-plugin-2 plugin to show contributors on footer of
       repository: Build5Nines/SharpVector
       branch: main
-      token: !ENV ["GITHUB_TOKEN"]
 
 extra:
   analytics:
