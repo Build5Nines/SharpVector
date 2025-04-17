@@ -9,6 +9,8 @@ theme:
   language: en
   favicon: images/favicon.png
   logo: images/logo.png
+  icon:
+    repo: fontawesome/brands/github
   features:
     - tabs
     - content.action.edit
@@ -85,7 +87,9 @@ markdown_extensions:
           case: lower
 
 plugins:
-  - search
+  - search:
+      lang:
+        - en
   - social
   - git-authors:
       show_email_address: false
