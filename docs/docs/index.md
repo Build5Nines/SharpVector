@@ -75,7 +75,7 @@ foreach(var item in results.Texts)
 ## 🚀 Key Features
 
 - 🔍 **Text Embedding & Search** – Store and search documents using vector similarity (cosine, Euclidean, etc.)
-- 🧠 **Pluggable Embeddings** – Works with your own vectorizer (like OpenAI, HuggingFace, or custom)
+- 🧠 **Pluggable Embeddings** – Works with your own vectorizer (like OpenAI, Ollama, or custom)
 - ⚡ **In-Memory Performance** – Designed for speed in local or embedded applications
 - 🛠️ **Lightweight & Easy to Use** – Minimal dependencies, simple API
 - 📦 **Custom Metadata** - Store additional metadata with each text entry stored in the vector database.
@@ -90,9 +90,9 @@ An in-memory vector databases like `Build5Nines.SharpVector` provides several ad
 
 SharpVector is great for:
 
-- Embedding search within desktop or server .NET applications
-
 - Building semantic search over documents or notes
+- 
+- Embedding search within desktop or server .NET applications
 
 - Powering recommendation features based on text similarity
 
@@ -101,6 +101,12 @@ SharpVector is great for:
 - Offline or Edge computing with limited or no internet connectivity
 
 - Development and testing without the overhead of installing a server
+
+---
+
+## Text Vector Generation
+
+`Build5Nines.SharpVector` includes a local text vectorizer to generate embeddings for text added to the database. This is automatic and eliminates external LLM server dependencies. However, both [OpenAI Embeddings](embeddings/openai/index.md) and [Ollama Embeddings](embeddings/ollama/index.md) are also supported for more robust and higher quality embeddings support.
 
 ---
 

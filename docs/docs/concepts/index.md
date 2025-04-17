@@ -54,7 +54,7 @@ SharpVector is embedding-agnostic — it supports the following methods of gener
 
 - Automatically generate vectors locally, no embeddings model required
 
-- Connect to remote OpenAI or Azure OpenAI embeddings models if required
+- Supports connecting to [OpenAI or Azure OpenAI embeddings models](../embeddings/openai/index.md) and [Ollama embeddings models](../embeddings/ollama/index.md) for more robust and higher quality text vectorization too
 
 This design gives you flexibility and decouples SharpVector from any specific ML model or service.
 
@@ -111,6 +111,24 @@ Normalizing vectors
 Managing memory usage
 
 Tips for batch processing -->
+
+## Semantic Search
+
+Semantic Search is a method of retrieving information based on the meaning and context of a query, rather than relying solely on exact keyword matches. This enables more intelligent and relevant search experiences — especially when users phrase things differently than how content is stored.
+
+Traditional search engines look for literal keyword matches, which can miss results that are phrased differently but mean the same thing. Semantic Search, on the other hand, uses vector databases to understand the intent behind the query.
+
+Here’s how it works with a text vector database like SharpVector:
+
+1. Text is Vectorized – Documents, sentences, or paragraphs are transformed into embeddings — numerical representations that capture semantic meaning.
+
+2. Queries are Also Vectorized – When a user submits a query, it’s also converted into a vector using the same embedding method.
+
+3. Similarity Search Happens – Instead of matching exact words, the database compares the query vector against stored vectors using metrics like cosine similarity to find semantically similar results.
+
+For example, searching for “`how to train a puppy`” might also return documents that say “`tips for raising a young dog`” — because their vector representations are close in meaning, even though they don’t share specific words.
+
+With `Build5Nines.SharpVector`, you can run these powerful semantic searches entirely within your .NET application, either using local vectorization or plugging into high-quality models like OpenAI or Ollama. This allows your applications to understand and retrieve content more like a human would — by meaning, not just matching.
 
 ## Retrieval Augmented Generation (RAG)
 
