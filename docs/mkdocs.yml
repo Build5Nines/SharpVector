@@ -113,22 +113,22 @@ extra:
     
 nav:
   - Home:
-      - Overview: index.md
+      - index.md
   - Get Started:
-      - Overview: get-started/index.md
+      - get-started/index.md
   - Concepts:
-      - Overview: concepts/index.md
+      - concepts/index.md
   - Text Chunking:
-      - Overview: text-chunking/index.md
+      - text-chunking/index.md
   - Persistence:
-      - Overview: persistence/index.md
+      - persistence/index.md
   - Embeddings:
-      - Overview: embeddings/index.md
+      - embeddings/index.md
       - OpenAI Embeddings: embeddings/openai
       - Ollama Embeddings: embeddings/ollama
   - Samples:
-      - Overview: samples/index.md
+      - samples/index.md
   - Resources:
-      - Overview: resources/index.md
+      - resources/index.md
   - License:
-      - Overview: license/index.md
+      - license/index.md
