@@ -91,7 +91,7 @@ An in-memory vector databases like `Build5Nines.SharpVector` provides several ad
 SharpVector is great for:
 
 - Building semantic search over documents or notes
-- 
+
 - Embedding search within desktop or server .NET applications
 
 - Powering recommendation features based on text similarity
@@ -104,9 +104,37 @@ SharpVector is great for:
 
 ---
 
-## Text Vector Generation
+## Local, OpenAI, or Ollama Embeddings Generation
 
 `Build5Nines.SharpVector` includes a local text vectorizer to generate embeddings for text added to the database. This is automatic and eliminates external LLM server dependencies. However, both [OpenAI Embeddings](embeddings/openai/index.md) and [Ollama Embeddings](embeddings/ollama/index.md) are also supported for more robust and higher quality embeddings support.
+
+<div class="grid cards" markdown>
+
+-   __Local Embeddings__
+
+    ---
+
+    Use built-in functionality to generate text vector embeddings, without server dependencies.
+
+    [:octicons-arrow-right-24: Getting started](get-started/index.md)
+
+-   :simple-openai:{ .lg .middle } __OpenAI Embeddings__
+
+    ---
+
+    Use OpenAI and/or Azure OpenAI Service embeddings models like `text-embedding-ada-002` or others.
+
+    [:octicons-arrow-right-24: Getting started](embeddings/openai/index.md)
+
+-   :simple-ollama:{ .lg .middle } __Ollama Embeddings__
+
+    ---
+
+    Use Ollama embeddings models like `nomic-embed-text` or others.
+
+    [:octicons-arrow-right-24: Get Started](embeddings/ollama/index.md)
+
+</div>
 
 ---
 

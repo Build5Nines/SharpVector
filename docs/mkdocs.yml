@@ -9,6 +9,8 @@ theme:
   language: en
   favicon: images/favicon.png
   logo: images/logo.png
+  icon:
+    repo: fontawesome/brands/github
   features:
     - tabs
     - content.action.edit
@@ -58,14 +60,22 @@ markdown_extensions:
   - abbr
   - admonition
   - attr_list
+  - md_in_html
   - toc:
       permalink: true
       toc_depth: 3
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
   - pymdownx.details
   - pymdownx.superfences
   - pymdownx.tasklist:
       custom_checkbox: true
-  - pymdownx.emoji
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.highlight:
       auto_title: true
       linenums: true
@@ -77,10 +87,12 @@ markdown_extensions:
           case: lower
 
 plugins:
-  - search
+  - search:
+      lang:
+        - en
   - social
-  - git-authors:
-      show_email_address: false
+  - git-committers:
+      repository: Build5Nines/SharpVector
 
 extra:
   analytics:
@@ -101,22 +113,22 @@ extra:
     
 nav:
   - Home:
-      - Overview: index.md
+      - index.md
   - Get Started:
-      - Overview: get-started/index.md
+      - get-started/index.md
   - Concepts:
-      - Overview: concepts/index.md
+      - concepts/index.md
   - Text Chunking:
-      - Overview: text-chunking/index.md
+      - text-chunking/index.md
   - Persistence:
-      - Overview: persistence/index.md
+      - persistence/index.md
   - Embeddings:
-      - Overview: embeddings/index.md
+      - embeddings/index.md
       - OpenAI Embeddings: embeddings/openai
       - Ollama Embeddings: embeddings/ollama
   - Samples:
-      - Overview: samples/index.md
+      - samples/index.md
   - Resources:
-      - Overview: resources/index.md
+      - resources/index.md
   - License:
-      - Overview: license/index.md
+      - license/index.md
