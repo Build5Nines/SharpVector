@@ -84,6 +84,15 @@ foreach(var item in results.Texts)
 
 ---
 
+!!! tip "Your IT Career Upgrade Starts Now!"
+    We believe mentorship is the fastest, most powerful way to unlock your IT career – and master in-demand skills like Cloud, Cybersecurity, DevOps, Development, and AI. You don’t have to do it alone. Our community is here to rise with you.
+
+    **Join the Build5Nines Membership** and get access to exclusive courses, hands-on labs, members-only forums, and mentoring.
+
+    [Join Now at members.build5nines.com →](https://members.build5nines.com){ .md-button .md-button--primary }
+
+---
+
 ## 🧠 Use Cases
 
 An in-memory vector databases like `Build5Nines.SharpVector` provides several advantages over a traditional vector database server, particularly in scenarios that might demand high performance, low latency, and efficient resource usage.
