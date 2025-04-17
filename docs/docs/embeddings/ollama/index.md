@@ -1,5 +1,6 @@
 ---
 title: Ollama Embeddings
+icon: simple-ollama
 description: Integrate Ollama embedding models with SharpVector to supercharge your semantic search and AI features in .NET apps.
 ---
 
