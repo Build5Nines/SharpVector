@@ -8,9 +8,13 @@ It's really easy to get started with using `Build5Nines.SharpVector`. Simply fol
 
 ## Prerequisites
 
+Using `Build5Nines.SharpVector` requires the following:
+
 - .NET 8.0 or later
 
 ## Install Nuget Package
+
+The `Build5Nines.SharpVector` library is available as a [Nuget package](https://www.nuget.org/packages/Build5Nines.SharpVector):
 
 === ".NET CLI"
     ```bash
@@ -23,6 +27,8 @@ It's really easy to get started with using `Build5Nines.SharpVector`. Simply fol
     ```
 
 ## Basic example
+
+The following is a basic example of using `Build5Nines.SharpVector` to create and use an in-memory vector database within a C# application:
 
 ```csharp
 using Build5Nines.SharpVector;
@@ -56,3 +62,6 @@ if (!result.IsEmpty)
 ```
 
 🚀 You are now using an in-memory vector database to implement semantic text searching within your app!
+
+!!! info
+    The `Build5Nines.SharpVector` library, be default, supports local text vector generation. However, there is also additional support for both [OpenAI and Ollama embeddings models](../embeddings) for using higher quality, more robust vector generation.
