@@ -2,6 +2,9 @@ using System.Text;
 
 namespace Build5Nines.SharpVector;
 
+/// <summary>
+/// Save and Load extnesion methods fo IVectorDatabase<>
+/// </summary>
 public static class IVectorDatabaseExtensions
 {
     public static async Task SaveToFileAsync<TId, TMetadata, TDocument>(this IVectorDatabase<TId, TMetadata, TDocument> vectorDatabase, string filePath)

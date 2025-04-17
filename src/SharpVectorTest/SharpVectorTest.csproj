@@ -28,4 +28,10 @@
     <ProjectReference Include="..\Build5Nines.SharpVector\Build5Nines.SharpVector.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Regression\*.b59vdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>  
+  </ItemGroup>
+  
 </Project>

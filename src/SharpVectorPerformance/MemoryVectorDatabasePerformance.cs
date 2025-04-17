@@ -14,7 +14,9 @@ using BenchmarkDotNet.Running;
 [MemoryDiagnoser]
 public class MemoryVectorDatabasePerformance
 {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     private MemoryVectorDatabase<double> database;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     private string fileName = "memory_vector_database_test.b59vdb";
 
     [GlobalSetup]

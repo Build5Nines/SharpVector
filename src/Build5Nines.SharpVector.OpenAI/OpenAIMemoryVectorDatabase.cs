@@ -6,6 +6,15 @@ using OpenAI.Embeddings;
 namespace Build5Nines.SharpVector.OpenAI;
 
 /// <summary>
+/// An interface for a vector database that uses OpenAI for embedding generation.
+/// </summary>
+/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TMetadata"></typeparam>
+public interface IOpenAIMemoryVectorDatabase<TId, TMetadata> : IVectorDatabase<TId, TMetadata>
+    where TId : notnull
+{ }
+
+/// <summary>
 /// A simple in-memory database for storing and querying vectorized text items.
 /// This database uses OpenAI to generate embeddings, and performs Cosine similarity search.
 /// </summary>

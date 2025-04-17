@@ -2,6 +2,8 @@ Build5Nines.SharpVector.OpenAI is the lightweight in-memory Vector Database for 
 
 The `Build5Nines.SharpVector.OpenAI.BasicOpenAIMemoryVectorDatabase` class uses an OpenAI Embeddings Client with Cosine similarity search.
 
+[Read Documentation](https://sharpvector.build5nines.com)
+
 ## Tutorials
 
 - [Enhanced In-Memory Text Vector Search in .NET with SharpVector and OpenAI Embeddings](https://build5nines.com/enhanced-in-memory-text-vector-search-in-net-with-sharpvector-and-openai-embeddings/?utm_source=github&utm_medium=sharpvector) by Chris Pietschmann
