@@ -2,7 +2,7 @@
 title: Discover
 description: The lightweight, in-memory, semantic search, text vector database for .NET that powers intelligent search and recommendation features.
 ---
-# Build5Nines.SharpVector
+# Discover Build5Nines.SharpVector
 
 **Build5Nines.SharpVector** is the lightweight, in-memory, semantic search, text vector database built for .NET applications. It enables fast and flexible vector-based similarity search for text data — ideal for search engines, recommendation systems, semantic analysis, and AI-enhanced features.
 
@@ -35,7 +35,7 @@ While there are lots of large databases that can be used to build Vector Databas
 
 ---
 
-## Basic Usage
+## 🚀 Basic Usage
 
 Here's a really simple usage of creating a vector database, adding some text to it, then performing a semantic search on the data.
 
@@ -72,7 +72,7 @@ foreach(var item in results.Texts)
 
 ---
 
-## 🚀 Key Features
+## 💡 Key Features
 
 - 🔍 **Text Embedding & Search** – Store and search documents using vector similarity (cosine, Euclidean, etc.)
 - 🧠 **Pluggable Embeddings** – Works with your own vectorizer (like OpenAI, Ollama, or custom)
@@ -113,7 +113,7 @@ SharpVector is great for:
 
 ---
 
-## Local, OpenAI, or Ollama Embeddings Generation
+## ⚙️ Local, OpenAI, or Ollama Embeddings Generation
 
 `Build5Nines.SharpVector` includes a local text vectorizer to generate embeddings for text added to the database. This is automatic and eliminates external LLM server dependencies. However, both [OpenAI Embeddings](embeddings/openai/index.md) and [Ollama Embeddings](embeddings/ollama/index.md) are also supported for more robust and higher quality embeddings support.
 
@@ -147,7 +147,7 @@ SharpVector is great for:
 
 ---
 
-## 🙌 Get Involved
+## 🙌 Contributing
 
 We welcome contributions, feedback, and new ideas. Whether it's a bug report or a pull request, head over to our GitHub repository to start collaborating!
 

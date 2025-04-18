@@ -125,10 +125,18 @@ extra:
       link: https://www.youtube.com/@build5nines
     
 nav:
-  - Home:
+  - Discover:
       - index.md
+      - 🚀 Basic usage: /#basic-usage
+      - 💡 Key Features: /#key-features
+      - 🧠 Use Cases: /#use-cases
+      - ⚙️ Local, OpenAI, or Ollama Embeddings: /#local-openai-or-ollama-embeddings-generation
+      - 🙌 Contributing: /#contributing
   - Get Started:
       - get-started/index.md
+      - Prerequisites: get-started/#prerequisites
+      - Install Nuget Package: get-started/#install-nuget-package
+      - Basic Example: get-started/#basic-example
   - Concepts:
       - concepts/index.md
       - What is a Vector Database?: concepts/#what-is-a-vector-database
@@ -152,6 +160,8 @@ nav:
       - Ollama Embeddings: embeddings/ollama/index.md
   - Samples:
       - samples/index.md
+      - Console App: samples/#sample-console-app
+      - Generative AI + RAG + ONNX: samples/#generative-ai-rag-onnx-model
   - Resources:
       - resources/index.md
   - License:
