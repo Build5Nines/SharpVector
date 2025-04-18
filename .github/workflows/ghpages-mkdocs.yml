@@ -33,6 +33,10 @@ jobs:
             fetch-depth: 0  # Fetch all history for all branches and tags, not just the default branch.
             # This is needed to ensure that the commit SHA is available for the deployment.
             # See
+            sparse-checkout: |
+              docs
+              mkdocs.yml
+              .github/workflows/ghpages-mkdocs.yml
     
         - name: Setup pages
           id: pages

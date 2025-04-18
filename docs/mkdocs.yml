@@ -95,7 +95,6 @@ plugins:
   - git-revision-date-localized:
       type: timeago
       locale: en
-      fallback_to_build_date: true
   - git-committers: # mkdocs-git-committers-plugin-2 plugin to show contributors on footer of
       repository: Build5Nines/SharpVector
       branch: main
