@@ -29,6 +29,7 @@ theme:
     - search.highlight
     - content.tabs.link # Ensures site-wide switch to same tab name
     - toc.follow
+    - toc.integrate
     
   palette:
     - media: "(prefers-color-scheme)"
@@ -91,11 +92,22 @@ plugins:
       lang:
         - en
   - social
+  - git-revision-date-localized:
+      type: timeago
+      locale: en
   - git-committers: # mkdocs-git-committers-plugin-2 plugin to show contributors on footer of
       repository: Build5Nines/SharpVector
       branch: main
 
 extra:
+  # consent:
+  #   title: "Cookies & Privacy"
+  #   description: "This website uses cookies to ensure you get the best experience on our website."
+  #   policy: "https://build5nines.com/privacy-policy/"
+  #   actions:
+  #     accept: "Accept"
+  #     reject: "Decline"
+  #     manage: "Manage"
   analytics:
     provider: google
     property: G-7KST9RSCN3
@@ -119,14 +131,25 @@ nav:
       - get-started/index.md
   - Concepts:
       - concepts/index.md
+      - What is a Vector Database?: concepts/#what-is-a-vector-database
+      - Text Vectorization: concepts/#text-vectorization
+      - Semantic Search: concepts/#semantic-search
+      - Retrieval Augmented Generation: concepts/#retrieval-augmented-generation-rag
   - Text Chunking:
       - text-chunking/index.md
+      - Why Chunk Text?: text-chunking/#why-chunk-text
+      - Getting Started: text-chunking/#getting-started-with-textdataloader
+      - Chunking Methods: text-chunking/#chunking-methods
+      - Customize Metadata: text-chunking/#customize-metadata
+      - Summary: text-chunking/#summary
   - Persistence:
       - persistence/index.md
+      - File Persistence: persistence/#file-persistence
+      - Persist to Stream: persistence/#persist-to-stream
   - Embeddings:
       - embeddings/index.md
-      - OpenAI Embeddings: embeddings/openai
-      - Ollama Embeddings: embeddings/ollama
+      - OpenAI Embeddings: embeddings/openai/index.md
+      - Ollama Embeddings: embeddings/ollama/index.md
   - Samples:
       - samples/index.md
   - Resources:
