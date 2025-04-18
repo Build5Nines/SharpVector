@@ -15,7 +15,7 @@ It loads a list of movie titles and descriptions from a JSON file, then allows t
 
 Here's a screenshot of the test console app running:
 
-![Screenshot of sample console app in the terminal](images/samples/build5nines-sharpvector-console-screenshot.jpg)
+![Screenshot of sample console app in the terminal](../images/samples/build5nines-sharpvector-console-screenshot.jpg)
 
 ## Generative AI + RAG + ONNX Model
 

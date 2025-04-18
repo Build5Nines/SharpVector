@@ -1,6 +1,5 @@
 ---
 title: OpenAI Embeddings
-icon: simple-openai
 description: Integrate OpenAI’s powerful embeddings with SharpVector to supercharge your semantic search and AI features in .NET apps.
 ---
 
