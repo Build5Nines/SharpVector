@@ -1,13 +1,13 @@
 ---
 title: Discover
-description: The lightweight, in-memory text vector database for .NET that powers intelligent search and recommendation features.
+description: The lightweight, in-memory, semantic search, text vector database for .NET that powers intelligent search and recommendation features.
 ---
 # Build5Nines.SharpVector
 
-**Build5Nines.SharpVector** is the lightweight, in-memory text vector database built for .NET applications. It enables fast and flexible vector-based similarity search for text data — ideal for search engines, recommendation systems, semantic analysis, and AI-enhanced features.
+**Build5Nines.SharpVector** is the lightweight, in-memory, semantic search, text vector database built for .NET applications. It enables fast and flexible vector-based similarity search for text data — ideal for search engines, recommendation systems, semantic analysis, and AI-enhanced features.
 
-![Tests: Passing](https://img.shields.io/github/actions/workflow/status/build5nines/sharpvector/dotnet-tests.yml?label=tests)
-![Build: Passing](https://img.shields.io/github/actions/workflow/status/build5nines/sharpvector/build-release.yml)
+[![.NET Core Tests](https://github.com/Build5Nines/SharpVector/actions/workflows/dotnet-tests.yml/badge.svg)](https://github.com/Build5Nines/SharpVector/actions/workflows/dotnet-tests.yml)
+[![Build and Release](https://github.com/Build5Nines/SharpVector/actions/workflows/build-release.yml/badge.svg)](https://github.com/Build5Nines/SharpVector/actions/workflows/build-release.yml)
 ![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/build5nines/sharpvector)
 
 [![NuGet](https://img.shields.io/nuget/v/Build5Nines.SharpVector.svg)](https://www.nuget.org/packages/Build5Nines.SharpVector/)

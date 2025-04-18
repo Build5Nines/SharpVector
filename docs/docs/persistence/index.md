@@ -2,7 +2,7 @@
 
 The `Build5Nines.SharpVector` library provides easy-to-use methods for saving a memory-based vector database to a file or stream and loading it again later. This is particularly useful for caching indexed content between runs, deploying pre-built vector stores, or shipping databases with your application.
 
-## File Persistence
+## :material-file: File Persistence
 
 `Build5Nines.SharpVector` supports persisting the vector database to a file.
 
@@ -48,7 +48,7 @@ vdb.LoadFromFile(filePath);
 await vdb.LoadFromFileAsync(filePath);
 ```
 
-## Persist to Stream
+## :material-file-move: Persist to Stream
 
 The underlying methods used by `SaveToFile` and `LoadFromFile` methods for serializing the vector database to a `Stream` are available to use directly. This provides support for reading/writing to `MemoryStream` (or other streams) if the vector database needs to be persisted to something other than the local file system.
 
