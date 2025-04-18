@@ -1,4 +1,4 @@
-# Build5Nines SharpVector - The lightweight, in-memory Text Vector Database for any C# / .NET Applications
+# Build5Nines SharpVector - The lightweight, in-memory, Semantic Search, Text Vector Database for any C# / .NET Applications
 
 `Build5Nines.SharpVector` is an in-memory vector database library designed for .NET applications. It allows you to store, search, and manage text data using vector representations. The library is customizable and extensible, enabling support for different vector comparison methods, preprocessing techniques, and vectorization strategies.
 
