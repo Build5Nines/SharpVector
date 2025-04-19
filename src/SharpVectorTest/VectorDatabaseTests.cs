@@ -852,15 +852,16 @@ public class VectorDatabaseTests
     public void EmbeddingGeneratorMemoryVectorDatabase_001()
     {
         var db = new EmbeddingGeneratorMemoryVectorDatabase();
-        //db.AddText("Test string", "metadata");
+        db.AddText("Test string", "metadata");
     }
 }
 
 public class MockEmbeddingsGenerator : IEmbeddingsGenerator
 {
-    public Task<float[]> GenerateEmbeddingsAsync(string text)
+    public async Task<float[]> GenerateEmbeddingsAsync(string text)
     {
-        return new Task<float[]>(() => new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f });
+        var val = new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
+        return val;
     }
 }
 
