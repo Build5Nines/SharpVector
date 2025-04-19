@@ -9,14 +9,9 @@ using System.IO.Compression;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Build5Nines.SharpVector.Embeddings;
-using System.Runtime.InteropServices;
 
 namespace Build5Nines.SharpVector;
 
-public abstract class MemoryVectorDatabaseBase
-{
-
-}
 
 public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabularyStore, TVocabularyKey, TVocabularyValue, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorComparer>
     : IVectorDatabase<TId, TMetadata, TVocabularyKey>
