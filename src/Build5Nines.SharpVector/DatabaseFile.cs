@@ -11,9 +11,9 @@ namespace Build5Nines.SharpVector;
 /// </summary>
 public static class DatabaseFile
 {
-    private const string databaseInfoFilename = "database.json";
-    private const string vectorStoreFilename = "vectorstore.json";
-    private const string vocabularyStoreFilename = "vocabularystore.json";
+    internal const string databaseInfoFilename = "database.json";
+    internal const string vectorStoreFilename = "vectorstore.json";
+    internal const string vocabularyStoreFilename = "vocabularystore.json";
 
     /// <summary>
     /// Load the vector database from a stream
@@ -209,6 +209,41 @@ public static class DatabaseFile
             await vocabularyStore.DeserializeFromJsonStreamAsync(entryStream);
         }
     }
+
+    public static async Task SaveDatabaseToZipArchiveAsync(
+        Stream stream,
+        DatabaseInfo databaseInfo,
+        Func<ZipArchive, Task> saveVectorStore
+    )
+    {
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+
+        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
+        {
+            var entryDatabaseType = archive.CreateEntry(databaseInfoFilename);
+            using(var entryStream = entryDatabaseType.Open())
+            {
+                // Save the database info
+                var databaseInfoJson = JsonSerializer.Serialize(databaseInfo);
+                if (databaseInfoJson != null)
+                {
+                    var databaseTypeBytes = System.Text.Encoding.UTF8.GetBytes(databaseInfoJson);
+                    await entryStream.WriteAsync(databaseTypeBytes);
+                    await entryStream.FlushAsync();
+                }
+                else
+                {
+                    throw new InvalidOperationException("Type name cannot be null.");
+                }
+            }
+
+            await saveVectorStore(archive);
+        }
+    }
+        
 
     public static async Task<DatabaseInfo> LoadDatabaseFromZipArchiveAsync(
         Stream stream, string? dbClassType,

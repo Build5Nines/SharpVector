@@ -9,8 +9,14 @@ using System.IO.Compression;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Build5Nines.SharpVector.Embeddings;
+using System.Runtime.InteropServices;
 
 namespace Build5Nines.SharpVector;
+
+public abstract class MemoryVectorDatabaseBase
+{
+
+}
 
 public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabularyStore, TVocabularyKey, TVocabularyValue, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorComparer>
     : IVectorDatabase<TId, TMetadata, TVocabularyKey>
@@ -260,43 +266,28 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
         await Task.WhenAll(taskVectorStore, taskVocabularyStore);
 
-        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
-        {
-            var entryDatabaseType = archive.CreateEntry("database.json");
-            using (var entryStream = entryDatabaseType.Open())
+        await DatabaseFile.SaveDatabaseToZipArchiveAsync(
+            stream,
+            new DatabaseInfo(this.GetType().FullName),
+            async (archive) =>
             {
-                var databaseInfo = new DatabaseInfo(this.GetType().FullName);
-
-                var databaseInfoJson = JsonSerializer.Serialize(databaseInfo);
-
-                if (databaseInfoJson != null)
+                var entryVectorStore = archive.CreateEntry(DatabaseFile.vectorStoreFilename);
+                using (var entryStream = entryVectorStore.Open())
                 {
-                    var databaseTypeBytes = System.Text.Encoding.UTF8.GetBytes(databaseInfoJson);
-                    await entryStream.WriteAsync(databaseTypeBytes);
+                    streamVectorStore.Position = 0;
+                    await streamVectorStore.CopyToAsync(entryStream);
                     await entryStream.FlushAsync();
                 }
-                else
+
+                var entryVocabularyStore = archive.CreateEntry(DatabaseFile.vocabularyStoreFilename);
+                using (var entryStream = entryVocabularyStore.Open())
                 {
-                    throw new InvalidOperationException("Type name cannot be null.");
+                    streamVocabularyStore.Position = 0;
+                    await streamVocabularyStore.CopyToAsync(entryStream);
+                    await entryStream.FlushAsync();
                 }
             }
-            var entryVectorStore = archive.CreateEntry("vectorstore.json");
-            using (var entryStream = entryVectorStore.Open())
-            {
-                streamVectorStore.Position = 0;
-                await streamVectorStore.CopyToAsync(entryStream);
-                await entryStream.FlushAsync();
-            }
-
-            var entryVocabularyStore = archive.CreateEntry("vocabularystore.json");
-            using (var entryStream = entryVocabularyStore.Open())
-            {
-                streamVocabularyStore.Position = 0;
-                await streamVocabularyStore.CopyToAsync(entryStream);
-                await entryStream.FlushAsync();
-            }
-        }
-
+        );
         await stream.FlushAsync();
     }
 
@@ -597,39 +588,22 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
     public virtual async Task SerializeToBinaryStreamAsync(Stream stream)
     {
         var streamVectorStore = new MemoryStream();
-        var streamVocabularyStore = new MemoryStream();
-
         await VectorStore.SerializeToJsonStreamAsync(streamVectorStore);
 
-        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
-        {
-            var entryDatabaseType = archive.CreateEntry("database.json");
-            using (var entryStream = entryDatabaseType.Open())
+        await DatabaseFile.SaveDatabaseToZipArchiveAsync(
+            stream,
+            new DatabaseInfo(this.GetType().FullName),
+            async (archive) =>
             {
-                var databaseInfo = new DatabaseInfo(this.GetType().FullName);
-
-                var databaseInfoJson = JsonSerializer.Serialize(databaseInfo);
-
-                if (databaseInfoJson != null)
+                var entryVectorStore = archive.CreateEntry(DatabaseFile.vectorStoreFilename);
+                using (var entryStream = entryVectorStore.Open())
                 {
-                    var databaseTypeBytes = System.Text.Encoding.UTF8.GetBytes(databaseInfoJson);
-                    await entryStream.WriteAsync(databaseTypeBytes);
+                    streamVectorStore.Position = 0;
+                    await streamVectorStore.CopyToAsync(entryStream);
                     await entryStream.FlushAsync();
                 }
-                else
-                {
-                    throw new InvalidOperationException("Type name cannot be null.");
-                }
             }
-            var entryVectorStore = archive.CreateEntry("vectorstore.json");
-            using (var entryStream = entryVectorStore.Open())
-            {
-                streamVectorStore.Position = 0;
-                await streamVectorStore.CopyToAsync(entryStream);
-                await entryStream.FlushAsync();
-            }
-        }
-
+        );
         await stream.FlushAsync();
     }
 
