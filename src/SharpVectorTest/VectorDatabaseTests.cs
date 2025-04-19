@@ -3,6 +3,7 @@ namespace SharpVectorTest;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Build5Nines.SharpVector;
+using Build5Nines.SharpVector.Embeddings;
 using Build5Nines.SharpVector.Id;
 using Build5Nines.SharpVector.Preprocessing;
 using Build5Nines.SharpVector.VectorCompare;
@@ -846,8 +847,39 @@ public class VectorDatabaseTests
         results = vdb.Search("Lion King");
         Assert.AreEqual("{ value: \"New Value\" }", results.Texts.First().Metadata);
     }
+
+    [TestMethod]
+    public void EmbeddingGeneratorMemoryVectorDatabase_001()
+    {
+        var db = new EmbeddingGeneratorMemoryVectorDatabase();
+        //db.AddText("Test string", "metadata");
+    }
 }
 
+public class MockEmbeddingsGenerator : IEmbeddingsGenerator
+{
+    public Task<float[]> GenerateEmbeddingsAsync(string text)
+    {
+        return new Task<float[]>(() => new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f });
+    }
+}
+
+public class EmbeddingGeneratorMemoryVectorDatabase
+     : MemoryVectorDatabaseBase<
+        int,
+        string,
+        MemoryDictionaryVectorStore<int, string>,
+        IntIdGenerator,
+        CosineSimilarityVectorComparer
+        >
+{
+    public EmbeddingGeneratorMemoryVectorDatabase()
+        : base(
+            new MockEmbeddingsGenerator(),
+            new MemoryDictionaryVectorStore<int, string>()
+            )
+    { }
+}
 
 public class EuclideanDistanceVectorComparerAsyncMemoryVectorDatabase<TMetadata>
      : MemoryVectorDatabaseBase<
