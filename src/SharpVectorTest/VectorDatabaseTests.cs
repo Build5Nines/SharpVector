@@ -26,7 +26,7 @@ public class VectorDatabaseTests
 
         Assert.AreEqual(1, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
-        Assert.AreEqual(0, results.Texts.First().Id);
+        Assert.AreEqual(1, results.Texts.First().Id);
         Assert.AreEqual("[some metadata here]", results.Texts.First().Metadata);
         Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
@@ -506,18 +506,19 @@ public class VectorDatabaseTests
         var item = results.Texts.First();
 
         Assert.AreEqual(2, id);
+        Assert.AreEqual(id, item.Id, "ID should match the one returned by AddText.");
 
         vdb.UpdateTextMetadata(item.Id, "222");
 
         results = await vdb.SearchAsync("Two");
 
-        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual(3, results.Texts.Count());
         Assert.AreEqual("Two", results.Texts.First().Text);
         Assert.AreEqual("222", results.Texts.First().Metadata);
 
         results = await vdb.SearchAsync("One");
 
-        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual(3, results.Texts.Count());
         Assert.AreEqual("One", results.Texts.First().Text);
         Assert.AreEqual("1", results.Texts.First().Metadata);
     }
@@ -540,13 +541,13 @@ public class VectorDatabaseTests
 
         vdb.UpdateTextMetadata(item.Id, "222");
 
-        results = await vdb.SearchAsync("Two");
+        results = await vdb.SearchAsync("Two", pageCount: 1);
 
         Assert.AreEqual(1, results.Texts.Count());
         Assert.AreEqual("Two", results.Texts.First().Text);
         Assert.AreEqual("222", results.Texts.First().Metadata);
 
-        results = await vdb.SearchAsync("One");
+        results = await vdb.SearchAsync("One", pageCount: 1);
 
         Assert.AreEqual(1, results.Texts.Count());
         Assert.AreEqual("One", results.Texts.First().Text);
@@ -567,24 +568,23 @@ public class VectorDatabaseTests
 
         var results = await vdb.SearchAsync("Two");
 
+        foreach(var i in results.Texts)
+        {
+            Assert.AreNotEqual("00000000-0000-0000-0000-000000000000", i.Id.ToString(), $"Search ID ({i.Text}) should not be empty.");
+        }
+
         var item = results.Texts.First();
 
-        Assert.AreNotEqual("00000000-0000-0000-0000-000000000000", item.Id.ToString(), "Search ID should not be empty.");
+        Assert.AreEqual(id, item.Id, "ID should match the one returned by AddText.");
 
         vdb.UpdateText(item.Id, "TwoTwo");
         vdb.UpdateTextMetadata(item.Id, "222");
 
         results = await vdb.SearchAsync("Two");
 
-        Assert.AreEqual(1, results.Texts.Count());
-        Assert.AreEqual("Two", results.Texts.First().Text);
+        Assert.AreEqual(3, results.Texts.Count());
+        Assert.AreEqual("TwoTwo", results.Texts.First().Text);
         Assert.AreEqual("222", results.Texts.First().Metadata);
-
-        results = await vdb.SearchAsync("One");
-
-        Assert.AreEqual(1, results.Texts.Count());
-        Assert.AreEqual("One", results.Texts.First().Text);
-        Assert.AreEqual("1", results.Texts.First().Metadata);
     }
 
     [TestMethod]
@@ -610,13 +610,6 @@ public class VectorDatabaseTests
         Assert.AreEqual("狮子王是一部非常棒的电影！", results.Texts.First().Text);
         Assert.AreEqual("{ value: \"元数据初始值\" }", results.Texts.First().Metadata);
     }
-
-
-
-
-
-
-
 
     [TestMethod]
     public void EuclideanDistanceVectorComparerAsyncMemoryVectorDatabase_1()

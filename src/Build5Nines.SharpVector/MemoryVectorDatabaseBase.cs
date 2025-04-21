@@ -9,6 +9,7 @@ using System.IO.Compression;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Build5Nines.SharpVector.Embeddings;
+using System.Runtime.ExceptionServices;
 
 namespace Build5Nines.SharpVector;
 
@@ -143,8 +144,9 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     public void UpdateTextMetadata(TId id, TMetadata metadata) {
         if (VectorStore.ContainsKey(id))
         {
-            var text = GetText(id);
-            text.Metadata = metadata;
+            var existing = VectorStore.Get(id);
+            existing.Metadata = metadata;
+            VectorStore.Set(id, existing);
         }
         else
         {
@@ -226,7 +228,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         }
 
         var results = new ConcurrentBag<VectorTextResultItem<TId, TVocabularyKey, TMetadata>>();
-        await foreach (var kvp in VectorStore)
+        await foreach (KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>> kvp in VectorStore)
         {
             var item = kvp.Value;
             float vectorComparisonValue = await _vectorComparer.CalculateAsync(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
@@ -438,9 +440,10 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
     {
         if (VectorStore.ContainsKey(id))
         {
+            var existing = VectorStore.Get(id);
             var vector = await EmbeddingsGenerator.GenerateEmbeddingsAsync(text);
-            var metadata = VectorStore.Get(id).Metadata;
-            VectorStore.Set(id, new VectorTextItem<TMetadata>(text, metadata, vector));
+            var metadata = existing.Metadata;
+            VectorStore.Set(id, new VectorTextItem<TMetadata>(text, existing.Metadata, vector));
         }
         else
         {
@@ -468,8 +471,9 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
     public void UpdateTextMetadata(TId id, TMetadata metadata) {
         if (VectorStore.ContainsKey(id))
         {
-            var text = GetText(id);
-            text.Metadata = metadata;
+            var existing = VectorStore.Get(id);
+            existing.Metadata = metadata;
+            VectorStore.Set(id, existing);
         }
         else
         {

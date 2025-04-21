@@ -29,7 +29,7 @@ public class VectorTextResultItem<TId, TDocument, TMetadata>
 
     public VectorTextResultItem(TId id, IVectorTextItem<TDocument, TMetadata> item, float vectorComparison)
     {
-        _id = Id;
+        _id = id;
         _item = item;
         VectorComparison = vectorComparison;
     }
