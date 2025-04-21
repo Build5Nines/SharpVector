@@ -397,7 +397,7 @@ public class VectorDatabaseTests
     [TestMethod]
     public void Text_Update_01_Chinese()
     {
-        var vdb = new MemoryVectorDatabase<string>();
+        var vdb = new BasicMemoryVectorDatabase();
         
         // Load Vector Database with Chinese sample text and JSON metadata
         var id = vdb.AddText("狮子王是一部1994年的迪士尼动画电影，讲述一个小狮子辛巴必将继承非洲大草原王位的故事。", "{ value: \"元数据初始值\" }");
@@ -560,15 +560,18 @@ public class VectorDatabaseTests
         
         // // Load Vector Database with some sample text
         vdb.AddText("One", "1");
-        vdb.AddText("Two", "2");
+        var id = vdb.AddText("Two", "2");
         vdb.AddText("Three", "3");
+
+        Assert.AreNotEqual("00000000-0000-0000-0000-000000000000", id.ToString(), "AddText ID should not be empty.");
 
         var results = await vdb.SearchAsync("Two");
 
         var item = results.Texts.First();
 
-        Assert.AreNotEqual("00000000-0000-0000-0000-000000000000", item.Id.ToString());
+        Assert.AreNotEqual("00000000-0000-0000-0000-000000000000", item.Id.ToString(), "Search ID should not be empty.");
 
+        vdb.UpdateText(item.Id, "TwoTwo");
         vdb.UpdateTextMetadata(item.Id, "222");
 
         results = await vdb.SearchAsync("Two");
@@ -582,6 +585,30 @@ public class VectorDatabaseTests
         Assert.AreEqual(1, results.Texts.Count());
         Assert.AreEqual("One", results.Texts.First().Text);
         Assert.AreEqual("1", results.Texts.First().Metadata);
+    }
+
+    [TestMethod]
+    public void SimpleTest_MemoryVectorDatabase_UpdateMetadata_03()
+    {
+        var vdb = new MockMemoryVectorDatabase();
+        
+        // Load Vector Database with Chinese sample text and JSON metadata
+        var id = vdb.AddText("狮子王是一部1994年的迪士尼动画电影，讲述一个小狮子辛巴必将继承非洲大草原王位的故事。", "{ value: \"元数据初始值\" }");
+        
+        Assert.AreNotEqual("00000000-0000-0000-0000-000000000000", id.ToString());
+
+        // Verify that search returns the expected text
+        var results = vdb.Search("狮子");
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.IsTrue(results.Texts.First().Text.Contains("狮子王"));
+        
+        // Update the text
+        vdb.UpdateText(id, "狮子王是一部非常棒的电影！");
+        
+        // Verify that the text is updated but the metadata remains unchanged
+        results = vdb.Search("狮子");
+        Assert.AreEqual("狮子王是一部非常棒的电影！", results.Texts.First().Text);
+        Assert.AreEqual("{ value: \"元数据初始值\" }", results.Texts.First().Metadata);
     }
 
 
