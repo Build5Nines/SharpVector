@@ -536,6 +536,39 @@ public class VectorDatabaseTests
 
         var item = results.Texts.First();
 
+        Assert.AreEqual(2, item.Id);
+
+        vdb.UpdateTextMetadata(item.Id, "222");
+
+        results = await vdb.SearchAsync("Two");
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual("Two", results.Texts.First().Text);
+        Assert.AreEqual("222", results.Texts.First().Metadata);
+
+        results = await vdb.SearchAsync("One");
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual("One", results.Texts.First().Text);
+        Assert.AreEqual("1", results.Texts.First().Metadata);
+    }
+
+    [TestMethod] 
+    public async Task SimpleTest_MemoryVectorDatabase_UpdateMetadata_02()
+    {
+        var vdb = new MockMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("One", "1");
+        vdb.AddText("Two", "2");
+        vdb.AddText("Three", "3");
+
+        var results = await vdb.SearchAsync("Two");
+
+        var item = results.Texts.First();
+
+        Assert.AreNotEqual("00000000-0000-0000-0000-000000000000", item.Id.ToString());
+
         vdb.UpdateTextMetadata(item.Id, "222");
 
         results = await vdb.SearchAsync("Two");
@@ -913,6 +946,23 @@ public class VectorDatabaseTests
         var db = new EmbeddingGeneratorMemoryVectorDatabase();
         db.AddText("Test string", "metadata");
     }
+}
+
+public class MockMemoryVectorDatabase
+     : MemoryVectorDatabaseBase<
+        Guid,
+        string,
+        MemoryDictionaryVectorStore<Guid, string>,
+        GuidIdGenerator,
+        CosineSimilarityVectorComparer
+        >
+{
+    public MockMemoryVectorDatabase()
+        : base(
+            new MockEmbeddingsGenerator(),
+            new MemoryDictionaryVectorStore<Guid, string>()
+            )
+    { }
 }
 
 public class MockEmbeddingsGenerator : IEmbeddingsGenerator
