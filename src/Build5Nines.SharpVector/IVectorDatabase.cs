@@ -80,7 +80,7 @@ public interface IVectorDatabase<TId, TMetadata, TDocument>
     /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
     /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
     /// <returns></returns>
-    IVectorTextResult<TDocument, TMetadata> Search(TDocument queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null);
+    IVectorTextResult<TId, TDocument, TMetadata> Search(TDocument queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null);
 
     /// <summary>
     /// Performs an asynchronous search vector search to find the top N most similar texts to the given text
@@ -90,7 +90,7 @@ public interface IVectorDatabase<TId, TMetadata, TDocument>
     /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
     /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
     /// <returns></returns>
-    Task<IVectorTextResult<TDocument, TMetadata>> SearchAsync(TDocument queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null);
+    Task<IVectorTextResult<TId, TDocument, TMetadata>> SearchAsync(TDocument queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null);
 
 
     [Obsolete("Use SerializeToBinaryStreamAsync Instead")]

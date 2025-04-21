@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Build5Nines.SharpVector.VectorCompare;
 
 public class EuclideanDistanceVectorComparer : IVectorComparer
@@ -39,22 +41,12 @@ public class EuclideanDistanceVectorComparer : IVectorComparer
         return (float)Math.Sqrt(sumOfSquares);
     }
 
-    public IEnumerable<VectorTextResultItem<TMetadata>> Sort<TMetadata>(IEnumerable<VectorTextResultItem<TMetadata>> results)
+    public IEnumerable<IVectorTextResultItem<TId, TDocument, TMetadata>> Sort<TId, TDocument, TMetadata>(IEnumerable<IVectorTextResultItem<TId, TDocument, TMetadata>> results)
     {
         return results.OrderBy(s => s.VectorComparison);
     }
 
-    public async Task<IEnumerable<VectorTextResultItem<TMetadata>>> SortAsync<TMetadata>(IEnumerable<VectorTextResultItem<TMetadata>> results)
-    {
-        return await Task.Run(() => Sort(results));
-    }
-
-    public IEnumerable<VectorTextResultItem<TDocument, TMetadata>> Sort<TDocument, TMetadata>(IEnumerable<VectorTextResultItem<TDocument, TMetadata>> results)
-    {
-        return results.OrderBy(s => s.VectorComparison);
-    }
-
-    public async Task<IEnumerable<VectorTextResultItem<TDocument, TMetadata>>> SortAsync<TDocument, TMetadata>(IEnumerable<VectorTextResultItem<TDocument, TMetadata>> results)
+    public async Task<IEnumerable<IVectorTextResultItem<TId, TDocument, TMetadata>>> SortAsync<TId, TDocument, TMetadata>(IEnumerable<IVectorTextResultItem<TId, TDocument, TMetadata>> results)
     {
         return await Task.Run(() => Sort(results));
     }

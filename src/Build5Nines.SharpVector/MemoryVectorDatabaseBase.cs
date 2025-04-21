@@ -180,7 +180,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="topN">The highest number of results to show.</param>
     /// <param name="threshold">The similarity threshold. Only return items greater or equal to the threshold. Null returns all.</param>
     /// <returns></returns>
-    public IVectorTextResult<TVocabularyKey, TMetadata> Search(TVocabularyKey queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    public IVectorTextResult<TId, TVocabularyKey, TMetadata> Search(TVocabularyKey queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
         return SearchAsync(queryText, threshold, pageIndex, pageCount).Result;
     }
@@ -193,7 +193,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
     /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
     /// <returns></returns>
-    public async Task<IVectorTextResult<TVocabularyKey, TMetadata>> SearchAsync(TVocabularyKey queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    public async Task<IVectorTextResult<TId, TVocabularyKey, TMetadata>> SearchAsync(TVocabularyKey queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
         var similarities = await CalculateVectorComparisonAsync(queryText, threshold);
 
@@ -201,7 +201,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
         var totalCountFoundInSearch = similarities.Count();
 
-        IEnumerable<VectorTextResultItem<TVocabularyKey, TMetadata>> resultsToReturn;
+        IEnumerable<IVectorTextResultItem<TId, TVocabularyKey, TMetadata>> resultsToReturn;
         if (pageCount != null && pageCount >= 0 && pageIndex >= 0) {
             resultsToReturn = similarities.Skip(pageIndex * pageCount.Value).Take(pageCount.Value);
         } else {
@@ -209,10 +209,10 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
             resultsToReturn = similarities;
         }
 
-        return new VectorTextResult<TVocabularyKey, TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
+        return new VectorTextResult<TId, TVocabularyKey, TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
     }
 
-    private async Task<IEnumerable<VectorTextResultItem<TVocabularyKey, TMetadata>>> CalculateVectorComparisonAsync(TVocabularyKey queryText, float? threshold = null)
+    private async Task<IEnumerable<IVectorTextResultItem<TId, TVocabularyKey, TMetadata>>> CalculateVectorComparisonAsync(TVocabularyKey queryText, float? threshold = null)
     {
         var queryTokens = _textPreprocessor.TokenizeAndPreprocess(queryText);
         float[] queryVector = _vectorizer.GenerateVectorFromTokens(VectorStore.VocabularyStore, queryTokens);
@@ -225,7 +225,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
             throw new InvalidOperationException("The database is empty.");
         }
 
-        var results = new ConcurrentBag<VectorTextResultItem<TVocabularyKey, TMetadata>>();
+        var results = new ConcurrentBag<VectorTextResultItem<TId, TVocabularyKey, TMetadata>>();
         await foreach (var kvp in VectorStore)
         {
             var item = kvp.Value;
@@ -233,7 +233,10 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
             if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
             {
-                results.Add(new VectorTextResultItem<TVocabularyKey, TMetadata>(item, vectorComparisonValue));
+                var id = kvp.Key;
+                results.Add(
+                    new VectorTextResultItem<TId, TVocabularyKey, TMetadata>(id, item, vectorComparisonValue)
+                    );
             }
         }
         return results;
@@ -512,7 +515,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
     /// <param name="topN">The highest number of results to show.</param>
     /// <param name="threshold">The similarity threshold. Only return items greater or equal to the threshold. Null returns all.</param>
     /// <returns></returns>
-    public IVectorTextResult<string, TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    public IVectorTextResult<TId, string, TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
         return SearchAsync(queryText, threshold, pageIndex, pageCount).Result;
     }
@@ -525,7 +528,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
     /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
     /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
     /// <returns></returns>
-    public async Task<IVectorTextResult<string, TMetadata>> SearchAsync(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    public async Task<IVectorTextResult<TId, string, TMetadata>> SearchAsync(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
         var similarities = await CalculateVectorComparisonAsync(queryText, threshold);
 
@@ -533,7 +536,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
 
         var totalCountFoundInSearch = similarities.Count();
 
-        IEnumerable<VectorTextResultItem<TMetadata>> resultsToReturn;
+        IEnumerable<IVectorTextResultItem<TId, string, TMetadata>> resultsToReturn;
         if (pageCount != null && pageCount >= 0 && pageIndex >= 0) {
             resultsToReturn = similarities.Skip(pageIndex * pageCount.Value).Take(pageCount.Value);
         } else {
@@ -541,10 +544,10 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
             resultsToReturn = similarities;
         }
 
-        return new VectorTextResult<TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
+        return new VectorTextResult<TId, string, TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
     }
 
-    private async Task<IEnumerable<VectorTextResultItem<TMetadata>>> CalculateVectorComparisonAsync(string queryText, float? threshold = null)
+    private async Task<IEnumerable<IVectorTextResultItem<TId, string, TMetadata>>> CalculateVectorComparisonAsync(string queryText, float? threshold = null)
     {
         var queryVector = await EmbeddingsGenerator.GenerateEmbeddingsAsync(queryText);
 
@@ -553,16 +556,19 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
             throw new InvalidOperationException("The database is empty.");
         }
 
-        var results = new ConcurrentBag<VectorTextResultItem<TMetadata>>();
+        var results = new ConcurrentBag<VectorTextResultItem<TId, string, TMetadata>>();
         await foreach (var kvp in VectorStore)
         {
             var item = kvp.Value;
-            //float vectorComparisonValue = await _vectorComparer.CalculateAsync(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
+
             float vectorComparisonValue = await _vectorComparer.CalculateAsync(queryVector, item.Vector);
 
             if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
             {
-                results.Add(new VectorTextResultItem<TMetadata>(item, vectorComparisonValue));
+                var id = kvp.Key;
+                results.Add(
+                    new VectorTextResultItem<TId, string, TMetadata>(id, item, vectorComparisonValue)
+                    );
             }
         }
         return results;

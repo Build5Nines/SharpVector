@@ -137,6 +137,10 @@ nav:
       - Prerequisites: get-started/#prerequisites
       - Install Nuget Package: get-started/#install-nuget-package
       - Basic Example: get-started/#basic-example
+      - Data Management:
+          - get-started/data-management/index.md
+          - Get Text ID: get-started/data-management/#get-text-id
+          - Update Text and Metadata: get-started/data-management/#update-text-and-metadata
   - Concepts:
       - concepts/index.md
       - What is a Vector Database?: concepts/#what-is-a-vector-database

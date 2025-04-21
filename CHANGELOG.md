@@ -7,9 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## vNext
 
+Add:
+
+- Added `VectorTextResultItem.Id` property so it's easy to get the database ID for search results if necessary.
+
 Fixed:
 
 - Refactorings for more Clean Code
+
+Breaking Changes:
+
+- The `.Search` and `.SearchAsync` methods now return a `IVectorTextResultItem<TId, TDocument, TMetadata>` instead of `VectorTextResultItem<TDocument, TMetadata>`. If you're using things like the documentation shows, then you wont see any changes or have any issues with this update.
 
 ## v2.0.4 (2025-04-16)
 

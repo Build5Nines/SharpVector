@@ -26,6 +26,7 @@ public class VectorDatabaseTests
 
         Assert.AreEqual(1, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
+        Assert.AreEqual(0, results.Texts.First().Id);
         Assert.AreEqual("[some metadata here]", results.Texts.First().Metadata);
         Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
@@ -276,7 +277,7 @@ public class VectorDatabaseTests
         
         await Task.WhenAll(textTasks);
 
-        var searchTasks = new Task<IVectorTextResult<string, double>>[15];
+        var searchTasks = new Task<IVectorTextResult<int, string, double>>[15];
         searchTasks[0] = vdb.SearchAsync("Lion King", pageCount: 5);
         searchTasks[1] = vdb.SearchAsync("Lion King", pageCount: 5);
         searchTasks[2] = vdb.SearchAsync("Lion King", pageCount: 5);
@@ -345,7 +346,7 @@ public class VectorDatabaseTests
 
         var newText = "The Incredibles is a 2004 Pixar animated action-adventure film about a family of superheroes who are forced to live a normal suburban life while hiding their powers. The movie is set in a retro-futuristic 1960s and has a runtime of 1 hour and 55 minutes.";
         vdb.UpdateTextAndMetadata(id, newText, "6.0");
-        
+
         var results = vdb.Search("Lion King", threshold: 0.001f);
         Assert.AreEqual(0, results.Texts.Count());
 
@@ -490,7 +491,65 @@ public class VectorDatabaseTests
         Assert.AreEqual("{ value: \"New Value\" }", results.Texts.First().Metadata);
     }
 
+    [TestMethod]
+    public async Task SimpleTest_BasicMemoryVectorDatabase_UpdateMetadata_01()
+    {
+        var vdb = new BasicMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("One", "1");
+        var id = vdb.AddText("Two", "2");
+        vdb.AddText("Three", "3");
 
+        var results = await vdb.SearchAsync("Two");
+
+        var item = results.Texts.First();
+
+        Assert.AreEqual(2, id);
+
+        vdb.UpdateTextMetadata(item.Id, "222");
+
+        results = await vdb.SearchAsync("Two");
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual("Two", results.Texts.First().Text);
+        Assert.AreEqual("222", results.Texts.First().Metadata);
+
+        results = await vdb.SearchAsync("One");
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual("One", results.Texts.First().Text);
+        Assert.AreEqual("1", results.Texts.First().Metadata);
+    }
+
+    [TestMethod]
+    public async Task SimpleTest_MemoryVectorDatabase_UpdateMetadata_01()
+    {
+        var vdb = new MemoryVectorDatabase<string>();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("One", "1");
+        vdb.AddText("Two", "2");
+        vdb.AddText("Three", "3");
+
+        var results = await vdb.SearchAsync("Two");
+
+        var item = results.Texts.First();
+
+        vdb.UpdateTextMetadata(item.Id, "222");
+
+        results = await vdb.SearchAsync("Two");
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual("Two", results.Texts.First().Text);
+        Assert.AreEqual("222", results.Texts.First().Metadata);
+
+        results = await vdb.SearchAsync("One");
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual("One", results.Texts.First().Text);
+        Assert.AreEqual("1", results.Texts.First().Metadata);
+    }
 
 
 
@@ -858,7 +917,9 @@ public class VectorDatabaseTests
 
 public class MockEmbeddingsGenerator : IEmbeddingsGenerator
 {
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     public async Task<float[]> GenerateEmbeddingsAsync(string text)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     {
         var val = new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
         return val;
