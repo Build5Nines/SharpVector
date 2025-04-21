@@ -3,6 +3,7 @@ namespace SharpVectorTest;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Build5Nines.SharpVector;
+using Build5Nines.SharpVector.Embeddings;
 using Build5Nines.SharpVector.Id;
 using Build5Nines.SharpVector.Preprocessing;
 using Build5Nines.SharpVector.VectorCompare;
@@ -25,6 +26,7 @@ public class VectorDatabaseTests
 
         Assert.AreEqual(1, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
+        Assert.AreEqual(1, results.Texts.First().Id);
         Assert.AreEqual("[some metadata here]", results.Texts.First().Metadata);
         Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
     }
@@ -75,6 +77,43 @@ public class VectorDatabaseTests
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.IsNull(results.Texts.First().Metadata);
         Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
+    }
+
+    [TestMethod]
+    public void BasicMemoryVectorDatabase_05()
+    {
+        var vdb = new BasicMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("The 👑 King", "metadata1");
+        vdb.AddText("It's 🔥 Fire.", "metadata2");
+        vdb.AddText("No emoji", "metadata3");
+        
+        var results = vdb.Search("🔥", pageCount: 1);
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual(0.5773503184318542, results.Texts.First().VectorComparison);
+        Assert.AreEqual("It's 🔥 Fire.", results.Texts.First().Text);
+        Assert.AreEqual(2, results.Texts.First().Id);
+        Assert.AreEqual("metadata2", results.Texts.First().Metadata);
+    }
+
+    [TestMethod]
+    public void BasicMemoryVectorDatabase_06()
+    {
+        var vdb = new BasicMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("The 👑 King", "metadata1");
+        vdb.AddText("It's 🔥 Fire", "metadata2");
+        vdb.AddText("👑🔥 🏕️", "metadata3");
+        
+        var results = vdb.Search("🔥👑🏕️", pageCount: 1);
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual("👑🔥 🏕️", results.Texts.First().Text);
+        Assert.AreEqual(3, results.Texts.First().Id);
+        Assert.AreEqual("metadata3", results.Texts.First().Metadata);
     }
 
     [TestMethod]
@@ -275,7 +314,7 @@ public class VectorDatabaseTests
         
         await Task.WhenAll(textTasks);
 
-        var searchTasks = new Task<IVectorTextResult<string, double>>[15];
+        var searchTasks = new Task<IVectorTextResult<int, string, double>>[15];
         searchTasks[0] = vdb.SearchAsync("Lion King", pageCount: 5);
         searchTasks[1] = vdb.SearchAsync("Lion King", pageCount: 5);
         searchTasks[2] = vdb.SearchAsync("Lion King", pageCount: 5);
@@ -344,7 +383,7 @@ public class VectorDatabaseTests
 
         var newText = "The Incredibles is a 2004 Pixar animated action-adventure film about a family of superheroes who are forced to live a normal suburban life while hiding their powers. The movie is set in a retro-futuristic 1960s and has a runtime of 1 hour and 55 minutes.";
         vdb.UpdateTextAndMetadata(id, newText, "6.0");
-        
+
         var results = vdb.Search("Lion King", threshold: 0.001f);
         Assert.AreEqual(0, results.Texts.Count());
 
@@ -395,7 +434,7 @@ public class VectorDatabaseTests
     [TestMethod]
     public void Text_Update_01_Chinese()
     {
-        var vdb = new MemoryVectorDatabase<string>();
+        var vdb = new BasicMemoryVectorDatabase();
         
         // Load Vector Database with Chinese sample text and JSON metadata
         var id = vdb.AddText("狮子王是一部1994年的迪士尼动画电影，讲述一个小狮子辛巴必将继承非洲大草原王位的故事。", "{ value: \"元数据初始值\" }");
@@ -489,14 +528,124 @@ public class VectorDatabaseTests
         Assert.AreEqual("{ value: \"New Value\" }", results.Texts.First().Metadata);
     }
 
+    [TestMethod]
+    public async Task SimpleTest_BasicMemoryVectorDatabase_UpdateMetadata_01()
+    {
+        var vdb = new BasicMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("One", "1");
+        var id = vdb.AddText("Two", "2");
+        vdb.AddText("Three", "3");
 
+        var results = await vdb.SearchAsync("Two");
 
+        var item = results.Texts.First();
 
+        Assert.AreEqual(2, id);
+        Assert.AreEqual(id, item.Id, "ID should match the one returned by AddText.");
 
+        vdb.UpdateTextMetadata(item.Id, "222");
 
+        results = await vdb.SearchAsync("Two");
 
+        Assert.AreEqual(3, results.Texts.Count());
+        Assert.AreEqual("Two", results.Texts.First().Text);
+        Assert.AreEqual("222", results.Texts.First().Metadata);
 
+        results = await vdb.SearchAsync("One");
 
+        Assert.AreEqual(3, results.Texts.Count());
+        Assert.AreEqual("One", results.Texts.First().Text);
+        Assert.AreEqual("1", results.Texts.First().Metadata);
+    }
+
+    [TestMethod]
+    public async Task SimpleTest_MemoryVectorDatabase_UpdateMetadata_01()
+    {
+        var vdb = new MemoryVectorDatabase<string>();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("One", "1");
+        vdb.AddText("Two", "2");
+        vdb.AddText("Three", "3");
+
+        var results = await vdb.SearchAsync("Two");
+
+        var item = results.Texts.First();
+
+        Assert.AreEqual(2, item.Id);
+
+        vdb.UpdateTextMetadata(item.Id, "222");
+
+        results = await vdb.SearchAsync("Two", pageCount: 1);
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual("Two", results.Texts.First().Text);
+        Assert.AreEqual("222", results.Texts.First().Metadata);
+
+        results = await vdb.SearchAsync("One", pageCount: 1);
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual("One", results.Texts.First().Text);
+        Assert.AreEqual("1", results.Texts.First().Metadata);
+    }
+
+    [TestMethod] 
+    public async Task SimpleTest_MemoryVectorDatabase_UpdateMetadata_02()
+    {
+        var vdb = new MockMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("One", "1");
+        var id = vdb.AddText("Two", "2");
+        vdb.AddText("Three", "3");
+
+        Assert.AreNotEqual("00000000-0000-0000-0000-000000000000", id.ToString(), "AddText ID should not be empty.");
+
+        var results = await vdb.SearchAsync("Two");
+
+        foreach(var i in results.Texts)
+        {
+            Assert.AreNotEqual("00000000-0000-0000-0000-000000000000", i.Id.ToString(), $"Search ID ({i.Text}) should not be empty.");
+        }
+
+        var item = results.Texts.First();
+
+        vdb.UpdateText(item.Id, "TwoTwo");
+        vdb.UpdateTextMetadata(item.Id, "222");
+
+        results = await vdb.SearchAsync("Two");
+
+        foreach(var i in results.Texts)
+        {
+            Assert.AreNotEqual("00000000-0000-0000-0000-000000000000", i.Id.ToString(), $"Search ID ({i.Text}) should not be empty.");
+        }
+    }
+
+    [TestMethod]
+    public void SimpleTest_MemoryVectorDatabase_UpdateMetadata_03()
+    {
+        var vdb = new MockMemoryVectorDatabase();
+        
+        // Load Vector Database with Chinese sample text and JSON metadata
+        var id = vdb.AddText("狮子王是一部1994年的迪士尼动画电影，讲述一个小狮子辛巴必将继承非洲大草原王位的故事。", "{ value: \"元数据初始值\" }");
+        
+        Assert.AreNotEqual("00000000-0000-0000-0000-000000000000", id.ToString());
+
+        // Verify that search returns the expected text
+        var results = vdb.Search("狮子");
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.IsTrue(results.Texts.First().Text.Contains("狮子王"));
+        
+        // Update the text
+        vdb.UpdateText(id, "狮子王是一部非常棒的电影！");
+        
+        // Verify that the text is updated but the metadata remains unchanged
+        results = vdb.Search("狮子");
+        Assert.AreEqual("狮子王是一部非常棒的电影！", results.Texts.First().Text);
+        Assert.AreEqual("{ value: \"元数据初始值\" }", results.Texts.First().Metadata);
+    }
 
     [TestMethod]
     public void EuclideanDistanceVectorComparerAsyncMemoryVectorDatabase_1()
@@ -846,8 +995,81 @@ public class VectorDatabaseTests
         results = vdb.Search("Lion King");
         Assert.AreEqual("{ value: \"New Value\" }", results.Texts.First().Metadata);
     }
+
+    [TestMethod]
+    public void EmbeddingGeneratorMemoryVectorDatabase_001()
+    {
+        var db = new EmbeddingGeneratorMemoryVectorDatabase();
+        db.AddText("Test string", "metadata");
+    }
+
+
+    [TestMethod]
+    public void BasicMemoryVectorDatabase_LoopThroughAllTexts_01()
+    {
+        var vdb = new BasicMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("The 👑 King", "metadata1");
+        vdb.AddText("It's 🔥 Fire.", "metadata2");
+        vdb.AddText("No emoji", "metadata3");
+
+        foreach(var item in vdb)
+        {
+            var id = item.Id;
+            var text = item.Text;
+            var metadata = item.Metadata;
+            var vector = item.Vector;
+            //Console.WriteLine($"ID: {item.Id}, Text: {item.Text}, Metadata: {item.Metadata}");
+            vdb.UpdateText(item.Id, item.Text + " - Updated");
+        }
+    }
 }
 
+public class MockMemoryVectorDatabase
+     : MemoryVectorDatabaseBase<
+        Guid,
+        string,
+        MemoryDictionaryVectorStore<Guid, string>,
+        GuidIdGenerator,
+        CosineSimilarityVectorComparer
+        >
+{
+    public MockMemoryVectorDatabase()
+        : base(
+            new MockEmbeddingsGenerator(),
+            new MemoryDictionaryVectorStore<Guid, string>()
+            )
+    { }
+}
+
+public class MockEmbeddingsGenerator : IEmbeddingsGenerator
+{
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+    public async Task<float[]> GenerateEmbeddingsAsync(string text)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+    {
+        var val = new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
+        return val;
+    }
+}
+
+public class EmbeddingGeneratorMemoryVectorDatabase
+     : MemoryVectorDatabaseBase<
+        int,
+        string,
+        MemoryDictionaryVectorStore<int, string>,
+        IntIdGenerator,
+        CosineSimilarityVectorComparer
+        >
+{
+    public EmbeddingGeneratorMemoryVectorDatabase()
+        : base(
+            new MockEmbeddingsGenerator(),
+            new MemoryDictionaryVectorStore<int, string>()
+            )
+    { }
+}
 
 public class EuclideanDistanceVectorComparerAsyncMemoryVectorDatabase<TMetadata>
      : MemoryVectorDatabaseBase<

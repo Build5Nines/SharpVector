@@ -17,15 +17,7 @@ public interface IVectorComparer
     /// <typeparam name="TMetadata"></typeparam>
     /// <param name="results"></param>
     /// <returns></returns>
-    IEnumerable<VectorTextResultItem<TDocument, TMetadata>> Sort<TDocument, TMetadata>(IEnumerable<VectorTextResultItem<TDocument, TMetadata>> results);
-
-    /// <summary>
-    /// Sorts the results of a comparison
-    /// </summary>
-    /// <typeparam name="TMetadata"></typeparam>
-    /// <param name="results"></param>
-    /// <returns></returns>
-    IEnumerable<VectorTextResultItem<TMetadata>> Sort<TMetadata>(IEnumerable<VectorTextResultItem<TMetadata>> results);
+    IEnumerable<IVectorTextResultItem<TId, TDocument, TMetadata>> Sort<TId, TDocument, TMetadata>(IEnumerable<IVectorTextResultItem<TId, TDocument, TMetadata>> results);
 
     /// <summary>
     /// Determines if the comparison is within threshold threshold
@@ -50,14 +42,6 @@ public interface IVectorComparer
     /// <typeparam name="TMetadata"></typeparam>
     /// <param name="results"></param>
     /// <returns></returns>
-    Task<IEnumerable<VectorTextResultItem<TDocument, TMetadata>>> SortAsync<TDocument, TMetadata>(IEnumerable<VectorTextResultItem<TDocument, TMetadata>> results);
-
-    /// <summary>
-    /// Sorts the results of a comparison asynchronously    
-    /// </summary>
-    /// <typeparam name="TMetadata"></typeparam>
-    /// <param name="results"></param>
-    /// <returns></returns>
-    Task<IEnumerable<VectorTextResultItem<TMetadata>>> SortAsync<TMetadata>(IEnumerable<VectorTextResultItem<TMetadata>> results);
+    Task<IEnumerable<IVectorTextResultItem<TId, TDocument, TMetadata>>> SortAsync<TId, TDocument, TMetadata>(IEnumerable<IVectorTextResultItem<TId, TDocument, TMetadata>> results);
 }
 

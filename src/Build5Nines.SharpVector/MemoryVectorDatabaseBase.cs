@@ -9,8 +9,11 @@ using System.IO.Compression;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Build5Nines.SharpVector.Embeddings;
+using System.Runtime.ExceptionServices;
+using System.Collections;
 
 namespace Build5Nines.SharpVector;
+
 
 public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabularyStore, TVocabularyKey, TVocabularyValue, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorComparer>
     : IVectorDatabase<TId, TMetadata, TVocabularyKey>
@@ -142,8 +145,15 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     public void UpdateTextMetadata(TId id, TMetadata metadata) {
         if (VectorStore.ContainsKey(id))
         {
-            var text = GetText(id);
-            text.Metadata = metadata;
+            var existing = VectorStore.Get(id);
+
+            var item = new VectorTextItem<TVocabularyKey, TMetadata>(
+                existing.Text,
+                metadata,
+                existing.Vector
+            );
+            
+            VectorStore.Set(id, item);
         }
         else
         {
@@ -179,7 +189,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="topN">The highest number of results to show.</param>
     /// <param name="threshold">The similarity threshold. Only return items greater or equal to the threshold. Null returns all.</param>
     /// <returns></returns>
-    public IVectorTextResult<TVocabularyKey, TMetadata> Search(TVocabularyKey queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    public IVectorTextResult<TId, TVocabularyKey, TMetadata> Search(TVocabularyKey queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
         return SearchAsync(queryText, threshold, pageIndex, pageCount).Result;
     }
@@ -192,7 +202,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
     /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
     /// <returns></returns>
-    public async Task<IVectorTextResult<TVocabularyKey, TMetadata>> SearchAsync(TVocabularyKey queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    public async Task<IVectorTextResult<TId, TVocabularyKey, TMetadata>> SearchAsync(TVocabularyKey queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
         var similarities = await CalculateVectorComparisonAsync(queryText, threshold);
 
@@ -200,7 +210,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
         var totalCountFoundInSearch = similarities.Count();
 
-        IEnumerable<VectorTextResultItem<TVocabularyKey, TMetadata>> resultsToReturn;
+        IEnumerable<IVectorTextResultItem<TId, TVocabularyKey, TMetadata>> resultsToReturn;
         if (pageCount != null && pageCount >= 0 && pageIndex >= 0) {
             resultsToReturn = similarities.Skip(pageIndex * pageCount.Value).Take(pageCount.Value);
         } else {
@@ -208,10 +218,10 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
             resultsToReturn = similarities;
         }
 
-        return new VectorTextResult<TVocabularyKey, TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
+        return new VectorTextResult<TId, TVocabularyKey, TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
     }
 
-    private async Task<IEnumerable<VectorTextResultItem<TVocabularyKey, TMetadata>>> CalculateVectorComparisonAsync(TVocabularyKey queryText, float? threshold = null)
+    private async Task<IEnumerable<IVectorTextResultItem<TId, TVocabularyKey, TMetadata>>> CalculateVectorComparisonAsync(TVocabularyKey queryText, float? threshold = null)
     {
         var queryTokens = _textPreprocessor.TokenizeAndPreprocess(queryText);
         float[] queryVector = _vectorizer.GenerateVectorFromTokens(VectorStore.VocabularyStore, queryTokens);
@@ -224,15 +234,18 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
             throw new InvalidOperationException("The database is empty.");
         }
 
-        var results = new ConcurrentBag<VectorTextResultItem<TVocabularyKey, TMetadata>>();
-        await foreach (var kvp in VectorStore)
+        var results = new ConcurrentBag<VectorTextResultItem<TId, TVocabularyKey, TMetadata>>();
+        await foreach (KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>> kvp in VectorStore)
         {
             var item = kvp.Value;
             float vectorComparisonValue = await _vectorComparer.CalculateAsync(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
 
             if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
             {
-                results.Add(new VectorTextResultItem<TVocabularyKey, TMetadata>(item, vectorComparisonValue));
+                var id = kvp.Key;
+                results.Add(
+                    new VectorTextResultItem<TId, TVocabularyKey, TMetadata>(id, item, vectorComparisonValue)
+                    );
             }
         }
         return results;
@@ -260,43 +273,28 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
         await Task.WhenAll(taskVectorStore, taskVocabularyStore);
 
-        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
-        {
-            var entryDatabaseType = archive.CreateEntry("database.json");
-            using (var entryStream = entryDatabaseType.Open())
+        await DatabaseFile.SaveDatabaseToZipArchiveAsync(
+            stream,
+            new DatabaseInfo(this.GetType().FullName),
+            async (archive) =>
             {
-                var databaseInfo = new DatabaseInfo(this.GetType().FullName);
-
-                var databaseInfoJson = JsonSerializer.Serialize(databaseInfo);
-
-                if (databaseInfoJson != null)
+                var entryVectorStore = archive.CreateEntry(DatabaseFile.vectorStoreFilename);
+                using (var entryStream = entryVectorStore.Open())
                 {
-                    var databaseTypeBytes = System.Text.Encoding.UTF8.GetBytes(databaseInfoJson);
-                    await entryStream.WriteAsync(databaseTypeBytes);
+                    streamVectorStore.Position = 0;
+                    await streamVectorStore.CopyToAsync(entryStream);
                     await entryStream.FlushAsync();
                 }
-                else
+
+                var entryVocabularyStore = archive.CreateEntry(DatabaseFile.vocabularyStoreFilename);
+                using (var entryStream = entryVocabularyStore.Open())
                 {
-                    throw new InvalidOperationException("Type name cannot be null.");
+                    streamVocabularyStore.Position = 0;
+                    await streamVocabularyStore.CopyToAsync(entryStream);
+                    await entryStream.FlushAsync();
                 }
             }
-            var entryVectorStore = archive.CreateEntry("vectorstore.json");
-            using (var entryStream = entryVectorStore.Open())
-            {
-                streamVectorStore.Position = 0;
-                await streamVectorStore.CopyToAsync(entryStream);
-                await entryStream.FlushAsync();
-            }
-
-            var entryVocabularyStore = archive.CreateEntry("vocabularystore.json");
-            using (var entryStream = entryVocabularyStore.Open())
-            {
-                streamVocabularyStore.Position = 0;
-                await streamVocabularyStore.CopyToAsync(entryStream);
-                await entryStream.FlushAsync();
-            }
-        }
-
+        );
         await stream.FlushAsync();
     }
 
@@ -348,6 +346,16 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
             throw new ArgumentNullException(nameof(stream));
         }
         DeserializeFromBinaryStreamAsync(stream).Wait();
+    }
+
+    public IEnumerator<IVectorTextDatabaseItem<TId, TVocabularyKey, TMetadata>> GetEnumerator()
+    {
+        return VectorStore.Select(kvp => new VectorTextDatabaseItem<TId, TVocabularyKey, TMetadata>(kvp.Key, kvp.Value.Text, kvp.Value.Metadata, kvp.Value.Vector)).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }
 
@@ -449,9 +457,10 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
     {
         if (VectorStore.ContainsKey(id))
         {
+            var existing = VectorStore.Get(id);
             var vector = await EmbeddingsGenerator.GenerateEmbeddingsAsync(text);
-            var metadata = VectorStore.Get(id).Metadata;
-            VectorStore.Set(id, new VectorTextItem<TMetadata>(text, metadata, vector));
+            var metadata = existing.Metadata;
+            VectorStore.Set(id, new VectorTextItem<TMetadata>(text, existing.Metadata, vector));
         }
         else
         {
@@ -479,8 +488,15 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
     public void UpdateTextMetadata(TId id, TMetadata metadata) {
         if (VectorStore.ContainsKey(id))
         {
-            var text = GetText(id);
-            text.Metadata = metadata;
+            var existing = VectorStore.Get(id);
+
+            var item = new VectorTextItem<string, TMetadata>(
+                existing.Text,
+                metadata,
+                existing.Vector
+            );
+            
+            VectorStore.Set(id, item);
         }
         else
         {
@@ -526,7 +542,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
     /// <param name="topN">The highest number of results to show.</param>
     /// <param name="threshold">The similarity threshold. Only return items greater or equal to the threshold. Null returns all.</param>
     /// <returns></returns>
-    public IVectorTextResult<string, TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    public IVectorTextResult<TId, string, TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
         return SearchAsync(queryText, threshold, pageIndex, pageCount).Result;
     }
@@ -539,7 +555,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
     /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
     /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
     /// <returns></returns>
-    public async Task<IVectorTextResult<string, TMetadata>> SearchAsync(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    public async Task<IVectorTextResult<TId, string, TMetadata>> SearchAsync(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
     {
         var similarities = await CalculateVectorComparisonAsync(queryText, threshold);
 
@@ -547,7 +563,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
 
         var totalCountFoundInSearch = similarities.Count();
 
-        IEnumerable<VectorTextResultItem<TMetadata>> resultsToReturn;
+        IEnumerable<IVectorTextResultItem<TId, string, TMetadata>> resultsToReturn;
         if (pageCount != null && pageCount >= 0 && pageIndex >= 0) {
             resultsToReturn = similarities.Skip(pageIndex * pageCount.Value).Take(pageCount.Value);
         } else {
@@ -555,10 +571,10 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
             resultsToReturn = similarities;
         }
 
-        return new VectorTextResult<TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
+        return new VectorTextResult<TId, string, TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
     }
 
-    private async Task<IEnumerable<VectorTextResultItem<TMetadata>>> CalculateVectorComparisonAsync(string queryText, float? threshold = null)
+    private async Task<IEnumerable<IVectorTextResultItem<TId, string, TMetadata>>> CalculateVectorComparisonAsync(string queryText, float? threshold = null)
     {
         var queryVector = await EmbeddingsGenerator.GenerateEmbeddingsAsync(queryText);
 
@@ -567,16 +583,19 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
             throw new InvalidOperationException("The database is empty.");
         }
 
-        var results = new ConcurrentBag<VectorTextResultItem<TMetadata>>();
+        var results = new ConcurrentBag<VectorTextResultItem<TId, string, TMetadata>>();
         await foreach (var kvp in VectorStore)
         {
             var item = kvp.Value;
-            //float vectorComparisonValue = await _vectorComparer.CalculateAsync(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
+
             float vectorComparisonValue = await _vectorComparer.CalculateAsync(queryVector, item.Vector);
 
             if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
             {
-                results.Add(new VectorTextResultItem<TMetadata>(item, vectorComparisonValue));
+                var id = kvp.Key;
+                results.Add(
+                    new VectorTextResultItem<TId, string, TMetadata>(id, item, vectorComparisonValue)
+                    );
             }
         }
         return results;
@@ -597,39 +616,22 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
     public virtual async Task SerializeToBinaryStreamAsync(Stream stream)
     {
         var streamVectorStore = new MemoryStream();
-        var streamVocabularyStore = new MemoryStream();
-
         await VectorStore.SerializeToJsonStreamAsync(streamVectorStore);
 
-        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
-        {
-            var entryDatabaseType = archive.CreateEntry("database.json");
-            using (var entryStream = entryDatabaseType.Open())
+        await DatabaseFile.SaveDatabaseToZipArchiveAsync(
+            stream,
+            new DatabaseInfo(this.GetType().FullName),
+            async (archive) =>
             {
-                var databaseInfo = new DatabaseInfo(this.GetType().FullName);
-
-                var databaseInfoJson = JsonSerializer.Serialize(databaseInfo);
-
-                if (databaseInfoJson != null)
+                var entryVectorStore = archive.CreateEntry(DatabaseFile.vectorStoreFilename);
+                using (var entryStream = entryVectorStore.Open())
                 {
-                    var databaseTypeBytes = System.Text.Encoding.UTF8.GetBytes(databaseInfoJson);
-                    await entryStream.WriteAsync(databaseTypeBytes);
+                    streamVectorStore.Position = 0;
+                    await streamVectorStore.CopyToAsync(entryStream);
                     await entryStream.FlushAsync();
                 }
-                else
-                {
-                    throw new InvalidOperationException("Type name cannot be null.");
-                }
             }
-            var entryVectorStore = archive.CreateEntry("vectorstore.json");
-            using (var entryStream = entryVectorStore.Open())
-            {
-                streamVectorStore.Position = 0;
-                await streamVectorStore.CopyToAsync(entryStream);
-                await entryStream.FlushAsync();
-            }
-        }
-
+        );
         await stream.FlushAsync();
     }
 
@@ -681,4 +683,13 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
         DeserializeFromBinaryStreamAsync(stream).Wait();
     }
 
+    public IEnumerator<IVectorTextDatabaseItem<TId, string, TMetadata>> GetEnumerator()
+    {
+        return VectorStore.Select(kvp => new VectorTextDatabaseItem<TId, string, TMetadata>(kvp.Key, kvp.Value.Text, kvp.Value.Metadata, kvp.Value.Vector)).GetEnumerator();
+    }
+
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    {
+        return this.GetEnumerator();
+    }
 }

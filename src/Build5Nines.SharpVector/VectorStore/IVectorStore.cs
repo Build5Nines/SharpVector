@@ -21,7 +21,7 @@ public interface IVectorStore<TId, TMetadata, TDocument>
     /// <param name="id"></param>
     /// <returns></returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    VectorTextItem<TDocument, TMetadata> Get(TId id);
+    IVectorTextItem<TDocument, TMetadata> Get(TId id);
 
     /// <summary>
     /// Gets all the Ids for every text.
@@ -51,7 +51,7 @@ public interface IVectorStore<TId, TMetadata, TDocument>
     /// <param name="id"></param>
     /// <returns>The removed text item</returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    VectorTextItem<TDocument, TMetadata> Delete(TId id);
+    IVectorTextItem<TDocument, TMetadata> Delete(TId id);
 
     /// <summary>
     /// Checks if the database contains a key
