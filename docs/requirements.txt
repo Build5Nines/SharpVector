@@ -5,3 +5,4 @@ pymdown-extensions
 markdown-include
 mkdocs-git-committers-plugin-2
 mkdocs-git-revision-date-localized-plugin
+mkdocs-with-pdf
