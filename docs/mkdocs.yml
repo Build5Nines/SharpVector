@@ -137,6 +137,12 @@ nav:
       - Prerequisites: get-started/#prerequisites
       - Install Nuget Package: get-started/#install-nuget-package
       - Basic Example: get-started/#basic-example
+      - Metadata:
+          - get-started/metadata/index.md
+          - Adding Metadata: get-started/metadata/#adding-metadata
+          - JSON and String Metadata: get-started/metadata/#json-and-string-metadata
+          - Custom Metadata Type: get-started/metadata/#custom-metadata-type
+
       - Data Management:
           - get-started/data-management/index.md
           - Get Text Item Id: get-started/data-management/#get-text-item-id

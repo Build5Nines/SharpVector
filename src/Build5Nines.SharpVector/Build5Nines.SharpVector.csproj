@@ -13,7 +13,7 @@
     <Description>Lightweight In-memory Vector Database to embed in any .NET Applications</Description>
     <Copyright>Copyright (c) 2025 Build5Nines LLC</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseUrl>https://github.com/Build5Nines/SharpVector/blob/main/LICENSE</PackageLicenseUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Authors>Chris Pietschmann</Authors>
     <Company>Build5Nines LLC</Company>
     <PackageTags>vector;search;database;data;rag;search;llm;generative ai;ai;genai</PackageTags>
@@ -21,5 +21,6 @@
 
   <ItemGroup>
       <None Include="docs/README.md" Pack="true" PackagePath="\"/>
+      <None Include="docs/LICENSE" Pack="true" PackagePath="\"/>
   </ItemGroup>
 </Project>

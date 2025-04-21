@@ -13,7 +13,7 @@
     <Description>Lightweight In-memory Vector Database to embed in any .NET Applications that integrates with OpenAI Embedding model for vector generation.</Description>
     <Copyright>Copyright (c) 2025 Build5Nines LLC</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseUrl>https://github.com/Build5Nines/SharpVector/blob/main/LICENSE</PackageLicenseUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Authors>Chris Pietschmann</Authors>
     <Company>Build5Nines LLC</Company>
     <PackageTags>vector;search;database;data;rag;openai;embeddings;azure;microsoft;</PackageTags>
@@ -21,10 +21,12 @@
 
   <ItemGroup>
       <None Include="docs/README.md" Pack="true" PackagePath="\" />
+      <None Include="docs/LICENSE" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
       <PackageReference Include="Build5Nines.SharpVector" Version="[2.0.3,3.0.0)" />
       <PackageReference Include="OpenAI" Version="[2.1.0,3.0.0]" />
+      <!-- <ProjectReference Include="..\Build5Nines.SharpVector\Build5Nines.SharpVector.csproj" /> -->
   </ItemGroup>
 </Project>
