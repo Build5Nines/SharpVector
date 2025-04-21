@@ -13,6 +13,7 @@ Add:
 
 Fixed:
 
+- Update `BasicTextPreprocessor` to support Emoji characters too
 - Refactorings for more Clean Code
 
 Breaking Changes:
