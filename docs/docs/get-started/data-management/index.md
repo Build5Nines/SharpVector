@@ -6,7 +6,7 @@ title: Data Management
 
 Since `Build5Nines.SharpVector` is a database, it also has data management methods available. These methods enable you to add, remove, and update the text documents that are vectorized and indexed within the semantic database.
 
-## Get Text Item IDs
+## Get Text Item ID
 
 Every text item within a `Build5Nines.SharpVector` database is assigned a unique identifier (ID). There are a few ways to get access to the ID of the text items.
 
