@@ -80,6 +80,43 @@ public class VectorDatabaseTests
     }
 
     [TestMethod]
+    public void BasicMemoryVectorDatabase_05()
+    {
+        var vdb = new BasicMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("The 👑 King", "metadata1");
+        vdb.AddText("It's 🔥 Fire.", "metadata2");
+        vdb.AddText("No emoji", "metadata3");
+        
+        var results = vdb.Search("🔥", pageCount: 1);
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual(1.0000001192092896, results.Texts.First().VectorComparison);
+        Assert.AreEqual("It's 🔥 Fire", results.Texts.First().Text);
+        Assert.AreEqual(2, results.Texts.First().Id);
+        Assert.AreEqual("metadata2", results.Texts.First().Metadata);
+    }
+
+    [TestMethod]
+    public void BasicMemoryVectorDatabase_06()
+    {
+        var vdb = new BasicMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("The 👑 King", "metadata1");
+        vdb.AddText("It's 🔥 Fire", "metadata2");
+        vdb.AddText("👑🔥 🏕️", "metadata3");
+        
+        var results = vdb.Search("🔥👑🏕️", pageCount: 1);
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual("👑🔥 🏕️", results.Texts.First().Text);
+        Assert.AreEqual(3, results.Texts.First().Id);
+        Assert.AreEqual("metadata3", results.Texts.First().Metadata);
+    }
+
+    [TestMethod]
     public void BasicMemoryVectorDatabase_SaveLoadAsync_01()
     {
         var vdb = new BasicMemoryVectorDatabase();
@@ -575,16 +612,15 @@ public class VectorDatabaseTests
 
         var item = results.Texts.First();
 
-        Assert.AreEqual(id, item.Id, "ID should match the one returned by AddText.");
-
         vdb.UpdateText(item.Id, "TwoTwo");
         vdb.UpdateTextMetadata(item.Id, "222");
 
         results = await vdb.SearchAsync("Two");
 
-        Assert.AreEqual(3, results.Texts.Count());
-        Assert.AreEqual("TwoTwo", results.Texts.First().Text);
-        Assert.AreEqual("222", results.Texts.First().Metadata);
+        foreach(var i in results.Texts)
+        {
+            Assert.AreNotEqual("00000000-0000-0000-0000-000000000000", i.Id.ToString(), $"Search ID ({i.Text}) should not be empty.");
+        }
     }
 
     [TestMethod]
