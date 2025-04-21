@@ -139,8 +139,10 @@ nav:
       - Basic Example: get-started/#basic-example
       - Data Management:
           - get-started/data-management/index.md
-          - Get Text ID: get-started/data-management/#get-text-id
-          - Update Text and Metadata: get-started/data-management/#update-text-and-metadata
+          - Get Text Item IDs: get-started/data-management/#get-text-item-ids
+          - Get By Id: get-started/data-management/#get-by-id
+          - Update: get-started/data-management/#update
+          - Delete: get-started/data-management/#delete
   - Concepts:
       - concepts/index.md
       - What is a Vector Database?: concepts/#what-is-a-vector-database

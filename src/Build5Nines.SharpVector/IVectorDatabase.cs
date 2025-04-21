@@ -9,6 +9,7 @@ namespace Build5Nines.SharpVector;
 /// <typeparam name="TMetadata"></typeparam>
 /// <typeparam name="TDocument"></typeparam>
 public interface IVectorDatabase<TId, TMetadata, TDocument>
+    : IEnumerable<IVectorTextDatabaseItem<TId, TDocument, TMetadata>>
     where TId : notnull
 {
     /// <summary>

@@ -18,8 +18,10 @@ public class VectorDatabaseTests
     public void TokenizeAndPreprocess_Null()
     {
         var preprocessor = new BasicTextPreprocessor();
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
         var tokens = preprocessor.TokenizeAndPreprocess(null);
-        
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+
         Assert.AreEqual(0, tokens.Count());
     }
 

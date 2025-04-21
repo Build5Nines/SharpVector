@@ -62,7 +62,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata, TDocument> : IVectorSto
     /// <param name="id"></param>
     /// <returns></returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    public VectorTextItem<TDocument, TMetadata> Get(TId id)
+    public IVectorTextItem<TDocument, TMetadata> Get(TId id)
     {
         if (_database.TryGetValue(id, out var entry))
         {
@@ -77,7 +77,7 @@ public class MemoryDictionaryVectorStore<TId, TMetadata, TDocument> : IVectorSto
     /// <param name="id"></param>
     /// <returns>The removed text item</returns>
     /// <exception cref="KeyNotFoundException"></exception>
-    public VectorTextItem<TDocument, TMetadata> Delete(TId id)
+    public IVectorTextItem<TDocument, TMetadata> Delete(TId id)
     {
         if (_database.ContainsKey(id))
         {

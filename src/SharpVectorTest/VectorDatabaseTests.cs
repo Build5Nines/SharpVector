@@ -1002,6 +1002,28 @@ public class VectorDatabaseTests
         var db = new EmbeddingGeneratorMemoryVectorDatabase();
         db.AddText("Test string", "metadata");
     }
+
+
+    [TestMethod]
+    public void BasicMemoryVectorDatabase_LoopThroughAllTexts_01()
+    {
+        var vdb = new BasicMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("The 👑 King", "metadata1");
+        vdb.AddText("It's 🔥 Fire.", "metadata2");
+        vdb.AddText("No emoji", "metadata3");
+
+        foreach(var item in vdb)
+        {
+            var id = item.Id;
+            var text = item.Text;
+            var metadata = item.Metadata;
+            var vector = item.Vector;
+            //Console.WriteLine($"ID: {item.Id}, Text: {item.Text}, Metadata: {item.Metadata}");
+            vdb.UpdateText(item.Id, item.Text + " - Updated");
+        }
+    }
 }
 
 public class MockMemoryVectorDatabase

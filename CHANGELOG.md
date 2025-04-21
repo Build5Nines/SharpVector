@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Add:
 
 - Added `VectorTextResultItem.Id` property so it's easy to get the database ID for search results if necessary.
+- `IVectorDatabase` now inherits from `IEnumerable` so you can easily look through the texts documents that have been added to the database.
 
 Fixed:
 

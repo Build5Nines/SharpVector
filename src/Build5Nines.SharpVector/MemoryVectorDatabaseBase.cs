@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Build5Nines.SharpVector.Embeddings;
 using System.Runtime.ExceptionServices;
+using System.Collections;
 
 namespace Build5Nines.SharpVector;
 
@@ -145,8 +146,14 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         if (VectorStore.ContainsKey(id))
         {
             var existing = VectorStore.Get(id);
-            existing.Metadata = metadata;
-            VectorStore.Set(id, existing);
+
+            var item = new VectorTextItem<TVocabularyKey, TMetadata>(
+                existing.Text,
+                metadata,
+                existing.Vector
+            );
+            
+            VectorStore.Set(id, item);
         }
         else
         {
@@ -340,6 +347,16 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         }
         DeserializeFromBinaryStreamAsync(stream).Wait();
     }
+
+    public IEnumerator<IVectorTextDatabaseItem<TId, TVocabularyKey, TMetadata>> GetEnumerator()
+    {
+        return VectorStore.Select(kvp => new VectorTextDatabaseItem<TId, TVocabularyKey, TMetadata>(kvp.Key, kvp.Value.Text, kvp.Value.Metadata, kvp.Value.Vector)).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 }
 
 
@@ -472,8 +489,14 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
         if (VectorStore.ContainsKey(id))
         {
             var existing = VectorStore.Get(id);
-            existing.Metadata = metadata;
-            VectorStore.Set(id, existing);
+
+            var item = new VectorTextItem<string, TMetadata>(
+                existing.Text,
+                metadata,
+                existing.Vector
+            );
+            
+            VectorStore.Set(id, item);
         }
         else
         {
@@ -660,4 +683,13 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
         DeserializeFromBinaryStreamAsync(stream).Wait();
     }
 
+    public IEnumerator<IVectorTextDatabaseItem<TId, string, TMetadata>> GetEnumerator()
+    {
+        return VectorStore.Select(kvp => new VectorTextDatabaseItem<TId, string, TMetadata>(kvp.Key, kvp.Value.Text, kvp.Value.Metadata, kvp.Value.Vector)).GetEnumerator();
+    }
+
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    {
+        return this.GetEnumerator();
+    }
 }
