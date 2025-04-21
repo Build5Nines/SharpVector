@@ -42,6 +42,58 @@ public class VectorDatabaseTests
     }
 
     [TestMethod]
+    public void TokenizeAndPreprocess_Punctuation_01()
+    {
+        var preprocessor = new BasicTextPreprocessor();
+        var tokens = preprocessor.TokenizeAndPreprocess("Hello.!@#$%^&*()`~世-_=+ 界{}[]|:;\"',.<>/?!");
+        
+        var expectedTokens = new List<string> { "hello", "世", "界"};
+        for(var i = 0; i < expectedTokens.Count; i++)
+        {
+            Assert.AreEqual(expectedTokens[i], tokens.ElementAt(i), $"Index: {i} does not match");
+        }
+    }
+
+    [TestMethod]
+    public void TokenizeAndPreprocess_Punctuation_02()
+    {
+        var preprocessor = new BasicTextPreprocessor();
+        var tokens = preprocessor.TokenizeAndPreprocess("Hello.!@#$%^&*()`~-_=+{}[]|:;\"',.<>/?");
+        
+        var expectedTokens = new List<string> { "hello" };
+        for(var i = 0; i < expectedTokens.Count; i++)
+        {
+            Assert.AreEqual(expectedTokens[i], tokens.ElementAt(i), $"Index: {i} does not match");
+        }
+    }
+
+    [TestMethod]
+    public void TokenizeAndPreprocess_Punctuation_03()
+    {
+        var preprocessor = new BasicTextPreprocessor();
+        var tokens = preprocessor.TokenizeAndPreprocess("Hello.🔥!@#$%^&*()`~世-_=+ 界{}[]|:;\"',.<>/?");
+        
+        var expectedTokens = new List<string> { "hello", "🔥", "世", "界"};
+        for(var i = 0; i < expectedTokens.Count; i++)
+        {
+            Assert.AreEqual(expectedTokens[i], tokens.ElementAt(i), $"Index: {i} does not match");
+        }
+    }
+    
+    [TestMethod]
+    public void TokenizeAndPreprocess_Punctuation_04()
+    {
+        var preprocessor = new BasicTextPreprocessor();
+        var tokens = preprocessor.TokenizeAndPreprocess("Hello.!@#🔥$%^&*()`~-_=+{}[]|:;\"',.<>/?");
+        
+        var expectedTokens = new List<string> { "hello", "🔥" };
+        for(var i = 0; i < expectedTokens.Count; i++)
+        {
+            Assert.AreEqual(expectedTokens[i], tokens.ElementAt(i), $"Index: {i} does not match");
+        }
+    }
+
+    [TestMethod]
     public void TokenizeAndPreprocess_01()
     {
         var preprocessor = new BasicTextPreprocessor();
@@ -76,7 +128,7 @@ public class VectorDatabaseTests
         var expectedTokens = new List<string> { "hello", "world", "👑", "🔥", "how", "are", "you", "🔥" };
         for(var i = 0; i < expectedTokens.Count; i++)
         {
-            Assert.AreEqual(expectedTokens[i], tokens.ElementAt(i), $"Index: {i} does not match");
+            Assert.AreEqual(expectedTokens[i], tokens.ElementAt(i), $"Index: {i} does not match ::" + String.Join("-", tokens));
         }
     } 
 
@@ -89,7 +141,7 @@ public class VectorDatabaseTests
         var expectedTokens = new List<string> { "hello", "world", "👑", "🔥", "你", "好", "世", "界", "👑" };
         for(var i = 0; i < expectedTokens.Count; i++)
         {
-            Assert.AreEqual(expectedTokens[i], tokens.ElementAt(i), $"Index: {i} does not match");
+            Assert.AreEqual(expectedTokens[i], tokens.ElementAt(i), $"Index: {i} does not match ::" + String.Join("-", tokens));
         }
     }
 }

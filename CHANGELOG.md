@@ -13,6 +13,7 @@ Add:
 
 Fixed:
 
+- Fixed text tokenization to correctly remove special characters
 - Update `BasicTextPreprocessor` to support Emoji characters too
 - Refactorings for more Clean Code
 

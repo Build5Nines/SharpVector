@@ -92,8 +92,8 @@ public class VectorDatabaseTests
         var results = vdb.Search("🔥", pageCount: 1);
 
         Assert.AreEqual(1, results.Texts.Count());
-        Assert.AreEqual(1.0000001192092896, results.Texts.First().VectorComparison);
-        Assert.AreEqual("It's 🔥 Fire", results.Texts.First().Text);
+        Assert.AreEqual(0.5773503184318542, results.Texts.First().VectorComparison);
+        Assert.AreEqual("It's 🔥 Fire.", results.Texts.First().Text);
         Assert.AreEqual(2, results.Texts.First().Id);
         Assert.AreEqual("metadata2", results.Texts.First().Metadata);
     }
