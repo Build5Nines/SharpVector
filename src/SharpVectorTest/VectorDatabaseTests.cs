@@ -1077,7 +1077,11 @@ public class VectorDatabaseTests
         vdb.AddText("It's 🔥 Fire", "metadata2");
         vdb.AddText("👑🔥 🏕️", "metadata3");
 
-        var results = await vdb.SearchAsync("🔥👑🏕️", pageCount: 1, filter: BasicMemoryVectorDatabase_SearchAsync_02_Filter);
+        var query = "🔥👑🏕️";
+        var results = await vdb.SearchAsync(
+            query,
+            filter: BasicMemoryVectorDatabase_SearchAsync_02_Filter
+        );
 
         Assert.AreEqual(1, results.Texts.Count());
         Assert.AreEqual("The 👑 King", results.Texts.First().Text);
