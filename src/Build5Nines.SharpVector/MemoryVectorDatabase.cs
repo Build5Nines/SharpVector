@@ -50,6 +50,11 @@ public class MemoryVectorDatabase<TMetadata>
         DeserializeFromBinaryStream(stream);
     }
 
+    /// <summary>
+    /// Deserializes the database from a binary stream.
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
     public override async Task DeserializeFromBinaryStreamAsync(Stream stream)
     {
         await base.DeserializeFromBinaryStreamAsync(stream);
@@ -58,6 +63,10 @@ public class MemoryVectorDatabase<TMetadata>
         _idGenerator = new IntIdGenerator(VectorStore.GetIds().Max());
     }
 
+    /// <summary>
+    /// Deserializes the database from a binary stream.
+    /// </summary>
+    /// <param name="stream"></param>
     public override void DeserializeFromBinaryStream(Stream stream)
     {
         base.DeserializeFromBinaryStream(stream);
