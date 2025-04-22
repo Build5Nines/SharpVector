@@ -2,7 +2,7 @@
 title: Data Management
 
 ---
-# Data Management
+# :material-database-edit-outline: Data Management
 
 Since `Build5Nines.SharpVector` is a database, it also has data management methods available. These methods enable you to add, remove, and update the text documents that are vectorized and indexed within the semantic database.
 

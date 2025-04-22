@@ -80,8 +80,9 @@ public interface IVectorDatabase<TId, TMetadata, TDocument>
     /// <param name="threshold">The similarity threshold to filter by.</param>
     /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
     /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
-    /// <returns></returns>
-    IVectorTextResult<TId, TDocument, TMetadata> Search(TDocument queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null);
+    /// <param name="filter">A filter function to apply to the metadata of the results.</param>
+    /// <returns>The search results as an IVectorTextResult object.</returns>
+    IVectorTextResult<TId, TDocument, TMetadata> Search(TDocument queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null, Func<TMetadata?, bool>? filter = null);
 
     /// <summary>
     /// Performs an asynchronous search vector search to find the top N most similar texts to the given text
@@ -90,8 +91,9 @@ public interface IVectorDatabase<TId, TMetadata, TDocument>
     /// <param name="threshold">The similarity threshold to filter by.</param>
     /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
     /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
-    /// <returns></returns>
-    Task<IVectorTextResult<TId, TDocument, TMetadata>> SearchAsync(TDocument queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null);
+    /// <param name="filter">A filter function to apply to the metadata of the results.</param>
+    /// <returns>The search results as an IVectorTextResult object.</returns>
+    Task<IVectorTextResult<TId, TDocument, TMetadata>> SearchAsync(TDocument queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null, Func<TMetadata?, Task<bool>>? filter = null);
 
 
     [Obsolete("Use SerializeToBinaryStreamAsync Instead")]

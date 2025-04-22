@@ -4,7 +4,7 @@ description: Review the MIT license terms for using and contributing to the Shar
 date: 2025-04-13
 ---
 
-# License
+# :octicons-file-badge-24: License
 
 ```text
 MIT License

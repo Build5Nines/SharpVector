@@ -15,6 +15,19 @@ using System.Collections;
 namespace Build5Nines.SharpVector;
 
 
+/// <summary>
+/// Base class for a memory vector database.
+/// </summary>
+/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TMetadata"></typeparam>
+/// <typeparam name="TVectorStore"></typeparam>
+/// <typeparam name="TVocabularyStore"></typeparam>
+/// <typeparam name="TVocabularyKey"></typeparam>
+/// <typeparam name="TVocabularyValue"></typeparam>
+/// <typeparam name="TIdGenerator"></typeparam>
+/// <typeparam name="TTextPreprocessor"></typeparam>
+/// <typeparam name="TVectorizer"></typeparam>
+/// <typeparam name="TVectorComparer"></typeparam>
 public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabularyStore, TVocabularyKey, TVocabularyValue, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorComparer>
     : IVectorDatabase<TId, TMetadata, TVocabularyKey>
     where TId : notnull
@@ -188,10 +201,18 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="queryText">The query prompt to search by.</param>
     /// <param name="topN">The highest number of results to show.</param>
     /// <param name="threshold">The similarity threshold. Only return items greater or equal to the threshold. Null returns all.</param>
+    /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
+    /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
+    /// <param name="filter">A filter function to apply to the metadata of each result.</param>
     /// <returns></returns>
-    public IVectorTextResult<TId, TVocabularyKey, TMetadata> Search(TVocabularyKey queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    public IVectorTextResult<TId, TVocabularyKey, TMetadata> Search(TVocabularyKey queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null, Func<TMetadata?, bool>? filter = null)
     {
-        return SearchAsync(queryText, threshold, pageIndex, pageCount).Result;
+        Func<TMetadata?, Task<bool>>? filterToUse = null;
+        if (filter != null)
+        {
+            filterToUse = (metadata) => Task.FromResult(filter(metadata));
+        }
+        return SearchAsync(queryText, threshold, pageIndex, pageCount, filterToUse).Result;
     }
 
     /// <summary>
@@ -201,10 +222,11 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     /// <param name="threshold">The similarity threshold to filter by.</param>
     /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
     /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
+    /// <param name="filter">A filter function to apply to the metadata of each result.</param>
     /// <returns></returns>
-    public async Task<IVectorTextResult<TId, TVocabularyKey, TMetadata>> SearchAsync(TVocabularyKey queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    public async Task<IVectorTextResult<TId, TVocabularyKey, TMetadata>> SearchAsync(TVocabularyKey queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null, Func<TMetadata?, Task<bool>>? filter = null)
     {
-        var similarities = await CalculateVectorComparisonAsync(queryText, threshold);
+        var similarities = await CalculateVectorComparisonAsync(queryText, threshold, filter);
 
         similarities = await _vectorComparer.SortAsync(similarities);
 
@@ -221,7 +243,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         return new VectorTextResult<TId, TVocabularyKey, TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
     }
 
-    private async Task<IEnumerable<IVectorTextResultItem<TId, TVocabularyKey, TMetadata>>> CalculateVectorComparisonAsync(TVocabularyKey queryText, float? threshold = null)
+    private async Task<IEnumerable<IVectorTextResultItem<TId, TVocabularyKey, TMetadata>>> CalculateVectorComparisonAsync(TVocabularyKey queryText, float? threshold = null, Func<TMetadata?, Task<bool>>? filter = null)
     {
         var queryTokens = _textPreprocessor.TokenizeAndPreprocess(queryText);
         float[] queryVector = _vectorizer.GenerateVectorFromTokens(VectorStore.VocabularyStore, queryTokens);
@@ -237,15 +259,18 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         var results = new ConcurrentBag<VectorTextResultItem<TId, TVocabularyKey, TMetadata>>();
         await foreach (KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>> kvp in VectorStore)
         {
-            var item = kvp.Value;
-            float vectorComparisonValue = await _vectorComparer.CalculateAsync(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
-
-            if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
+            if (filter == null || await filter(kvp.Value.Metadata))
             {
-                var id = kvp.Key;
-                results.Add(
-                    new VectorTextResultItem<TId, TVocabularyKey, TMetadata>(id, item, vectorComparisonValue)
-                    );
+                var item = kvp.Value;
+                float vectorComparisonValue = await _vectorComparer.CalculateAsync(_vectorizer.NormalizeVector(queryVector, desiredLength), _vectorizer.NormalizeVector(item.Vector, desiredLength));
+
+                if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
+                {
+                    var id = kvp.Key;
+                    results.Add(
+                        new VectorTextResultItem<TId, TVocabularyKey, TMetadata>(id, item, vectorComparisonValue)
+                        );
+                }
             }
         }
         return results;
@@ -361,7 +386,14 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
 
 
 
-
+/// <summary>
+/// Base class for a memory vector database.
+/// </summary>
+/// <typeparam name="TId"></typeparam>
+/// <typeparam name="TMetadata"></typeparam>
+/// <typeparam name="TVectorStore"></typeparam>
+/// <typeparam name="TIdGenerator"></typeparam>
+/// <typeparam name="TVectorComparer"></typeparam>
 public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenerator, TVectorComparer>
     : IMemoryVectorDatabase<TId, TMetadata>, IVectorDatabase<TId, TMetadata>
     where TId : notnull
@@ -541,10 +573,18 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
     /// <param name="queryText">The query prompt to search by.</param>
     /// <param name="topN">The highest number of results to show.</param>
     /// <param name="threshold">The similarity threshold. Only return items greater or equal to the threshold. Null returns all.</param>
-    /// <returns></returns>
-    public IVectorTextResult<TId, string, TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
+    /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
+    /// <param name="filter">A filter function to apply to the metadata of each result.</param>
+    /// <returns>The search results as an IVectorTextResult object.</returns>
+    public IVectorTextResult<TId, string, TMetadata> Search(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null, Func<TMetadata?, bool>? filter = null)
     {
-        return SearchAsync(queryText, threshold, pageIndex, pageCount).Result;
+        Func<TMetadata?, Task<bool>>? filterToUse = null;
+        if (filter != null)
+        {
+            filterToUse = (metadata) => Task.FromResult(filter(metadata));
+        }
+        return SearchAsync(queryText, threshold, pageIndex, pageCount, filterToUse).Result;
     }
 
     /// <summary>
@@ -554,10 +594,11 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
     /// <param name="threshold">The similarity threshold to filter by.</param>
     /// <param name="pageIndex">The page index of the search results. Default is 0.</param>
     /// <param name="pageCount">The number of search results per page. Default is Null and returns all results.</param>
-    /// <returns></returns>
-    public async Task<IVectorTextResult<TId, string, TMetadata>> SearchAsync(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null)
+    /// <param name="filter">A filter function to apply to the metadata of each result.</param>
+    /// <returns>The search results as an IVectorTextResult object.</returns>
+    public async Task<IVectorTextResult<TId, string, TMetadata>> SearchAsync(string queryText, float? threshold = null, int pageIndex = 0, int? pageCount = null, Func<TMetadata?, Task<bool>>? filter = null)
     {
-        var similarities = await CalculateVectorComparisonAsync(queryText, threshold);
+        var similarities = await CalculateVectorComparisonAsync(queryText, threshold, filter);
 
         similarities = await _vectorComparer.SortAsync(similarities);
 
@@ -574,7 +615,7 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
         return new VectorTextResult<TId, string, TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
     }
 
-    private async Task<IEnumerable<IVectorTextResultItem<TId, string, TMetadata>>> CalculateVectorComparisonAsync(string queryText, float? threshold = null)
+    private async Task<IEnumerable<IVectorTextResultItem<TId, string, TMetadata>>> CalculateVectorComparisonAsync(string queryText, float? threshold = null, Func<TMetadata?, Task<bool>>? filter = null)
     {
         var queryVector = await EmbeddingsGenerator.GenerateEmbeddingsAsync(queryText);
 
@@ -586,16 +627,19 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
         var results = new ConcurrentBag<VectorTextResultItem<TId, string, TMetadata>>();
         await foreach (var kvp in VectorStore)
         {
-            var item = kvp.Value;
-
-            float vectorComparisonValue = await _vectorComparer.CalculateAsync(queryVector, item.Vector);
-
-            if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
+            if (filter == null || await filter(kvp.Value.Metadata))
             {
-                var id = kvp.Key;
-                results.Add(
-                    new VectorTextResultItem<TId, string, TMetadata>(id, item, vectorComparisonValue)
-                    );
+                var item = kvp.Value;
+
+                float vectorComparisonValue = await _vectorComparer.CalculateAsync(queryVector, item.Vector);
+
+                if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
+                {
+                    var id = kvp.Key;
+                    results.Add(
+                        new VectorTextResultItem<TId, string, TMetadata>(id, item, vectorComparisonValue)
+                        );
+                }
             }
         }
         return results;

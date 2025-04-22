@@ -1,4 +1,7 @@
-# Data Persistence
+---
+title: Data Persistence
+---
+# :octicons-file-24: Data Persistence
 
 The `Build5Nines.SharpVector` library provides easy-to-use methods for saving a memory-based vector database to a file or stream and loading it again later. This is particularly useful for caching indexed content between runs, deploying pre-built vector stores, or shipping databases with your application.
 

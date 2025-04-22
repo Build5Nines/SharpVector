@@ -2,7 +2,7 @@
 title: Concepts
 description: Understand the core concepts behind SharpVector, from vector similarity to embedding strategies and in-memory architecture.
 ---
-# Concepts
+# :octicons-light-bulb-24: Concepts
 
 ## What is a Vector Database?
 
