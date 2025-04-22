@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.1.1
+
+Add:
+
+- Add optional `filter` parameter to `.Search` and `.SearchAsync` methods that is of type `Func<TMetadata, bool>` that is called for each text item in the database for more advanced filtering prior to performing vector similarity search and returning results. If undefined or `null` it's ignored.
+
 ## v2.1.0
 
 Add:

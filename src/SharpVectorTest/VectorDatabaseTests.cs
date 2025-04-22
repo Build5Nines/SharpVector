@@ -1024,6 +1024,48 @@ public class VectorDatabaseTests
             vdb.UpdateText(item.Id, item.Text + " - Updated");
         }
     }
+
+    [TestMethod]
+    public void BasicMemoryVectorDatabase_Search_01()
+    {
+        var vdb = new BasicMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("The 👑 King", "metadata1");
+        vdb.AddText("It's 🔥 Fire", "metadata2");
+        vdb.AddText("👑🔥 🏕️", "metadata3");
+        
+        var results = vdb.Search("🔥👑🏕️", pageCount: 1, filter: (metadata) => {
+            return metadata == "metadata1";
+        });
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual("The 👑 King", results.Texts.First().Text);
+        Assert.AreEqual(1, results.Texts.First().Id);
+        Assert.AreEqual("metadata1", results.Texts.First().Metadata);
+    }
+
+    [TestMethod]
+    public async Task BasicMemoryVectorDatabase_SearchAsync_01()
+    {
+        var vdb = new BasicMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("The 👑 King", "metadata1");
+        vdb.AddText("It's 🔥 Fire", "metadata2");
+        vdb.AddText("👑🔥 🏕️", "metadata3");
+
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        var results = await vdb.SearchAsync("🔥👑🏕️", pageCount: 1, filter: async (metadata) => {
+            return metadata == "metadata1";
+        });
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual("The 👑 King", results.Texts.First().Text);
+        Assert.AreEqual(1, results.Texts.First().Id);
+        Assert.AreEqual("metadata1", results.Texts.First().Metadata);
+    }
 }
 
 public class MockMemoryVectorDatabase
