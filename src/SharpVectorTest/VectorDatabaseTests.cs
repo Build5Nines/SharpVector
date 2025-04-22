@@ -1066,6 +1066,31 @@ public class VectorDatabaseTests
         Assert.AreEqual(1, results.Texts.First().Id);
         Assert.AreEqual("metadata1", results.Texts.First().Metadata);
     }
+
+    [TestMethod]
+    public async Task BasicMemoryVectorDatabase_SearchAsync_02()
+    {
+        var vdb = new BasicMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("The 👑 King", "metadata1");
+        vdb.AddText("It's 🔥 Fire", "metadata2");
+        vdb.AddText("👑🔥 🏕️", "metadata3");
+
+        var results = await vdb.SearchAsync("🔥👑🏕️", pageCount: 1, filter: BasicMemoryVectorDatabase_SearchAsync_02_Filter);
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual("The 👑 King", results.Texts.First().Text);
+        Assert.AreEqual(1, results.Texts.First().Id);
+        Assert.AreEqual("metadata1", results.Texts.First().Metadata);
+    }
+
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+    private async Task<bool> BasicMemoryVectorDatabase_SearchAsync_02_Filter(string? metadata)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+    {
+        return metadata == "metadata1";
+    }
 }
 
 public class MockMemoryVectorDatabase
