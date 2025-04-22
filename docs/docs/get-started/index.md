@@ -2,7 +2,7 @@
 title: Get Started
 description: Get up and running with SharpVector in minutes. Learn how to install, initialize, and begin storing and searching vectorized text data.
 ---
-# Get Started
+# :octicons-rocket-24: Get Started
 
 It's really easy to get started with using `Build5Nines.SharpVector`. Simply follow the below steps.
 

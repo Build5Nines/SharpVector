@@ -1,7 +1,7 @@
 ---
 title: Metadata
 ---
-# Metadata
+# :material-database-cog-outline: Metadata
 
 The `Build5Nines.SharpVector` vector database enables semantic search for `Text` that is stored in the database. Being able to semantically search text is an extremely useful way to lookup more information related to the text. For this purpose, `Metadata` is stored alongside the `Text` within the vector database. This way, when `Text` is found when performing a semantic search, then the matching `Metadata` is also retrieved.
 

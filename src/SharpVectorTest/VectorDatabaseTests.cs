@@ -1070,7 +1070,7 @@ public class VectorDatabaseTests
     [TestMethod]
     public async Task BasicMemoryVectorDatabase_SearchAsync_02()
     {
-        var vdb = new BasicMemoryVectorDatabase();
+        var vdb = new MemoryVectorDatabase<string>();
         
         // // Load Vector Database with some sample text
         vdb.AddText("The 👑 King", "metadata1");

@@ -2,7 +2,7 @@
 title: Text Chunking
 description: Learn how to break large documents into smaller chunks to improve vector search relevance and optimize embedding performance.
 ---
-# Text Chunking
+# :material-script-text: Text Chunking
 
 **Text chunking** is the process of breaking up large documents into smaller segments ("chunks") before embedding and storing them in a vector database. This allows for more accurate semantic search and improves performance in applications that deal with large bodies of text.
 
@@ -124,7 +124,10 @@ The `TextDataLoader<TKey, TValue>` class can be used to load documents into the 
     }
     ```
 
-> 🧠 Tip: Use chunking method and size that best aligns with your content type and retrieval goals.
+!!! info "Optimization Tip"
+    Use chunking method and size that best aligns with your content type and retrieval goals. For larger documents, text chunking will be required to get the best semantic search results returned from the vector database.
+
+    Some experimentation on your data set may be required to find the text chunking strategy that works best for your solution.
 
 ---
 

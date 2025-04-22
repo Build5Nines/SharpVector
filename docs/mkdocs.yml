@@ -64,7 +64,7 @@ markdown_extensions:
   - md_in_html
   - toc:
       permalink: true
-      toc_depth: 3
+      toc_depth: 2
   - pymdownx.critic
   - pymdownx.caret
   - pymdownx.keys
@@ -142,18 +142,10 @@ nav:
       - Prerequisites: get-started/#prerequisites
       - Install Nuget Package: get-started/#install-nuget-package
       - Basic Example: get-started/#basic-example
-      - Metadata:
-          - get-started/metadata/index.md
-          - Adding Metadata: get-started/metadata/#adding-metadata
-          - JSON and String Metadata: get-started/metadata/#json-and-string-metadata
-          - Custom Metadata Type: get-started/metadata/#custom-metadata-type
-
-      - Data Management:
-          - get-started/data-management/index.md
-          - Get Text Item Id: get-started/data-management/#get-text-item-id
-          - Get Item By Id: get-started/data-management/#get
-          - Update Item: get-started/data-management/#update
-          - Delete Item: get-started/data-management/#delete
+      - Metadata: get-started/metadata/index.md
+      - Semantic search: get-started/search/index.md
+      - Data Management: get-started/data-management/index.md
+          
   - Concepts:
       - concepts/index.md
       - What is a Vector Database?: concepts/#what-is-a-vector-database

@@ -2,7 +2,7 @@
 title: Discover
 description: The lightweight, in-memory, semantic search, text vector database for .NET that powers intelligent search and recommendation features.
 ---
-# Discover Build5Nines.SharpVector
+# :fontawesome-regular-compass: Discover Build5Nines.SharpVector
 
 **Build5Nines.SharpVector** is the lightweight, in-memory, semantic search, text vector database built for .NET applications. It enables fast and flexible vector-based similarity search for text data — ideal for search engines, recommendation systems, semantic analysis, and AI-enhanced features.
 
