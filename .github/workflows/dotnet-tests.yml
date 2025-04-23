@@ -74,12 +74,6 @@ jobs:
           echo "❌ $FAILED test(s) failed!" >> $GITHUB_STEP_SUMMARY
         fi
     
-        # Append summary table
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "| 📊 Total | ✅ Passed | ❌ Failed | ➖ Skipped |" >> $GITHUB_STEP_SUMMARY
-        echo "|-------|--------|--------|---------|" >> $GITHUB_STEP_SUMMARY
-        echo "| $TOTAL | $PASSED | $FAILED | $SKIPPED |" >> $GITHUB_STEP_SUMMARY
-
         BAR_LENGTH=10
 
         make_bar() {
@@ -106,7 +100,6 @@ jobs:
         SKIPPED_PCT=$(format_pct $SKIPPED $TOTAL)
 
         {
-          echo "## 🧪 Test Results Summary"
           echo
           echo "| Outcome   | Count | Percent (%)      |       |"
           echo "|-----------|-------|------------|-------|"
