@@ -1,17 +1,9 @@
-name: Build and Release
+name: Build Release
 
 on:
   push:
     branches:
       - main
-      - dev
-    paths-ignore:
-      - 'docs/**'
-      - mkdocs.yml
-  pull_request:
-    branches:
-      - main
-      - dev
     paths-ignore:
       - 'docs/**'
       - mkdocs.yml
@@ -38,6 +30,15 @@ jobs:
 
     - name: Build
       run: dotnet build --configuration Release --no-restore
+
+    - name: Run tests with code coverage
+      run: dotnet test --no-build --verbosity normal --results-directory "./TestResults/Coverage/" --collect:"XPlat Code Coverage" 
+
+    - name: Upload test results artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: '**/TestResults/**'
 
     - name: Performance Test
       run: dotnet run --project SharpVectorPerformance --configuration Release

@@ -9,6 +9,8 @@ on:
       - .github/workflows/ghpages-mkdocs.yml
       - docs/**
       - mkdocs.yml
+    paths-ignore:
+      - .github/**
   workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages

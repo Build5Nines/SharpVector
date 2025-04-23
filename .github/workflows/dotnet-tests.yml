@@ -1,13 +1,6 @@
 name: .NET Tests
 
 on:
-  push:
-    branches:
-      - main
-      - dev
-    paths-ignore:
-      - 'docs/**'
-      - 'mkdocs.yml'
   pull_request:
     branches:
       - main
@@ -18,7 +11,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  tests:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -40,10 +33,143 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Run tests with code coverage
-      run: dotnet test --no-build --verbosity normal --results-directory "./TestResults/Coverage/" --collect:"XPlat Code Coverage" 
+      run: dotnet test --no-build --verbosity normal --results-directory "./TestResults/Coverage/" --logger "trx;LogFileName=test_results.trx" --collect:"XPlat Code Coverage" 
+
+    # - name: Publish test results
+    #   uses: dorny/test-reporter@v1
+    #   with:
+    #     name: tests
+    #     path: src/TestResults/Coverage/test_results.trx
+    #     reporter: dotnet-trx
+    #     fail-on-error: true
 
     - name: Upload test results artifact
       uses: actions/upload-artifact@v4
       with:
         name: test-results
         path: '**/TestResults/**'
+
+
+
+
+    - name: Install xmlstarlet
+      run: sudo apt-get update && sudo apt-get install -y xmlstarlet
+    
+    - name: Summarize test results from .trx
+      run: |
+        TRX_FILE="TestResults/Coverage/test_results.trx"
+    
+        # Register the namespace (ns) and query using that
+        PASSED=$(xmlstarlet sel -N ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" -t -v "count(//ns:UnitTestResult[@outcome='Passed'])" "$TRX_FILE")
+        FAILED=$(xmlstarlet sel -N ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" -t -v "count(//ns:UnitTestResult[@outcome='Failed'])" "$TRX_FILE")
+        SKIPPED=$(xmlstarlet sel -N ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" -t -v "count(//ns:UnitTestResult[@outcome='NotExectured'])" "$TRX_FILE")
+        TOTAL=$(xmlstarlet sel -N ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" -t -v "count(//ns:UnitTestResult)" "$TRX_FILE")
+
+        echo "## 🧪 Test Results Summary" >> $GITHUB_STEP_SUMMARY
+
+        # Write message based on test outcome
+        if [ "$FAILED" -eq 0 ]; then
+          echo "✅ All tests passed!" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ $FAILED test(s) failed!" >> $GITHUB_STEP_SUMMARY
+        fi
+    
+        BAR_LENGTH=10
+
+        make_bar() {
+          COUNT=$1
+          TOTAL=$2
+          CHAR=$3
+          FILLED=$(( (COUNT * BAR_LENGTH + TOTAL / 2) / TOTAL ))
+          EMPTY=$(( BAR_LENGTH - FILLED ))
+
+          BAR=""
+          for ((i=0; i<FILLED; i++)); do BAR+="$CHAR"; done
+          for ((i=0; i<EMPTY; i++)); do BAR+="⬜"; done
+          echo "$BAR"
+        }
+
+        format_pct() {
+          COUNT=$1
+          TOTAL=$2
+          echo "$(echo "scale=1; $COUNT*100/$TOTAL" | bc)%"
+        }
+
+        PASSED_BAR=$(make_bar $PASSED $TOTAL "🟩")
+        FAILED_BAR=$(make_bar $FAILED $TOTAL "🟥")
+        SKIPPED_BAR=$(make_bar $SKIPPED $TOTAL "🟨")
+
+        PASSED_PCT=$(format_pct $PASSED $TOTAL)
+        FAILED_PCT=$(format_pct $FAILED $TOTAL)
+        SKIPPED_PCT=$(format_pct $SKIPPED $TOTAL)
+
+        {
+          echo ""
+          echo "|           | Count | Percent |             |"
+          echo "|-----------|--------|---------|-------------|"
+          echo "| ✅ Passed  | $PASSED  | $PASSED_PCT | $PASSED_BAR |"
+          echo "| ❌ Failed  | $FAILED  | $FAILED_PCT | $FAILED_BAR |"
+          echo "| ➖ Skipped | $SKIPPED | $SKIPPED_PCT | $SKIPPED_BAR |"
+          echo "| 📊 Total   | $TOTAL   |         |             |"
+        } >> $GITHUB_STEP_SUMMARY
+    
+
+
+
+    - name: Install ReportGenerator
+      run: dotnet tool install -g dotnet-reportgenerator-globaltool
+      
+    - name: Generate Markdown report
+      run: |
+        reportgenerator \
+          -reports:./TestResults/Coverage/**/coverage.cobertura.xml \
+          -targetdir:./coveragereport \
+          -reporttypes:MarkdownSummaryGithub
+
+    - name: Append coverage to summary
+      run: |
+        echo "## Code Coverage Summary" >> $GITHUB_STEP_SUMMARY
+        cat ./coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+
+    - name: Upload code coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: CodeCoverage
+        path: ./src/TestResults/Coverage/**/coverage.cobertura.xml
+          
+  
+
+  performance:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.0.x' # Adjust the version as needed
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
+
+    - name: Performance Test
+      run: dotnet run --project SharpVectorPerformance --configuration Release
+      
+    - name: Performance Results
+      run: |
+        echo "## Performance Results" > $GITHUB_STEP_SUMMARY
+        cat ./BenchmarkDotNet.Artifacts/results/SharpVectorPerformance.MemoryVectorDatabasePerformance-report-github.md >> $GITHUB_STEP_SUMMARY
+  
+    - name: Upload Performance artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-results
+        path: './src/BenchmarkDotNet.Artifacts/*'
