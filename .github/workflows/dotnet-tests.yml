@@ -33,20 +33,29 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Run tests with code coverage
-      run: dotnet test --no-build --verbosity normal --results-directory "./TestResults/Coverage/" --collect:"XPlat Code Coverage" 
-
-    - name: Test Results
-      run: |
-        echo "## Test Results" > $GITHUB_STEP_SUMMARY
-        echo "### Code Coverage" >> $GITHUB_STEP_SUMMARY
-        echo "Code coverage report generated at: ./TestResults/Coverage/coverage.cobertura.xml" >> $GITHUB_STEP_SUMMARY
-        
+      run: dotnet test --no-build --verbosity normal --results-directory "./TestResults/Coverage/" --logger "trx;LogFileName=test_results.trx" --collect:"XPlat Code Coverage" 
 
     - name: Upload test results artifact
       uses: actions/upload-artifact@v4
       with:
         name: test-results
         path: '**/TestResults/**'
+
+    - name: Publish test results
+      uses: dorny/test-reporter@v1
+      with:
+        name: Unit Tests
+        path: src/TestResults/Coverage/test_results.trx
+        reporter: dotnet-trx
+        fail-on-error: true
+
+    - name: Upload code coverage report
+      uses: actions/upload-artifact@v3
+      with:
+        name: CodeCoverage
+        path: src/TestResults/Coverage/**/coverage.cobertura.xml
+          
+  
 
   performance:
     runs-on: ubuntu-latest
