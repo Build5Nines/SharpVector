@@ -1,13 +1,6 @@
 name: .NET Tests
 
 on:
-  push:
-    branches:
-      - main
-      - dev
-    paths-ignore:
-      - 'docs/**'
-      - 'mkdocs.yml'
   pull_request:
     branches:
       - main
@@ -47,3 +40,14 @@ jobs:
       with:
         name: test-results
         path: '**/TestResults/**'
+
+    - name: Performance Results
+      run: |
+        echo "## Performance Results" > $GITHUB_STEP_SUMMARY
+        cat ./BenchmarkDotNet.Artifacts/results/SharpVectorPerformance.MemoryVectorDatabasePerformance-report-github.md >> $GITHUB_STEP_SUMMARY
+  
+    - name: Upload Performance artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-results
+        path: './src/BenchmarkDotNet.Artifacts/*'
