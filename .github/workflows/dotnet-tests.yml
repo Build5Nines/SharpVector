@@ -49,7 +49,7 @@ jobs:
         reportgenerator \
           -reports:./TestResults/Coverage/**/coverage.cobertura.xml \
           -targetdir:./coveragereport \
-          -reporttypes:HtmlInline_AzurePipelines
+          -reporttypes:MarkdownSummaryGithub;Badges
 
     - name: Append coverage to summary
       run: |
