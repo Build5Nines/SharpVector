@@ -45,23 +45,16 @@ jobs:
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
 
-    - name: Install trx2json
+    - name: Summarize test results from .trx
       run: |
-        dotnet tool install --global trx2json
+        TRX_FILE="TestResults/Coverage/test_results.trx"
     
-    - name: Generate test summary
-      run: |
-        # Convert .trx to JSON
-        trx2json -i TestResults/Coverage/test_results.trx -o test_results.json
+        TOTAL=$(xmllint --xpath "count(//UnitTestResult)" "$TRX_FILE")
+        PASSED=$(xmllint --xpath "count(//UnitTestResult[@outcome='Passed'])" "$TRX_FILE")
+        FAILED=$(xmllint --xpath "count(//UnitTestResult[@outcome='Failed'])" "$TRX_FILE")
+        SKIPPED=$(xmllint --xpath "count(//UnitTestResult[@outcome='NotExecuted'])" "$TRX_FILE")
     
-        # Extract summary (pass/fail/total)
-        PASSED=$(jq '.results[] | select(.outcome=="Passed") | .outcome' test_results.json | wc -l)
-        FAILED=$(jq '.results[] | select(.outcome=="Failed") | .outcome' test_results.json | wc -l)
-        SKIPPED=$(jq '.results[] | select(.outcome=="Skipped") | .outcome' test_results.json | wc -l)
-        TOTAL=$(jq '.results | length' test_results.json)
-    
-        # Write to GitHub summary
-        echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "## 🧪 Test Results Summary" >> $GITHUB_STEP_SUMMARY
         echo "| Total | Passed | Failed | Skipped |" >> $GITHUB_STEP_SUMMARY
         echo "|-------|--------|--------|---------|" >> $GITHUB_STEP_SUMMARY
         echo "| $TOTAL | $PASSED | $FAILED | $SKIPPED |" >> $GITHUB_STEP_SUMMARY
