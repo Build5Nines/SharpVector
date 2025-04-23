@@ -41,13 +41,29 @@ jobs:
         name: test-results
         path: '**/TestResults/**'
 
-    - name: Publish test results
-      uses: dorny/test-reporter@v1
-      with:
-        name: Unit Tests
-        path: src/TestResults/Coverage/test_results.trx
-        reporter: dotnet-trx
-        fail-on-error: true
+    - name: Install ReportGenerator
+      run: dotnet tool install -g dotnet-reportgenerator-globaltool
+
+    - name: Generate Markdown report
+      run: |
+        reportgenerator \
+          -reports:./TestResults/Coverage/**/coverage.cobertura.xml \
+          -targetdir:./coveragereport \
+          -reporttypes:MarkdownSummaryGithub
+
+    - name: Append coverage to summary
+      run: |
+        echo "## Code Coverage Summary" >> $GITHUB_STEP_SUMMARY
+        cat ./coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+
+
+    # - name: Publish test results
+    #   uses: dorny/test-reporter@v1
+    #   with:
+    #     name: Unit Tests
+    #     path: src/TestResults/Coverage/test_results.trx
+    #     reporter: dotnet-trx
+    #     fail-on-error: true
 
     - name: Upload code coverage report
       uses: actions/upload-artifact@v4
