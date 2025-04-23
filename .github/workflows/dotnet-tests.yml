@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  tests:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -41,6 +41,30 @@ jobs:
         name: test-results
         path: '**/TestResults/**'
 
+  performance:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.0.x' # Adjust the version as needed
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
+
+    - name: Performance Test
+      run: dotnet run --project SharpVectorPerformance --configuration Release
+      
     - name: Performance Results
       run: |
         echo "## Performance Results" > $GITHUB_STEP_SUMMARY
