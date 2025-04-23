@@ -5,8 +5,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
+/// <summary>
+/// Represents a result of a vector text search.
+/// </summary>
+/// <typeparam name="TId">The type of the identifier.</typeparam>
+/// <typeparam name="TDocument">The type of the document.</typeparam>
+/// <typeparam name="TMetadata">The type of the metadata.</typeparam>
 public interface IVectorTextResult<TId, TDocument, TMetadata>
 {
+    /// <summary>
+    /// The list of Texts found in the search results.
+    /// </summary>
     IEnumerable<IVectorTextResultItem<TId, TDocument, TMetadata>> Texts { get; }
 
     /// <summary>
@@ -30,10 +39,20 @@ public interface IVectorTextResult<TId, TDocument, TMetadata>
     public int TotalPages { get; }
 }
 
+/// <summary>
+/// Represents a result of a vector text search.
+/// </summary>
+/// <typeparam name="TMetadata">The type of the metadata.</typeparam>
 public interface IVectorTextResult<TMetadata>
  : IVectorTextResult<int, string, TMetadata>
  { }
 
+/// <summary>
+/// Represents a result of a vector text search.
+/// </summary>
+/// <typeparam name="TId">The type of the identifier.</typeparam>
+/// <typeparam name="TDocument">The type of the document.</typeparam>
+/// <typeparam name="TMetadata">The type of the metadata.</typeparam>
 public class VectorTextResult<TId, TDocument, TMetadata>
     : IVectorTextResult<TId, TDocument, TMetadata>
 {
@@ -50,6 +69,9 @@ public class VectorTextResult<TId, TDocument, TMetadata>
     /// </summary>
     public IEnumerable<IVectorTextResultItem<TId, TDocument, TMetadata>> Texts { get; private set; }
 
+    /// <summary>
+    /// Returns true if the search returned no results.
+    /// </summary>
     public bool IsEmpty { get => Texts == null || !Texts.Any(); }
 
     /// <summary>
@@ -68,6 +90,10 @@ public class VectorTextResult<TId, TDocument, TMetadata>
     public int TotalPages { get; private set; }
 }
 
+/// <summary>
+/// Represents a result of a vector text search.
+/// </summary>
+/// <typeparam name="TMetadata">The type of the metadata.</typeparam>
 public class VectorTextResult<TMetadata>
     : VectorTextResult<int, string, TMetadata>, IVectorTextResult<TMetadata>
 {
