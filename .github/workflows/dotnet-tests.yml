@@ -57,13 +57,13 @@ jobs:
         cat ./coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
 
 
-    # - name: Publish test results
-    #   uses: dorny/test-reporter@v1
-    #   with:
-    #     name: Unit Tests
-    #     path: src/TestResults/Coverage/test_results.trx
-    #     reporter: dotnet-trx
-    #     fail-on-error: true
+    - name: Publish test results
+      uses: dorny/test-reporter@v1
+      with:
+        name: tests
+        path: src/TestResults/Coverage/test_results.trx
+        reporter: dotnet-trx
+        fail-on-error: true
 
     - name: Upload code coverage report
       uses: actions/upload-artifact@v4
