@@ -35,6 +35,13 @@ jobs:
     - name: Run tests with code coverage
       run: dotnet test --no-build --verbosity normal --results-directory "./TestResults/Coverage/" --collect:"XPlat Code Coverage" 
 
+    - name: Test Results
+      run: |
+        echo "## Test Results" > $GITHUB_STEP_SUMMARY
+        echo "### Code Coverage" >> $GITHUB_STEP_SUMMARY
+        echo "Code coverage report generated at: ./TestResults/Coverage/coverage.cobertura.xml" >> $GITHUB_STEP_SUMMARY
+        
+
     - name: Upload test results artifact
       uses: actions/upload-artifact@v4
       with:
