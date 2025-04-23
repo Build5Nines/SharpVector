@@ -52,18 +52,18 @@ jobs:
 
 
 
-    - name: Install xmllint
-      run: sudo apt-get update && sudo apt-get install -y libxml2-utils
+    - name: Install xmlstarlet
+      run: sudo apt-get update && sudo apt-get install -y xmlstarlet
     
     - name: Summarize test results from .trx
       run: |
         TRX_FILE="TestResults/Coverage/test_results.trx"
     
         # Register the namespace (ns) and query using that
-        TOTAL=$(xmllint --xpath "count(//ns:UnitTestResult)" --xmlns ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" "$TRX_FILE")
-        PASSED=$(xmllint --xpath "count(//ns:UnitTestResult[@outcome='Passed'])" --xmlns ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" "$TRX_FILE")
-        FAILED=$(xmllint --xpath "count(//ns:UnitTestResult[@outcome='Failed'])" --xmlns ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" "$TRX_FILE")
-        SKIPPED=$(xmllint --xpath "count(//ns:UnitTestResult[@outcome='NotExecuted'])" --xmlns ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" "$TRX_FILE")
+        PASSED=$(xmlstarlet sel -N ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" -t -v "count(//ns:UnitTestResult[@outcome='Passed'])" "$TRX_FILE")
+        FAILED=$(xmlstarlet sel -N ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" -t -v "count(//ns:UnitTestResult[@outcome='Failed'])" "$TRX_FILE")
+        SKIPPED=$(xmlstarlet sel -N ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" -t -v "count(//ns:UnitTestResult[@outcome='NotExectured'])" "$TRX_FILE")
+        TOTAL=$(xmlstarlet sel -N ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" -t -v "count(//ns:UnitTestResult)" "$TRX_FILE")
 
         echo "## 🧪 Test Results Summary" >> $GITHUB_STEP_SUMMARY
 
