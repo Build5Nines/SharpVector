@@ -79,16 +79,19 @@ jobs:
         make_bar() {
           COUNT=$1
           TOTAL=$2
-          FILLED=$(( (COUNT * BAR_LENGTH + TOTAL / 2) / TOTAL ))  # rounded division
+          FILLED=$(( (COUNT * BAR_LENGTH + TOTAL / 2) / TOTAL ))
           EMPTY=$(( BAR_LENGTH - FILLED ))
-          printf "%*s" "$FILLED" | tr ' ' '☑️'
-          printf "%*s" "$EMPTY" | tr ' ' '➖'
+
+          BAR=""
+          for ((i=0; i<FILLED; i++)); do BAR+="☑️"; done
+          for ((i=0; i<EMPTY; i++)); do BAR+="➖"; done
+          echo "$BAR"
         }
 
         format_pct() {
           COUNT=$1
           TOTAL=$2
-          printf "%.1f%%" "$(echo "$COUNT*100/$TOTAL" | bc -l)"
+          echo "$(echo "scale=1; $COUNT*100/$TOTAL" | bc)%"
         }
 
         PASSED_BAR=$(make_bar $PASSED $TOTAL)
@@ -100,13 +103,13 @@ jobs:
         SKIPPED_PCT=$(format_pct $SKIPPED $TOTAL)
 
         {
-          echo
-          echo "| Outcome   | Count | Percent (%)      |       |"
-          echo "|-----------|-------|------------|-------|"
-          printf "| ✅ Passed  | %-5s | %-5s | %-10s |\n" "$PASSED" "$PASSED_PCT" "$PASSED_BAR"
-          printf "| ❌ Failed  | %-5s | %-5s | %-10s |\n" "$FAILED" "$FAILED_PCT" "$FAILED_BAR"
-          printf "| ➖ Skipped | %-5s | %-5s | %-10s |\n" "$SKIPPED" "$SKIPPED_PCT" "$SKIPPED_BAR"
-          printf "| 📊 Total   | %-5s |            |       |\n" "$TOTAL"
+          echo ""
+          echo "| Outcome   | Count | Percent | Bar         |"
+          echo "|-----------|--------|---------|-------------|"
+          echo "| ✅ Passed  | $PASSED  | $PASSED_PCT | $PASSED_BAR |"
+          echo "| ❌ Failed  | $FAILED  | $FAILED_PCT | $FAILED_BAR |"
+          echo "| ➖ Skipped | $SKIPPED | $SKIPPED_PCT | $SKIPPED_BAR |"
+          echo "| 📊 Total   | $TOTAL   |         |             |"
         } >> $GITHUB_STEP_SUMMARY
     
 
