@@ -87,8 +87,8 @@ jobs:
           TOTAL=$2
           FILLED=$(( (COUNT * BAR_LENGTH + TOTAL / 2) / TOTAL ))  # rounded division
           EMPTY=$(( BAR_LENGTH - FILLED ))
-          printf "%*s" "$FILLED" | tr ' ' '█'
-          printf "%*s" "$EMPTY" | tr ' ' '░'
+          printf "%*s" "$FILLED" | tr ' ' ':black_square:'
+          printf "%*s" "$EMPTY" | tr ' ' ':white_square:'
         }
 
         format_pct() {
