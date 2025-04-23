@@ -83,8 +83,8 @@ jobs:
           EMPTY=$(( BAR_LENGTH - FILLED ))
 
           BAR=""
-          for ((i=0; i<FILLED; i++)); do BAR+="☑️"; done
-          for ((i=0; i<EMPTY; i++)); do BAR+="➖"; done
+          for ((i=0; i<FILLED; i++)); do BAR+="█"; done
+          for ((i=0; i<EMPTY; i++)); do BAR+="░"; done
           echo "$BAR"
         }
 
