@@ -35,16 +35,26 @@ jobs:
     - name: Run tests with code coverage
       run: dotnet test --no-build --verbosity normal --results-directory "./TestResults/Coverage/" --logger "trx;LogFileName=test_results.trx" --collect:"XPlat Code Coverage" 
 
+    # - name: Publish test results
+    #   uses: dorny/test-reporter@v1
+    #   with:
+    #     name: tests
+    #     path: src/TestResults/Coverage/test_results.trx
+    #     reporter: dotnet-trx
+    #     fail-on-error: true
+
     - name: Upload test results artifact
       uses: actions/upload-artifact@v4
       with:
         name: test-results
         path: '**/TestResults/**'
 
-    - name: Install ReportGenerator
-      run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
 
+
+    - name: Install xmllint
+      run: sudo apt-get update && sudo apt-get install -y libxml2-utils
+    
     - name: Summarize test results from .trx
       run: |
         TRX_FILE="TestResults/Coverage/test_results.trx"
@@ -54,10 +64,25 @@ jobs:
         FAILED=$(xmllint --xpath "count(//UnitTestResult[@outcome='Failed'])" "$TRX_FILE")
         SKIPPED=$(xmllint --xpath "count(//UnitTestResult[@outcome='NotExecuted'])" "$TRX_FILE")
     
+        # Write message based on test outcome
+        if [ "$FAILED" -eq 0 ]; then
+          echo "✅ All tests passed!" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ $FAILED test(s) failed!" >> $GITHUB_STEP_SUMMARY
+        fi
+    
+        # Append summary table
+        echo "" >> $GITHUB_STEP_SUMMARY
         echo "## 🧪 Test Results Summary" >> $GITHUB_STEP_SUMMARY
         echo "| Total | Passed | Failed | Skipped |" >> $GITHUB_STEP_SUMMARY
         echo "|-------|--------|--------|---------|" >> $GITHUB_STEP_SUMMARY
         echo "| $TOTAL | $PASSED | $FAILED | $SKIPPED |" >> $GITHUB_STEP_SUMMARY
+    
+
+
+
+    - name: Install ReportGenerator
+      run: dotnet tool install -g dotnet-reportgenerator-globaltool
       
     - name: Generate Markdown report
       run: |
@@ -70,15 +95,6 @@ jobs:
       run: |
         echo "## Code Coverage Summary" >> $GITHUB_STEP_SUMMARY
         cat ./coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
-
-
-    - name: Publish test results
-      uses: dorny/test-reporter@v1
-      with:
-        name: tests
-        path: src/TestResults/Coverage/test_results.trx
-        reporter: dotnet-trx
-        fail-on-error: true
 
     - name: Upload code coverage report
       uses: actions/upload-artifact@v4
