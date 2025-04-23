@@ -59,11 +59,14 @@ jobs:
       run: |
         TRX_FILE="TestResults/Coverage/test_results.trx"
     
-        TOTAL=$(xmllint --xpath "count(//UnitTestResult)" "$TRX_FILE")
-        PASSED=$(xmllint --xpath "count(//UnitTestResult[@outcome='Passed'])" "$TRX_FILE")
-        FAILED=$(xmllint --xpath "count(//UnitTestResult[@outcome='Failed'])" "$TRX_FILE")
-        SKIPPED=$(xmllint --xpath "count(//UnitTestResult[@outcome='NotExecuted'])" "$TRX_FILE")
-    
+        # Register the namespace (ns) and query using that
+        TOTAL=$(xmllint --xpath "count(//ns:UnitTestResult)" --xmlns ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" "$TRX_FILE")
+        PASSED=$(xmllint --xpath "count(//ns:UnitTestResult[@outcome='Passed'])" --xmlns ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" "$TRX_FILE")
+        FAILED=$(xmllint --xpath "count(//ns:UnitTestResult[@outcome='Failed'])" --xmlns ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" "$TRX_FILE")
+        SKIPPED=$(xmllint --xpath "count(//ns:UnitTestResult[@outcome='NotExecuted'])" --xmlns ns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" "$TRX_FILE")
+
+        echo "## 🧪 Test Results Summary" >> $GITHUB_STEP_SUMMARY
+
         # Write message based on test outcome
         if [ "$FAILED" -eq 0 ]; then
           echo "✅ All tests passed!" >> $GITHUB_STEP_SUMMARY
@@ -73,7 +76,6 @@ jobs:
     
         # Append summary table
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "## 🧪 Test Results Summary" >> $GITHUB_STEP_SUMMARY
         echo "| Total | Passed | Failed | Skipped |" >> $GITHUB_STEP_SUMMARY
         echo "|-------|--------|--------|---------|" >> $GITHUB_STEP_SUMMARY
         echo "| $TOTAL | $PASSED | $FAILED | $SKIPPED |" >> $GITHUB_STEP_SUMMARY
