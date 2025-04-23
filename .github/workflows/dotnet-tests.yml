@@ -105,7 +105,7 @@ jobs:
 
         {
           echo ""
-          echo "| Outcome   | Count | Percent |             |"
+          echo "|           | Count | Percent |             |"
           echo "|-----------|--------|---------|-------------|"
           echo "| ✅ Passed  | $PASSED  | $PASSED_PCT | $PASSED_BAR |"
           echo "| ❌ Failed  | $FAILED  | $FAILED_PCT | $FAILED_BAR |"
