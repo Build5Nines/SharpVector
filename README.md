@@ -16,7 +16,11 @@ Vector databases are used with Semantic Search and [Generative AI](https://build
 
 While there are lots of large databases that can be used to build Vector Databases (like Azure CosmosDB, PostgreSQL w/ pgvector, Azure AI Search, Elasticsearch, and more), there are not many options for a lightweight vector database that can be embedded into any .NET application to provide a local text vector database.
 
-> Build5Nines SharpVector is the lightweight, local, in-memory Text Vector Database for implementing semantic search into any .NET application!
+> "For the in-memory vector database, we're using Build5Nines.SharpVector, an excellent open-source project by Chris Pietschmann. SharpVector makes it easy to store and retrieve vectorized data, making it an ideal choice for our sample RAG implementation."
+>
+> [Tulika Chaudharie, Principal Product Manager at Microsoft for Azure App Service](https://azure.github.io/AppService/2024/09/03/Phi3-vector.html)
+
+Build5Nines SharpVector is the lightweight, local, in-memory Text Vector Database for implementing semantic search into any .NET application!
 
 ### [Documentation](https://sharpvector.build5nines.com) | [Get Started](https://sharpvector.build5nines.com/get-started/) | [Samples](https://sharpvector.build5nines.com/samples/)
 
