@@ -1,4 +1,4 @@
-# Build5Nines SharpVector - The lightweight, in-memory, Semantic Search, Text Vector Database for any C# / .NET Applications
+# Build5Nines SharpVector - The lightweight, in-memory, local, Semantic Search, Text Vector Database for any C# / .NET Applications
 
 `Build5Nines.SharpVector` is an in-memory vector database library designed for .NET applications. It allows you to store, search, and manage text data using vector representations. The library is customizable and extensible, enabling support for different vector comparison methods, preprocessing techniques, and vectorization strategies.
 
@@ -14,7 +14,9 @@
 
 Vector databases are used with Semantic Search and [Generative AI](https://build5nines.com/what-is-generative-ai/?utm_source=github&utm_medium=sharpvector) solutions augmenting the LLM (Large Language Model) with the ability to load additional context data with the AI prompt using the [RAG (Retrieval-Augmented Generation)](https://build5nines.com/what-is-retrieval-augmented-generation-rag/?utm_source=github&utm_medium=sharpvector) design pattern.
 
-While there are lots of large databases that can be used to build Vector Databases (like Azure CosmosDB, PostgreSQL w/ pgvector, Azure AI Search, Elasticsearch, and more), there are not many options for a lightweight vector database that can be embedded into any .NET application. Build5Nines SharpVector is the lightweight in-memory Text Vector Database for use in any .NET application that you're looking for!
+While there are lots of large databases that can be used to build Vector Databases (like Azure CosmosDB, PostgreSQL w/ pgvector, Azure AI Search, Elasticsearch, and more), there are not many options for a lightweight vector database that can be embedded into any .NET application to provide a local text vector database.
+
+> Build5Nines SharpVector is the lightweight, local, in-memory Text Vector Database for implementing semantic search into any .NET application!
 
 ### [Documentation](https://sharpvector.build5nines.com) | [Get Started](https://sharpvector.build5nines.com/get-started/) | [Samples](https://sharpvector.build5nines.com/samples/)
 
