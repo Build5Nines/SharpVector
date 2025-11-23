@@ -6,7 +6,6 @@
 [![Build and Release](https://github.com/Build5Nines/SharpVector/actions/workflows/build-release.yml/badge.svg)](https://github.com/Build5Nines/SharpVector/actions/workflows/build-release.yml)
 ![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/build5nines/sharpvector)
 
-[![NuGet](https://img.shields.io/nuget/v/Build5Nines.SharpVector.svg)](https://www.nuget.org/packages/Build5Nines.SharpVector/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 ![Framework: .NET 8+](https://img.shields.io/badge/framework-.NET%208%2B-blue)
 ![Semantic Search: Enabled](https://img.shields.io/badge/semantic%20search-enabled-purple)
