@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.1.2
+
+Fixed:
+
+- Fixed a bug when loading saved database from file/stream where `IntIdGenerator` or `NumericIdGenerator` lose max Id, resulting in adding new texts to database causes existing texts to be overwritten. This specifically affected `SharpVector.OpenAI` and `SharpVector.Ollama` libraries but the fix is implemented within the core `Build5Nines.SharpVector` library.
+
 ## v2.1.1
 
 Add:
