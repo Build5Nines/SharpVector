@@ -31,6 +31,10 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
 
+    - name: Test (diagnostic)
+      run: |
+        dotnet --info echo "Build output directories:" ls -la src/SharpVectorOpenAITest/bin/Debug/net8.0 || true ls -la src/SharpVectorTest/bin/Debug/net8.0 || true dotnet test src/SharpVector.sln --no-build --logger:"console;verbosity=detailed"
+
     - name: Run tests with code coverage
       run: dotnet test --no-build --verbosity normal --results-directory "./TestResults/Coverage/" --collect:"XPlat Code Coverage" 
 
