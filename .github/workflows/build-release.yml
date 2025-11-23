@@ -31,18 +31,17 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
 
-    - name: Test (diagnostic)
-      run: |
-        dotnet --info echo "Build output directories:" ls -la src/SharpVectorOpenAITest/bin/Debug/net8.0 || true ls -la src/SharpVectorTest/bin/Debug/net8.0 || true dotnet test src/SharpVector.sln --no-build --logger:"console;verbosity=detailed"
+    - name: Tests
+      run: dotnet test --configuration Release --no-build
 
-    - name: Run tests with code coverage
-      run: dotnet test --no-build --verbosity normal --results-directory "./TestResults/Coverage/" --collect:"XPlat Code Coverage" 
+    # - name: Run tests with code coverage
+    #   run: dotnet test --no-build --verbosity normal --results-directory "./TestResults/Coverage/" --collect:"XPlat Code Coverage" 
 
-    - name: Upload test results artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: '**/TestResults/**'
+    # - name: Upload test results artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: test-results
+    #     path: '**/TestResults/**'
 
     - name: Performance Test
       run: dotnet run --project SharpVectorPerformance --configuration Release
