@@ -12,6 +12,12 @@ Add:
 - Added `IVectorTextResultItem.Similarity` and marked `IVectorTextResultItem.VectorComparison` obsolete. `VectorComparison` will be removed in the future.
 - Added more comment metadata to code
 
+## v2.1.2
+
+Fixed:
+
+- Fixed a bug when loading saved database from file/stream where `IntIdGenerator` or `NumericIdGenerator` lose max Id, resulting in adding new texts to database causes existing texts to be overwritten. This specifically affected `SharpVector.OpenAI` and `SharpVector.Ollama` libraries but the fix is implemented within the core `Build5Nines.SharpVector` library.
+
 ## v2.1.1
 
 Add:
