@@ -43,7 +43,7 @@ public class EuclideanDistanceVectorComparer : IVectorComparer
 
     public IEnumerable<IVectorTextResultItem<TId, TDocument, TMetadata>> Sort<TId, TDocument, TMetadata>(IEnumerable<IVectorTextResultItem<TId, TDocument, TMetadata>> results)
     {
-        return results.OrderBy(s => s.VectorComparison);
+        return results.OrderBy(s => s.Similarity);
     }
 
     public async Task<IEnumerable<IVectorTextResultItem<TId, TDocument, TMetadata>>> SortAsync<TId, TDocument, TMetadata>(IEnumerable<IVectorTextResultItem<TId, TDocument, TMetadata>> results)

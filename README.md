@@ -2,8 +2,7 @@
 
 `Build5Nines.SharpVector` is an in-memory vector database library designed for .NET applications. It allows you to store, search, and manage text data using vector representations. The library is customizable and extensible, enabling support for different vector comparison methods, preprocessing techniques, and vectorization strategies.
 
-[![.NET Core Tests](https://github.com/Build5Nines/SharpVector/actions/workflows/dotnet-tests.yml/badge.svg)](https://github.com/Build5Nines/SharpVector/actions/workflows/dotnet-tests.yml)
-[![Build and Release](https://github.com/Build5Nines/SharpVector/actions/workflows/build-release.yml/badge.svg)](https://github.com/Build5Nines/SharpVector/actions/workflows/build-release.yml)
+[![Release Build](https://github.com/Build5Nines/SharpVector/actions/workflows/build-release.yml/badge.svg)](https://github.com/Build5Nines/SharpVector/actions/workflows/build-release.yml)
 ![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/build5nines/sharpvector)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)

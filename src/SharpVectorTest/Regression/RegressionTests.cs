@@ -25,7 +25,7 @@ public class RegressionTests
         Assert.AreEqual(1, results.Texts.Count());
         Assert.IsTrue(results.Texts.First().Text.Contains("Lion King"));
         Assert.AreEqual("{ value: \"JSON Metadata Value\" }", results.Texts.First().Metadata);
-        Assert.AreEqual(0.3396831452846527, results.Texts.First().VectorComparison);
+        Assert.AreEqual(0.3396831452846527, results.Texts.First().Similarity);
     }
 
     [TestMethod]

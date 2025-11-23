@@ -131,7 +131,7 @@ class Program
                 ragContext += result.Text + "\n\n";
                 // Print the metadata, vector comparison, and text of the result to the console
                 Console.WriteLine($"Document: {result.Metadata}");
-                Console.WriteLine($"Vector Comparison: {result.VectorComparison}");
+                Console.WriteLine($"Vector Comparison: {result.Similarity}");
                 Console.WriteLine($"Text Chunk Length: {result.Text.Length}");
                 Console.WriteLine("");
             }

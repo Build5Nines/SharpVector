@@ -6,8 +6,7 @@ description: The lightweight, in-memory, semantic search, text vector database f
 
 **Build5Nines.SharpVector** is the lightweight, in-memory, semantic search, text vector database built for .NET applications. It enables fast and flexible vector-based similarity search for text data — ideal for search engines, recommendation systems, semantic analysis, and AI-enhanced features.
 
-[![.NET Core Tests](https://github.com/Build5Nines/SharpVector/actions/workflows/dotnet-tests.yml/badge.svg)](https://github.com/Build5Nines/SharpVector/actions/workflows/dotnet-tests.yml)
-[![Build and Release](https://github.com/Build5Nines/SharpVector/actions/workflows/build-release.yml/badge.svg)](https://github.com/Build5Nines/SharpVector/actions/workflows/build-release.yml)
+[![Release Build](https://github.com/Build5Nines/SharpVector/actions/workflows/build-release.yml/badge.svg)](https://github.com/Build5Nines/SharpVector/actions/workflows/build-release.yml)
 ![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/build5nines/sharpvector)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
