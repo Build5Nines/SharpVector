@@ -1,6 +1,6 @@
 namespace Build5Nines.SharpVector.Id;
 
-public class NumericIdGenerator<TId> : IIdGenerator<TId>
+public class NumericIdGenerator<TId> : ISequentialIdGenerator<TId>
     where TId : struct
 {
     public NumericIdGenerator()
@@ -20,6 +20,13 @@ public class NumericIdGenerator<TId> : IIdGenerator<TId>
             current++;
             _lastId = current;
             return _lastId;
+        }
+    }
+
+    public void SetMostRecent(TId mostRecentId)
+    {
+        lock(_lock) {
+            _lastId = mostRecentId;
         }
     }
 }

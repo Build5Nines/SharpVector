@@ -11,6 +11,7 @@ using System.Text.Json;
 using Build5Nines.SharpVector.Embeddings;
 using System.Runtime.ExceptionServices;
 using System.Collections;
+using System.Linq;
 
 namespace Build5Nines.SharpVector;
 
@@ -351,8 +352,18 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
             async (archive) =>
             {
                 await DatabaseFile.LoadVectorStoreAsync(archive, VectorStore);
-
                 await DatabaseFile.LoadVocabularyStoreAsync(archive, VectorStore.VocabularyStore);
+
+                // Re-initialize the IdGenerator with the max Id value from the VectorStore if it supports sequential numeric IDs
+                if (_idGenerator is ISequentialIdGenerator<TId> seqIdGen)
+                {
+                    // Re-seed the sequence only if there are existing IDs
+                    var ids = VectorStore.GetIds();
+                    if (ids.Any())
+                    {
+                        seqIdGen.SetMostRecent(ids.Max()!);
+                    }
+                }
             }
         );
     }
@@ -708,6 +719,17 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
             async (archive) =>
             {
                 await DatabaseFile.LoadVectorStoreAsync(archive, VectorStore);
+
+                // Re-initialize the IdGenerator with the max Id value from the VectorStore if it supports sequential numeric IDs
+                if (_idGenerator is ISequentialIdGenerator<TId> seqIdGen)
+                {
+                    // Re-seed the sequence only if there are existing IDs
+                    var ids = VectorStore.GetIds();
+                    if (ids.Any())
+                    {
+                        seqIdGen.SetMostRecent(ids.Max()!);
+                    }
+                }
             }
         );
     }

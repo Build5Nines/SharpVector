@@ -175,6 +175,40 @@ public class VectorDatabaseTests
     }
 
     [TestMethod]
+    public void BasicMemoryVectorDatabase_SaveLoad_TestIds()
+    {
+        var vdb = new BasicMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        vdb.AddText("The Lion King is a 1994 Disney animated film about a young lion cub named Simba who is the heir to the throne of an African savanna.", "First");
+        vdb.AddText("Build5Nines is awesome!", "Second");
+        var results = vdb.Search("Lion King");
+
+        Assert.AreEqual(2, results.Texts.Count());
+
+        var filename = "BasicMemoryVectorDatabase_SaveLoad_TestIds.b59vdb";
+        vdb.SaveToFile(filename);
+
+        var newvdb = new BasicMemoryVectorDatabase();
+        newvdb.LoadFromFile(filename);
+
+        // Add a new text entry after loading
+        // This should get the next available ID (3) and not overwrite existing entries
+        newvdb.AddText("A new string that should be added, not replacing existing one.", "Third");
+
+        results = newvdb.Search("Lion King");
+
+        Assert.AreEqual(3, results.Texts.Count());
+        var listOfTexts = results.Texts.OrderBy(x => x.Id).ToArray();
+        Assert.AreEqual(listOfTexts[0].Id, 1);
+        Assert.AreEqual(listOfTexts[0].Metadata, "First");
+        Assert.AreEqual(listOfTexts[1].Id, 2);
+        Assert.AreEqual(listOfTexts[1].Metadata, "Second");
+        Assert.AreEqual(listOfTexts[2].Id, 3);
+        Assert.AreEqual(listOfTexts[2].Metadata, "Third");
+    }
+
+    [TestMethod]
     public async Task BasicMemoryVectorDatabase_SaveLoadBinaryStreamAsync_01()
     {
         var vdb = new BasicMemoryVectorDatabase();
