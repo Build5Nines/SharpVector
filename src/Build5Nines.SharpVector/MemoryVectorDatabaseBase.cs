@@ -470,6 +470,48 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
     }
 
     /// <summary>
+    /// Adds multiple texts with optional metadata to the database efficiently.
+    /// If the embeddings generator supports batching, this will generate vectors in a single multi-input call.
+    /// </summary>
+    /// <param name="items">Collection of (text, metadata) tuples to add.</param>
+    /// <returns>List of generated IDs in the same order as inputs.</returns>
+    public async Task<IReadOnlyList<TId>> AddTextsAsync(IEnumerable<(string text, TMetadata? metadata)> items)
+    {
+        if (items is null) throw new ArgumentNullException(nameof(items));
+
+        var list = items.ToList();
+        if (list.Count == 0) return Array.Empty<TId>();
+
+        // Try batch embeddings if supported
+        float[][] vectors;
+        if (EmbeddingsGenerator is IBatchEmbeddingsGenerator batchGen)
+        {
+            var batch = await batchGen.GenerateEmbeddingsAsync(list.Select(i => i.text));
+            vectors = batch.Select(v => v.ToArray()).ToArray();
+        }
+        else
+        {
+            // Fallback to per-item embedding
+            vectors = new float[list.Count][];
+            for (int i = 0; i < list.Count; i++)
+            {
+                vectors[i] = await EmbeddingsGenerator.GenerateEmbeddingsAsync(list[i].text);
+            }
+        }
+
+        // Store items and produce IDs
+        var ids = new List<TId>(list.Count);
+        for (int i = 0; i < list.Count; i++)
+        {
+            TId id = _idGenerator.NewId();
+            ids.Add(id);
+            await VectorStore.SetAsync(id, new VectorTextItem<TMetadata>(list[i].text, list[i].metadata, vectors[i]));
+        }
+
+        return ids;
+    }
+
+    /// <summary>
     /// Retrieves a text and metadata by its ID
     /// </summary>
     /// <param name="id"></param>
