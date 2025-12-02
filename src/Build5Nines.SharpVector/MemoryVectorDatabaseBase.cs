@@ -107,6 +107,22 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
         return id;
     }
 
+    public async Task<IReadOnlyList<TId>> AddTextsAsync(IEnumerable<(TVocabularyKey text, TMetadata? metadata)> items)
+    {
+        if (items is null) throw new ArgumentNullException(nameof(items));
+
+        var ids = new List<TId>();
+        
+        foreach(var item in items)
+        {
+            TId id = await AddTextAsync(item.text, item.metadata);
+            ids.Add(id);
+        }
+
+        return ids;
+    }
+
+
     /// <summary>
     /// Retrieves a text and metadata by its ID
     /// </summary>

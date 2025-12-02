@@ -29,6 +29,13 @@ public interface IVectorDatabase<TId, TMetadata, TDocument>
     Task<TId> AddTextAsync(TDocument text, TMetadata? metadata = default(TMetadata));
     
     /// <summary>
+    /// Adds multiple texts with Metadata to the database and returns their IDs
+    /// </summary>
+    /// <param name="items">The texts and metadata to add in batch.</param>
+    /// <returns>The IDs of the added texts.</returns>
+    Task<IReadOnlyList<TId>> AddTextsAsync(IEnumerable<(TDocument text, TMetadata? metadata)> items);
+
+    /// <summary>
     /// Get all the Ids for each text the database.
     /// </summary>
     /// <returns></returns>
