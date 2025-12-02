@@ -39,6 +39,23 @@ namespace Build5Nines.SharpVector.OpenAI.Tests
                     It.IsAny<EmbeddingGenerationOptions?>(),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(clientResult);
+            
+            _mockEmbeddingClient
+                .Setup(c => c.GenerateEmbeddingsAsync(
+                    It.IsAny<IEnumerable<string>>(),
+                    It.IsAny<EmbeddingGenerationOptions?>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync((List<string> inputs, EmbeddingGenerationOptions? options, CancellationToken token) =>
+                {
+                    // return OpenAIEmbeddingCollection with same embedding for each input
+                    var embeddings = new List<OpenAIEmbedding>();
+                    for (int i = 0; i < inputs.Count; i++)
+                    {
+                        embeddings.Add(OpenAIEmbeddingsModelFactory.OpenAIEmbedding(index: i, vector: embeddingVector));
+                    }
+                    var collection = OpenAIEmbeddingsModelFactory.OpenAIEmbeddingCollection(embeddings);
+                    return ClientResult.FromValue(collection, new TestPipelineResponse());
+                });
 
             _database = new BasicOpenAIMemoryVectorDatabase(_mockEmbeddingClient.Object);
         }
@@ -119,6 +136,36 @@ namespace Build5Nines.SharpVector.OpenAI.Tests
             Assert.AreEqual(2, results.Texts.Count());
 
             var filename = "openai_test_saveload_testids_02.b59vdb";
+#pragma warning disable CS8604 // Possible null reference argument.
+            await _database.SaveToFileAsync(filename);
+#pragma warning restore CS8604 // Possible null reference argument.
+
+            var newdb = new BasicOpenAIMemoryVectorDatabase(_mockEmbeddingClient.Object);
+            await newdb.LoadFromFileAsync(filename);
+    
+            newdb.AddText("A new text after loading to check ID assignment.", "333");
+
+            var newResults = newdb.Search("testing IDs");
+            Assert.AreEqual(3, newResults.Texts.Count());
+            var texts = newResults.Texts.OrderBy(x => x.Metadata).ToArray();
+            Assert.AreEqual("111", texts[0].Metadata);
+            Assert.AreEqual("222", texts[1].Metadata);
+            Assert.AreEqual("333", texts[2].Metadata);
+        }
+
+        [TestMethod]
+        public async Task Test_SaveLoad_TestIds_Batch_02()
+        {
+            await _database.AddTextsAsync(new (string text, string? metadata)[]
+            {
+                ("Sample text for testing IDs.", "111"),
+                ("Another sample text for testing IDs.", "222")
+            });
+
+            var results = _database.Search("testing IDs");
+            Assert.AreEqual(2, results.Texts.Count());
+
+            var filename = "openai_test_saveload_testids_batch_02.b59vdb";
 #pragma warning disable CS8604 // Possible null reference argument.
             await _database.SaveToFileAsync(filename);
 #pragma warning restore CS8604 // Possible null reference argument.
