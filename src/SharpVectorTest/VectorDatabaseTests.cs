@@ -99,6 +99,30 @@ public class VectorDatabaseTests
     }
 
     [TestMethod]
+    public void BasicMemoryVectorDatabase_05_Batch()
+    {
+        var vdb = new BasicMemoryVectorDatabase();
+        
+        // // Load Vector Database with some sample text
+        var inputs = new (string text, string? metadata)[]
+        {
+            ("The 👑 King", "metadata1"),
+            ("It's 🔥 Fire.", "metadata2"),
+            ("No emoji", "metadata3")
+        };
+        vdb.AddTextsAsync(inputs).Wait();
+        
+        var results = vdb.Search("🔥", pageCount: 1);
+
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual(0.5773503184318542, results.Texts.First().Similarity);
+        Assert.AreEqual("It's 🔥 Fire.", results.Texts.First().Text);
+        Assert.AreEqual(2, results.Texts.First().Id);
+        Assert.AreEqual("metadata2", results.Texts.First().Metadata);
+    }
+
+
+    [TestMethod]
     public void BasicMemoryVectorDatabase_06()
     {
         var vdb = new BasicMemoryVectorDatabase();
