@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Build5Nines.SharpVector.OpenAI.Embeddings;
 
-public class OpenAIEmbeddingsGenerator :  IEmbeddingsGenerator //IBatchEmbeddingsGenerator
+public class OpenAIEmbeddingsGenerator :  IBatchEmbeddingsGenerator
 {
     protected EmbeddingClient EmbeddingClient { get; private set; }
 
