@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- <ProjectReference Include="..\Build5Nines.SharpVector\Build5Nines.SharpVector.csproj" /> -->
     <ProjectReference Include="..\Build5Nines.SharpVector.OpenAI\Build5Nines.SharpVector.OpenAI.csproj" />
   </ItemGroup>
 
