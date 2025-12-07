@@ -163,6 +163,7 @@ nav:
       - persistence/index.md
       - File Persistence: persistence/#file-persistence
       - Persist to Stream: persistence/#persist-to-stream
+      - BasicDiskVectorDatabase: persistence/#basicdiskvectordatabase
   - Embeddings:
       - embeddings/index.md
       - OpenAI Embeddings: embeddings/openai/index.md
