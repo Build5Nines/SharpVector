@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option csharp_namespace = "SharpVectorProtobuf";
+
+package sharpvector;
+
+// Wrapper message for SharpVector database binary data
+message VectorDatabaseWrapper {
+  // The binary serialized SharpVector database (in ZIP format)
+  bytes database_data = 1;
+  
+  // Metadata about the database (optional)
+  string database_type = 2;
+  string version = 3;
+  int64 timestamp = 4;
+}
