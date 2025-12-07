@@ -8,5 +8,6 @@ public class Program
     public static void Main(string[] args)
     {
         BenchmarkRunner.Run<MemoryVectorDatabasePerformance>();
+        BenchmarkRunner.Run<DiskVectorDatabasePerformance>();
     }
 }
