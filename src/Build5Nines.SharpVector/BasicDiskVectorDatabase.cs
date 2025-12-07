@@ -12,7 +12,7 @@ namespace Build5Nines.SharpVector;
 /// disk-backed vector store and vocabulary store. Uses int IDs and string metadata.
 /// </summary>
 public class BasicDiskVectorDatabase<TMetadata>
-     : DiskMemoryVectorDatabaseBase<
+     : BasicDiskMemoryVectorDatabaseBase<
         int,
         TMetadata,
         BasicDiskVectorStore<int, TMetadata, BasicDiskVocabularyStore<string>, string, int>,

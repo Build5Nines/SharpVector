@@ -5,6 +5,8 @@ title: Data Persistence
 
 The `Build5Nines.SharpVector` library provides easy-to-use methods for saving a memory-based vector database to a file or stream and loading it again later. This is particularly useful for caching indexed content between runs, deploying pre-built vector stores, or shipping databases with your application.
 
+---
+
 ## :material-file: File Persistence
 
 `Build5Nines.SharpVector` supports persisting the vector database to a file.
@@ -51,6 +53,8 @@ vdb.LoadFromFile(filePath);
 await vdb.LoadFromFileAsync(filePath);
 ```
 
+---
+
 ## :material-file-move: Persist to Stream
 
 The underlying methods used by `SaveToFile` and `LoadFromFile` methods for serializing the vector database to a `Stream` are available to use directly. This provides support for reading/writing to `MemoryStream` (or other streams) if the vector database needs to be persisted to something other than the local file system.
@@ -92,3 +96,30 @@ vdb.DeserializeFromBinaryStream(stream);
 // deserialize asynchronously from JSON stream
 await vdb.DeserializeFromBinaryStreamAsync(stream);
 ```
+
+---
+
+## :material-file-database: BasicDiskVectorDatabase
+
+The `BasicDiskVectorDatabase` provides a basic vector database implementation that automatically stores the vector store and vocabulary store to disk. It's implmentation of vectorization is the same as the `BasicMemoryVectorDatabase`, but with the modification that it automatically persists the database to disk in the background to the specified folder path.
+
+Here's a basic example of using `BasicDiskVectorDatabase`:
+
+```csharp
+// specify the folder where to persist the database data on disk
+var vdb = new BasicDiskVectorDatabase("C:/data/content-db");
+foreach (var doc in documents)
+{
+    vdb.AddText(doc.Id, doc.Text);
+}
+
+var results = vdb.Search("some text");
+
+```
+
+### Tips
+
+- Prefer absolute paths for the storage folder in production services.
+- Place the folder on fast storage (SSD) for best indexing/query performance.
+- Avoid sharing the same folder across multiple processes concurrently.
+- Back up the folder regularly to preserve your vector store and vocabulary.

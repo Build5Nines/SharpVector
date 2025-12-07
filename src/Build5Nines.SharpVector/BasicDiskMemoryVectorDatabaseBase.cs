@@ -11,8 +11,8 @@ namespace Build5Nines.SharpVector;
 /// Base class for an on-disk vector database. Mirrors MemoryVectorDatabaseBase generic composition
 /// while using disk-backed stores for persistence.
 /// </summary>
-public abstract class DiskMemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabularyStore, TVocabularyKey, TVocabularyValue, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorComparer>
-    : MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabularyStore, TVocabularyKey, TVocabularyValue, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorComparer>
+public abstract class BasicDiskMemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabularyStore, TVocabularyKey, TVocabularyValue, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorComparer>
+    : VectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabularyStore, TVocabularyKey, TVocabularyValue, TIdGenerator, TTextPreprocessor, TVectorizer, TVectorComparer>
     where TId : notnull
     where TVocabularyKey : notnull
     where TVocabularyValue : notnull
@@ -23,7 +23,7 @@ public abstract class DiskMemoryVectorDatabaseBase<TId, TMetadata, TVectorStore,
     where TVectorizer : IVectorizer<TVocabularyKey, TVocabularyValue>, new()
     where TVectorComparer : IVectorComparer, new()
 {
-    protected DiskMemoryVectorDatabaseBase(TVectorStore vectorStore)
+    protected BasicDiskMemoryVectorDatabaseBase(TVectorStore vectorStore)
         : base(vectorStore)
     { }
 }
