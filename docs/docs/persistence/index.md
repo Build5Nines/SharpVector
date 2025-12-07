@@ -99,7 +99,7 @@ await vdb.DeserializeFromBinaryStreamAsync(stream);
 
 ---
 
-## :material-file-database: BasicDiskVectorDatabase
+## :material-database-outline: BasicDiskVectorDatabase
 
 The `BasicDiskVectorDatabase` provides a basic vector database implementation that automatically stores the vector store and vocabulary store to disk. It's implmentation of vectorization is the same as the `BasicMemoryVectorDatabase`, but with the modification that it automatically persists the database to disk in the background to the specified folder path.
 
