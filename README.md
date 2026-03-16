@@ -11,6 +11,10 @@
 ![Vector Text Search: Enabled](https://img.shields.io/badge/Vector%20Text%20Search-Enabled-purple)
 ![Generative AI: Ready](https://img.shields.io/badge/Generative%20AI-Ready-purple)
 
+![Local Embeddings: Supported](https://img.shields.io/badge/Local%20Embeddings-Supported-ff1493)
+![OpenAI Embeddings: Supported](https://img.shields.io/badge/OpenAI%20Embeddings-Supported-ff1493)
+![Ollama Embeddings: Supported](https://img.shields.io/badge/Ollama%20Embeddings-Supported-ff1493)
+
 Vector databases are used with Semantic Search and [Generative AI](https://build5nines.com/what-is-generative-ai/?utm_source=github&utm_medium=sharpvector) solutions augmenting the LLM (Large Language Model) with the ability to load additional context data with the AI prompt using the [RAG (Retrieval-Augmented Generation)](https://build5nines.com/what-is-retrieval-augmented-generation-rag/?utm_source=github&utm_medium=sharpvector) design pattern.
 
 While there are lots of large databases that can be used to build Vector Databases (like Azure CosmosDB, PostgreSQL w/ pgvector, Azure AI Search, Elasticsearch, and more), there are not many options for a lightweight vector database that can be embedded into any .NET application to provide a local text vector database.
