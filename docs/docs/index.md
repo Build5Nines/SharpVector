@@ -15,6 +15,10 @@ description: The lightweight, in-memory, semantic search, text vector database f
 ![Vector Text Search: Enabled](https://img.shields.io/badge/Vector%20Test%20Search-Enabled-purple)
 ![Generative AI: Ready](https://img.shields.io/badge/Generative%20AI-Ready-purple)
 
+![Local Embeddings: Supported](https://img.shields.io/badge/Local%20Embeddings-Supported-ff1493)
+![OpenAI Embeddings: Supported](https://img.shields.io/badge/OpenAI%20Embeddings-Supported-ff1493)
+![Ollama Embeddings: Supported](https://img.shields.io/badge/Ollama%20Embeddings-Supported-ff1493)
+
 <!--
 ![GitHub contributors](https://img.shields.io/github/contributors/Build5Nines/SharpVector)
 <!-- https://buttons.github.io/ -->
