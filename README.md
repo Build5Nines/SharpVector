@@ -9,7 +9,7 @@
 ![Framework: .NET 8+](https://img.shields.io/badge/Framework-.NET%208%2B-blue)
 ![Semantic Search: Enabled](https://img.shields.io/badge/Semantic%20Search-Enabled-purple)
 ![Vector Text Search: Enabled](https://img.shields.io/badge/Vector%20Text%20Search-Enabled-purple)
-![Gen AI: Ready](https://img.shields.io/badge/Gen%20AI-Ready-purple)
+![Generative AI: Ready](https://img.shields.io/badge/Generative%20AI-Ready-purple)
 
 Vector databases are used with Semantic Search and [Generative AI](https://build5nines.com/what-is-generative-ai/?utm_source=github&utm_medium=sharpvector) solutions augmenting the LLM (Large Language Model) with the ability to load additional context data with the AI prompt using the [RAG (Retrieval-Augmented Generation)](https://build5nines.com/what-is-retrieval-augmented-generation-rag/?utm_source=github&utm_medium=sharpvector) design pattern.
 
