@@ -6,7 +6,7 @@
 ![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/build5nines/sharpvector)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Framework: .NET 8+](https://img.shields.io/badge/framework-.NET%208%2B-blue)
+![Framework: .NET 8+](https://img.shields.io/badge/Framework-.NET%208%2B-blue)
 ![Semantic Search: Enabled](https://img.shields.io/badge/Semantic%20Search-Enabled-purple)
 ![Vector Text Search: Enabled](https://img.shields.io/badge/Vector%20Text%20Search-Enabled-purple)
 ![Gen AI: Ready](https://img.shields.io/badge/Gen%20AI-Ready-purple)
