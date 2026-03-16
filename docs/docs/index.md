@@ -10,9 +10,10 @@ description: The lightweight, in-memory, semantic search, text vector database f
 ![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/build5nines/sharpvector)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Framework: .NET 8+](https://img.shields.io/badge/framework-.NET%208%2B-blue)
-![Semantic Search: Enabled](https://img.shields.io/badge/semantic%20search-enabled-purple)
-![Gen AI: Ready](https://img.shields.io/badge/Gen%20AI-ready-purple)
+![Framework: .NET 8+](https://img.shields.io/badge/Framework-.NET%208%2B-blue)
+![Semantic Search: Enabled](https://img.shields.io/badge/Semantic%20Search-Enabled-purple)
+![Vector Text Search: Enabled](https://img.shields.io/badge/Vector%20Test%20Search-Enabled-purple)
+![Generative AI: Ready](https://img.shields.io/badge/Generative%20AI-Ready-purple)
 
 <!--
 ![GitHub contributors](https://img.shields.io/github/contributors/Build5Nines/SharpVector)
