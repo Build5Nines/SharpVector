@@ -27,6 +27,10 @@ Build5Nines SharpVector is the lightweight, local, in-memory Text Vector Databas
 
 ### [Documentation](https://sharpvector.build5nines.com) | [Get Started](https://sharpvector.build5nines.com/get-started/) | [Samples](https://sharpvector.build5nines.com/samples/)
 
+![Build5Nines.SharpVector Overview](/docs/docs/images/featured-build5nines-sharpvector-overview.png)
+
+---
+
 ## Nuget Package
 
 The `Build5Nines.SharpVector` library is available as a Nuget Package to easily include into your .NET projects:

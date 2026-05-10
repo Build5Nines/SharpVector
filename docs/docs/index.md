@@ -39,6 +39,9 @@ While there are lots of large databases that can be used to build Vector Databas
 > _- [Tulika Chaudharie, Principal Product Manager at Microsoft for Azure App Service](https://azure.github.io/AppService/2024/09/03/Phi3-vector.html)_
 
 ---
+![Build5Nines.SharpVector Overview](/docs/docs/images/featured-build5nines-sharpvector-overview.png)
+
+---
 
 ## 🚀 Basic Usage
 
