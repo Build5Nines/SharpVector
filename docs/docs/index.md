@@ -39,7 +39,7 @@ While there are lots of large databases that can be used to build Vector Databas
 > _- [Tulika Chaudharie, Principal Product Manager at Microsoft for Azure App Service](https://azure.github.io/AppService/2024/09/03/Phi3-vector.html)_
 
 ---
-![Build5Nines.SharpVector Overview](/docs/docs/images/featured-build5nines-sharpvector-overview.png)
+![Build5Nines.SharpVector Overview](/images/featured-build5nines-sharpvector-overview.png)
 
 ---
 
@@ -79,6 +79,8 @@ foreach(var item in results.Texts)
 ```
 
 ---
+
+![Build5Nines.SharpVector Key Features](/images/build5nines-sharpvector-key-features.png)
 
 ## 💡 Key Features
 
