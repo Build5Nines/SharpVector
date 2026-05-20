@@ -3,6 +3,13 @@ namespace Build5Nines.SharpVector.VectorCompare;
 public interface IVectorComparer
 {
     /// <summary>
+    /// The kind of metric this comparer implements. The database uses this to
+    /// dispatch to the matching fast-path in an <see cref="VectorEncoding.IVectorEncoding"/>
+    /// when stored vectors are compressed.
+    /// </summary>
+    VectorComparison MetricKind { get; }
+
+    /// <summary>
     /// Calculates a comparison between two vectors
     /// </summary>
     /// <param name="vectorA"></param>

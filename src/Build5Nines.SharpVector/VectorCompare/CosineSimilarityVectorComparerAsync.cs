@@ -5,6 +5,8 @@ namespace Build5Nines.SharpVector.VectorCompare;
 
 public class CosineSimilarityVectorComparer : IVectorComparer
 {
+    public VectorComparison MetricKind => VectorComparison.CosineSimilarity;
+
     /// <summary>
     /// Calculates the cosine similarity between two vectors.
     /// 

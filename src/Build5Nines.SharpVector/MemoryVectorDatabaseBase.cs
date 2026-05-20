@@ -3,6 +3,7 @@ using Build5Nines.SharpVector.Preprocessing;
 using Build5Nines.SharpVector.Vocabulary;
 using Build5Nines.SharpVector.Vectorization;
 using Build5Nines.SharpVector.VectorCompare;
+using Build5Nines.SharpVector.VectorEncoding;
 using Build5Nines.SharpVector.VectorStore;
 using System.Collections.Concurrent;
 using System.IO.Compression;
@@ -43,6 +44,10 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TVo
     protected MemoryVectorDatabaseBase(TVectorStore vectorStore)
         : base(vectorStore)
     { }
+
+    protected MemoryVectorDatabaseBase(TVectorStore vectorStore, IVectorEncoding encoding)
+        : base(vectorStore, encoding)
+    { }
 }
 
 /// <summary>
@@ -62,5 +67,9 @@ public abstract class MemoryVectorDatabaseBase<TId, TMetadata, TVectorStore, TId
 {
     public MemoryVectorDatabaseBase(IEmbeddingsGenerator embeddingsGenerator, TVectorStore vectorStore)
         : base(embeddingsGenerator, vectorStore)
+    { }
+
+    public MemoryVectorDatabaseBase(IEmbeddingsGenerator embeddingsGenerator, TVectorStore vectorStore, IVectorEncoding encoding)
+        : base(embeddingsGenerator, vectorStore, encoding)
     { }
 }

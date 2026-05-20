@@ -3,6 +3,7 @@ using Build5Nines.SharpVector.Preprocessing;
 using Build5Nines.SharpVector.Vocabulary;
 using Build5Nines.SharpVector.Vectorization;
 using Build5Nines.SharpVector.VectorCompare;
+using Build5Nines.SharpVector.VectorEncoding;
 using Build5Nines.SharpVector.VectorStore;
 using System.Collections.Concurrent;
 using System.IO.Compression;
@@ -53,13 +54,24 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabula
     /// </summary>
     protected TVectorStore VectorStore { get; private set; }
 
+    /// <summary>
+    /// The encoding applied to vectors as they are written into the store.
+    /// On load, this is overridden by the encoding recorded in the database file.
+    /// </summary>
+    public IVectorEncoding VectorEncoding { get; protected internal set; }
+
     public VectorDatabaseBase(TVectorStore vectorStore)
+        : this(vectorStore, RawFloat32Encoding.Instance)
+    { }
+
+    public VectorDatabaseBase(TVectorStore vectorStore, IVectorEncoding encoding)
     {
         VectorStore = vectorStore;
         _idGenerator = new TIdGenerator();
         _textPreprocessor = new TTextPreprocessor();
         _vectorizer = new TVectorizer();
         _vectorComparer = new TVectorComparer();
+        VectorEncoding = encoding ?? RawFloat32Encoding.Instance;
     }
 
     /// <summary>
@@ -98,11 +110,12 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabula
         
         // Generate the vector asynchronously
         float[] vector = await _vectorizer.GenerateVectorFromTokensAsync(VectorStore.VocabularyStore, tokens);
-        
+
         // Generate the ID and store the vector text item asynchronously
         TId id = _idGenerator.NewId();
-        await VectorStore.SetAsync(id, new VectorTextItem<TVocabularyKey, TMetadata>(text, metadata, vector));
-        
+        var encoded = VectorEncoding.Encode(vector);
+        await VectorStore.SetAsync(id, new VectorTextItem<TVocabularyKey, TMetadata>(text, metadata, encoded));
+
         return id;
     }
 
@@ -157,7 +170,8 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabula
             VectorStore.VocabularyStore.Update(tokens);
             float[] vector = _vectorizer.GenerateVectorFromTokens(VectorStore.VocabularyStore, tokens);
             var metadata = VectorStore.Get(id).Metadata;
-            VectorStore.Set(id, new VectorTextItem<TVocabularyKey, TMetadata>(text, metadata, vector));
+            var encoded = VectorEncoding.Encode(vector);
+            VectorStore.Set(id, new VectorTextItem<TVocabularyKey, TMetadata>(text, metadata, encoded));
         }
         else
         {
@@ -179,9 +193,9 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabula
             var item = new VectorTextItem<TVocabularyKey, TMetadata>(
                 existing.Text,
                 metadata,
-                existing.Vector
+                existing.EncodedVector
             );
-            
+
             VectorStore.Set(id, item);
         }
         else
@@ -203,7 +217,8 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabula
             var tokens = _textPreprocessor.TokenizeAndPreprocess(text);
             VectorStore.VocabularyStore.Update(tokens);
             float[] vector = _vectorizer.GenerateVectorFromTokens(VectorStore.VocabularyStore, tokens);
-            VectorStore.Set(id, new VectorTextItem<TVocabularyKey, TMetadata>(text, metadata, vector));
+            var encoded = VectorEncoding.Encode(vector);
+            VectorStore.Set(id, new VectorTextItem<TVocabularyKey, TMetadata>(text, metadata, encoded));
         }
         else
         {
@@ -314,9 +329,15 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabula
 
         await Task.WhenAll(taskVectorStore, taskVocabularyStore);
 
+        var info = new DatabaseInfo(this.GetType().FullName);
+        if (VectorEncoding.Id != RawFloat32Encoding.EncodingId)
+        {
+            info.VectorEncodingId = VectorEncoding.Id;
+        }
+
         await DatabaseFile.SaveDatabaseToZipArchiveAsync(
             stream,
-            new DatabaseInfo(this.GetType().FullName),
+            info,
             async (archive) =>
             {
                 var entryVectorStore = archive.CreateEntry(DatabaseFile.vectorStoreFilename);
@@ -361,7 +382,7 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabula
 
     public virtual async Task DeserializeFromBinaryStreamAsync(Stream stream)
     {
-        await DatabaseFile.LoadDatabaseFromZipArchiveAsync(
+        var info = await DatabaseFile.LoadDatabaseFromZipArchiveAsync(
             stream,
             this.GetType().FullName,
             async (archive) =>
@@ -381,6 +402,13 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabula
                 }
             }
         );
+
+        // If the file recorded an explicit encoding, switch the database to use
+        // it for any subsequent writes. Absence implies the legacy raw encoding.
+        if (!string.IsNullOrEmpty(info.VectorEncodingId))
+        {
+            VectorEncoding = VectorEncodingRegistry.Get(info.VectorEncodingId);
+        }
     }
 
 
@@ -438,12 +466,23 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenera
 
     protected IEmbeddingsGenerator EmbeddingsGenerator { get; private set; }
 
+    /// <summary>
+    /// The encoding applied to vectors as they are written into the store.
+    /// On load, this is overridden by the encoding recorded in the database file.
+    /// </summary>
+    public IVectorEncoding VectorEncoding { get; protected internal set; }
+
     public VectorDatabaseBase(IEmbeddingsGenerator embeddingsGenerator, TVectorStore vectorStore)
+        : this(embeddingsGenerator, vectorStore, RawFloat32Encoding.Instance)
+    { }
+
+    public VectorDatabaseBase(IEmbeddingsGenerator embeddingsGenerator, TVectorStore vectorStore, IVectorEncoding encoding)
     {
         EmbeddingsGenerator = embeddingsGenerator;
         VectorStore = vectorStore;
         _idGenerator = new TIdGenerator();
         _vectorComparer = new TVectorComparer();
+        VectorEncoding = encoding ?? RawFloat32Encoding.Instance;
     }
 
     /// <summary>
@@ -473,14 +512,15 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenera
     /// <param name="text"></param>
     /// <returns></returns>
     public async Task<TId> AddTextAsync(string text, TMetadata? metadata = default(TMetadata))
-    {       
+    {
         // Generate the vector asynchronously
         var vector = await EmbeddingsGenerator.GenerateEmbeddingsAsync(text);
-        
+
         // Generate the ID and store the vector text item asynchronously
         TId id = _idGenerator.NewId();
-        await VectorStore.SetAsync(id, new VectorTextItem<TMetadata>(text, metadata, vector));
-        
+        var encoded = VectorEncoding.Encode(vector);
+        await VectorStore.SetAsync(id, new VectorTextItem<TMetadata>(text, metadata, encoded));
+
         return id;
     }
 
@@ -520,7 +560,8 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenera
         {
             TId id = _idGenerator.NewId();
             ids.Add(id);
-            await VectorStore.SetAsync(id, new VectorTextItem<TMetadata>(list[i].text, list[i].metadata, vectors[i]));
+            var encoded = VectorEncoding.Encode(vectors[i]);
+            await VectorStore.SetAsync(id, new VectorTextItem<TMetadata>(list[i].text, list[i].metadata, encoded));
         }
 
         return ids;
@@ -559,8 +600,8 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenera
         {
             var existing = VectorStore.Get(id);
             var vector = await EmbeddingsGenerator.GenerateEmbeddingsAsync(text);
-            var metadata = existing.Metadata;
-            VectorStore.Set(id, new VectorTextItem<TMetadata>(text, existing.Metadata, vector));
+            var encoded = VectorEncoding.Encode(vector);
+            VectorStore.Set(id, new VectorTextItem<TMetadata>(text, existing.Metadata, encoded));
         }
         else
         {
@@ -593,9 +634,9 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenera
             var item = new VectorTextItem<string, TMetadata>(
                 existing.Text,
                 metadata,
-                existing.Vector
+                existing.EncodedVector
             );
-            
+
             VectorStore.Set(id, item);
         }
         else
@@ -615,7 +656,8 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenera
         if (VectorStore.ContainsKey(id))
         {
             var vector = await EmbeddingsGenerator.GenerateEmbeddingsAsync(text);
-            VectorStore.Set(id, new VectorTextItem<TMetadata>(text, metadata, vector));
+            var encoded = VectorEncoding.Encode(vector);
+            VectorStore.Set(id, new VectorTextItem<TMetadata>(text, metadata, encoded));
         }
         else
         {
@@ -692,14 +734,20 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenera
             throw new InvalidOperationException("The database is empty.");
         }
 
+        var metricKind = _vectorComparer.MetricKind;
         var results = new ConcurrentBag<VectorTextResultItem<TId, string, TMetadata>>();
         await foreach (var kvp in VectorStore)
         {
             if (filter == null || await filter(kvp.Value.Metadata))
             {
                 var item = kvp.Value;
-
-                float vectorComparisonValue = await _vectorComparer.CalculateAsync(queryVector, item.Vector);
+                var stored = item.EncodedVector;
+                // Dispatch to the encoding's fast asymmetric distance path. For
+                // raw encoding this is equivalent to the comparer's float/float
+                // calculation; for compressed encodings it avoids decoding back
+                // to float[] at search time.
+                var encoding = VectorEncodingRegistry.TryGet(stored.EncodingId, out var e) ? e : VectorEncoding;
+                float vectorComparisonValue = encoding.Compare(metricKind, queryVector, stored);
 
                 if (_vectorComparer.IsWithinThreshold(threshold, vectorComparisonValue))
                 {
@@ -730,9 +778,15 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenera
         var streamVectorStore = new MemoryStream();
         await VectorStore.SerializeToJsonStreamAsync(streamVectorStore);
 
+        var info = new DatabaseInfo(this.GetType().FullName);
+        if (VectorEncoding.Id != RawFloat32Encoding.EncodingId)
+        {
+            info.VectorEncodingId = VectorEncoding.Id;
+        }
+
         await DatabaseFile.SaveDatabaseToZipArchiveAsync(
             stream,
-            new DatabaseInfo(this.GetType().FullName),
+            info,
             async (archive) =>
             {
                 var entryVectorStore = archive.CreateEntry(DatabaseFile.vectorStoreFilename);
@@ -770,7 +824,7 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenera
 
     public virtual async Task DeserializeFromBinaryStreamAsync(Stream stream)
     {
-        await DatabaseFile.LoadDatabaseFromZipArchiveAsync(
+        var info = await DatabaseFile.LoadDatabaseFromZipArchiveAsync(
             stream,
             this.GetType().FullName,
             async (archive) =>
@@ -789,6 +843,11 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenera
                 }
             }
         );
+
+        if (!string.IsNullOrEmpty(info.VectorEncodingId))
+        {
+            VectorEncoding = VectorEncodingRegistry.Get(info.VectorEncodingId);
+        }
     }
 
     [Obsolete("Use DeserializeFromBinaryStream Instead")]

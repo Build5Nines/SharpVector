@@ -3,6 +3,7 @@ using Build5Nines.SharpVector.Preprocessing;
 using Build5Nines.SharpVector.Vocabulary;
 using Build5Nines.SharpVector.Vectorization;
 using Build5Nines.SharpVector.VectorCompare;
+using Build5Nines.SharpVector.VectorEncoding;
 using Build5Nines.SharpVector.VectorStore;
 
 namespace Build5Nines.SharpVector;
@@ -25,5 +26,9 @@ public abstract class BasicDiskMemoryVectorDatabaseBase<TId, TMetadata, TVectorS
 {
     protected BasicDiskMemoryVectorDatabaseBase(TVectorStore vectorStore)
         : base(vectorStore)
+    { }
+
+    protected BasicDiskMemoryVectorDatabaseBase(TVectorStore vectorStore, IVectorEncoding encoding)
+        : base(vectorStore, encoding)
     { }
 }

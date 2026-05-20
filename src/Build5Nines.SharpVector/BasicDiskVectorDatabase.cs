@@ -3,6 +3,7 @@ using Build5Nines.SharpVector.Id;
 using Build5Nines.SharpVector.Preprocessing;
 using Build5Nines.SharpVector.Vectorization;
 using Build5Nines.SharpVector.VectorCompare;
+using Build5Nines.SharpVector.VectorEncoding;
 using Build5Nines.SharpVector.VectorStore;
 
 namespace Build5Nines.SharpVector;
@@ -30,6 +31,20 @@ public class BasicDiskVectorDatabase<TMetadata>
                 rootPath,
                 new BasicDiskVocabularyStore<string>(rootPath)
             )
+        )
+    { }
+
+    /// <summary>
+    /// Create a disk-backed database that compresses vectors with the supplied
+    /// encoding before storing them.
+    /// </summary>
+    public BasicDiskVectorDatabase(string rootPath, IVectorEncoding encoding)
+        : base(
+            new BasicDiskVectorStore<int, TMetadata, BasicDiskVocabularyStore<string>, string, int>(
+                rootPath,
+                new BasicDiskVocabularyStore<string>(rootPath)
+            ),
+            encoding
         )
     { }
 
