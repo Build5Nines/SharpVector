@@ -191,33 +191,40 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
 
         // Replay WAL to recover any operations after the last checkpoint
         if (!File.Exists(_walPath)) return;
-        using var fs = new FileStream(_walPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        using var br = new BinaryReader(fs);
-        while (fs.Position < fs.Length)
-        {
-            bool isDelete = br.ReadBoolean();
-            var idJson = br.ReadString();
-            var id = JsonSerializer.Deserialize<TId>(idJson)!;
-            if (isDelete)
-            {
-                _index.TryRemove(id, out _);
-                _cache.TryRemove(id, out _);
-            }
-            else
-            {
-                var itemJson = br.ReadString();
-                var item = JsonSerializer.Deserialize<VectorTextItem<TVocabularyKey, TMetadata>>(itemJson)!;
 
-                // Append item to items file to bring storage up-to-date
-                using var ofs = new FileStream(_itemsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
-                ofs.Seek(0, SeekOrigin.End);
-                var offset = ofs.Position;
-                WriteItem(ofs, item);
-                ofs.Flush(true);
-                _index[id] = offset;
-                _cache[id] = item;
+        // Scope the read handles so the file is closed before we overwrite it
+        // below; `using var` would otherwise hold the handle until the end of
+        // the method and File.WriteAllBytes would race against it on Windows.
+        using (var fs = new FileStream(_walPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+        using (var br = new BinaryReader(fs))
+        {
+            while (fs.Position < fs.Length)
+            {
+                bool isDelete = br.ReadBoolean();
+                var idJson = br.ReadString();
+                var id = JsonSerializer.Deserialize<TId>(idJson)!;
+                if (isDelete)
+                {
+                    _index.TryRemove(id, out _);
+                    _cache.TryRemove(id, out _);
+                }
+                else
+                {
+                    var itemJson = br.ReadString();
+                    var item = JsonSerializer.Deserialize<VectorTextItem<TVocabularyKey, TMetadata>>(itemJson)!;
+
+                    // Append item to items file to bring storage up-to-date
+                    using var ofs = new FileStream(_itemsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+                    ofs.Seek(0, SeekOrigin.End);
+                    var offset = ofs.Position;
+                    WriteItem(ofs, item);
+                    ofs.Flush(true);
+                    _index[id] = offset;
+                    _cache[id] = item;
+                }
             }
         }
+
         // After successful replay, truncate WAL (commit)
         File.WriteAllBytes(_walPath, Array.Empty<byte>());
         PersistIndex();
