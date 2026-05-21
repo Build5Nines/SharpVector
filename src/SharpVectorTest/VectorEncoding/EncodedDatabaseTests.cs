@@ -119,4 +119,64 @@ public class EncodedDatabaseTests
 
         StringAssert.Contains(json, "\"VectorEncodingId\":\"" + Int8ScalarQuantizationEncoding.EncodingId + "\"");
     }
+
+    [TestMethod]
+    public void RaBitQDatabase_StoresEncodedVectorAndStillFindsResult()
+    {
+        var vdb = new BasicMemoryVectorDatabase(RaBitQEncoding.Instance);
+        vdb.AddText(SampleText, "meta");
+
+        var stored = vdb.GetText(1);
+        Assert.AreEqual(RaBitQEncoding.EncodingId, stored.EncodedVector.EncodingId);
+
+        var results = vdb.Search("Lion King");
+        Assert.IsTrue(results.Texts.Any(t => t.Text.Contains("Lion King")));
+    }
+
+    [TestMethod]
+    public async Task SaveAndLoad_PreservesRaBitQEncoding()
+    {
+        var vdb = new BasicMemoryVectorDatabase(RaBitQEncoding.Instance);
+        vdb.AddText(SampleText, "meta");
+
+        using var ms = new MemoryStream();
+        await vdb.SerializeToBinaryStreamAsync(ms);
+        ms.Position = 0;
+
+        var reloaded = new BasicMemoryVectorDatabase();
+        await reloaded.DeserializeFromBinaryStreamAsync(ms);
+
+        Assert.AreEqual(RaBitQEncoding.EncodingId, reloaded.VectorEncoding.Id);
+        Assert.AreEqual(SampleText, reloaded.GetText(1).Text);
+    }
+
+    [TestMethod]
+    public void TurboQuantDatabase_StoresEncodedVectorAndStillFindsResult()
+    {
+        var vdb = new BasicMemoryVectorDatabase(TurboQuantEncoding.Instance);
+        vdb.AddText(SampleText, "meta");
+
+        var stored = vdb.GetText(1);
+        Assert.AreEqual(TurboQuantEncoding.EncodingId, stored.EncodedVector.EncodingId);
+
+        var results = vdb.Search("Lion King");
+        Assert.IsTrue(results.Texts.Any(t => t.Text.Contains("Lion King")));
+    }
+
+    [TestMethod]
+    public async Task SaveAndLoad_PreservesTurboQuantEncoding()
+    {
+        var vdb = new BasicMemoryVectorDatabase(TurboQuantEncoding.Instance);
+        vdb.AddText(SampleText, "meta");
+
+        using var ms = new MemoryStream();
+        await vdb.SerializeToBinaryStreamAsync(ms);
+        ms.Position = 0;
+
+        var reloaded = new BasicMemoryVectorDatabase();
+        await reloaded.DeserializeFromBinaryStreamAsync(ms);
+
+        Assert.AreEqual(TurboQuantEncoding.EncodingId, reloaded.VectorEncoding.Id);
+        Assert.AreEqual(SampleText, reloaded.GetText(1).Text);
+    }
 }

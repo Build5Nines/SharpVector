@@ -86,14 +86,95 @@ public class EncodingTests
     }
 
     [TestMethod]
-    public void RaBitQ_StubThrows()
+    public void RaBitQ_BytesRoundTrip_RestoresEncodedForm()
     {
-        Assert.ThrowsException<NotImplementedException>(() => RaBitQEncoding.Instance.Encode(new float[4]));
+        var original = SampleVector(256, 7);
+        var encoded = RaBitQEncoding.Instance.Encode(original);
+        var bytes = encoded.GetBytes();
+
+        var rehydrated = RaBitQEncoding.Instance.LoadFromBytes(bytes, 256);
+
+        var query = SampleVector(256, 8);
+        float a = RaBitQEncoding.Instance.Compare(VectorComparison.CosineSimilarity, query, encoded);
+        float b = RaBitQEncoding.Instance.Compare(VectorComparison.CosineSimilarity, query, rehydrated);
+        Assert.AreEqual(a, b);
     }
 
     [TestMethod]
-    public void TurboQuant_StubThrows()
+    public void RaBitQ_RankingMatchesRawForRandomVectors()
     {
-        Assert.ThrowsException<NotImplementedException>(() => TurboQuantEncoding.Instance.Encode(new float[4]));
+        // RaBitQ is a coarse approximation, so don't assert numeric closeness;
+        // instead assert it can still rank a clearly-similar pair above a
+        // clearly-dissimilar pair.
+        var query = SampleVector(512, 10);
+        var similar = (float[])query.Clone();
+        for (int i = 0; i < similar.Length; i++) similar[i] += 0.05f * (i % 3 - 1);
+        var different = SampleVector(512, 11);
+
+        var encSimilar = RaBitQEncoding.Instance.Encode(similar);
+        var encDifferent = RaBitQEncoding.Instance.Encode(different);
+
+        float simSimilar = RaBitQEncoding.Instance.Compare(VectorComparison.CosineSimilarity, query, encSimilar);
+        float simDifferent = RaBitQEncoding.Instance.Compare(VectorComparison.CosineSimilarity, query, encDifferent);
+
+        Assert.IsTrue(simSimilar > simDifferent,
+            $"RaBitQ similarity ranking incorrect: similar={simSimilar}, different={simDifferent}");
+    }
+
+    [TestMethod]
+    public void RaBitQ_ProducesExpectedStorageSize()
+    {
+        // 8 bytes of scalar correction + ceil(D/8) bytes of sign bits.
+        var encoded = RaBitQEncoding.Instance.Encode(SampleVector(384, 12));
+        Assert.AreEqual(8 + 48, encoded.GetBytes().Length);
+    }
+
+    [TestMethod]
+    public void TurboQuant_RoundTrip_PreservesCosineSimilarityClosely()
+    {
+        var a = SampleVector(384, 13);
+        var b = SampleVector(384, 14);
+
+        var rawEncA = RawFloat32Encoding.Instance.Encode(a);
+        var rawCos = RawFloat32Encoding.Instance.Compare(VectorComparison.CosineSimilarity, b, rawEncA);
+
+        var encA = TurboQuantEncoding.Instance.Encode(a);
+        var cosViaTurbo = TurboQuantEncoding.Instance.Compare(VectorComparison.CosineSimilarity, b, encA);
+
+        // 4-bit SQ is coarser than int8; allow up to 3% deviation for random vectors.
+        Assert.IsTrue(Math.Abs(rawCos - cosViaTurbo) < 0.03f,
+            $"Expected cosine within 0.03 of raw value, got |{rawCos} - {cosViaTurbo}| = {Math.Abs(rawCos - cosViaTurbo)}");
+    }
+
+    [TestMethod]
+    public void TurboQuant_BytesRoundTrip_RestoresEncodedForm()
+    {
+        var original = SampleVector(256, 15);
+        var encoded = TurboQuantEncoding.Instance.Encode(original);
+        var bytes = encoded.GetBytes();
+
+        var rehydrated = TurboQuantEncoding.Instance.LoadFromBytes(bytes, 256);
+
+        var query = SampleVector(256, 16);
+        float a = TurboQuantEncoding.Instance.Compare(VectorComparison.CosineSimilarity, query, encoded);
+        float b = TurboQuantEncoding.Instance.Compare(VectorComparison.CosineSimilarity, query, rehydrated);
+        Assert.AreEqual(a, b);
+    }
+
+    [TestMethod]
+    public void TurboQuant_HandlesOddDimensions()
+    {
+        // Odd dimension count exercises the nibble-packing tail case.
+        var original = SampleVector(127, 17);
+        var encoded = TurboQuantEncoding.Instance.Encode(original);
+        var bytes = encoded.GetBytes();
+        // 4 bytes scale + ceil(127/2) = 64 bytes payload
+        Assert.AreEqual(4 + 64, bytes.Length);
+
+        var rehydrated = TurboQuantEncoding.Instance.LoadFromBytes(bytes, 127);
+        var query = SampleVector(127, 18);
+        float a = TurboQuantEncoding.Instance.Compare(VectorComparison.CosineSimilarity, query, encoded);
+        float b = TurboQuantEncoding.Instance.Compare(VectorComparison.CosineSimilarity, query, rehydrated);
+        Assert.AreEqual(a, b);
     }
 }
