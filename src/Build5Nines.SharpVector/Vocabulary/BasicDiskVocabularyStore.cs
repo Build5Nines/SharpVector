@@ -118,23 +118,30 @@ public class BasicDiskVocabularyStore<TKey> : IVocabularyStore<TKey, int>, IDisp
     {
         LoadIfExists();
         if (!File.Exists(_walPath)) return;
-        using var fs = new FileStream(_walPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        using var br = new BinaryReader(fs);
-        while (fs.Position < fs.Length)
+
+        // Scope the read handles so the file is closed before we overwrite it
+        // below; `using var` would otherwise hold the handle until the end of
+        // the method and File.WriteAllBytes would race against it on Windows.
+        using (var fs = new FileStream(_walPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+        using (var br = new BinaryReader(fs))
         {
-            int count = br.ReadInt32();
-            for (int i = 0; i < count; i++)
+            while (fs.Position < fs.Length)
             {
-                var tokenJson = br.ReadString();
-                var token = JsonSerializer.Deserialize<TKey>(tokenJson)!;
-                if (!_vocab.ContainsKey(token))
+                int count = br.ReadInt32();
+                for (int i = 0; i < count; i++)
                 {
-                    var idx = _vocab.Count;
-                    _vocab[token] = idx;
-                    _cache[token] = idx;
+                    var tokenJson = br.ReadString();
+                    var token = JsonSerializer.Deserialize<TKey>(tokenJson)!;
+                    if (!_vocab.ContainsKey(token))
+                    {
+                        var idx = _vocab.Count;
+                        _vocab[token] = idx;
+                        _cache[token] = idx;
+                    }
                 }
             }
         }
+
         File.WriteAllBytes(_walPath, Array.Empty<byte>());
         Persist();
     }
