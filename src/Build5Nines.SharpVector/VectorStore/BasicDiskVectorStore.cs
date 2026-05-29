@@ -34,7 +34,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
 
     public TVocabularyStore VocabularyStore { get; }
 
-    public int Count => _cache.Count;
+    public int Count => _index.Count;
 
     public BasicDiskVectorStore(string rootPath, TVocabularyStore vocabularyStore)
     {
@@ -48,7 +48,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
         _backgroundFlushTask = Task.Run(BackgroundFlusherAsync);
     }
 
-    public IEnumerable<TId> GetIds() => _cache.Keys;
+    public IEnumerable<TId> GetIds() => _index.Keys;
 
     public IVectorTextItem<TVocabularyKey, TMetadata> Get(TId id)
     {
@@ -116,7 +116,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
         return existing;
     }
 
-    public bool ContainsKey(TId id) => _cache.ContainsKey(id);
+    public bool ContainsKey(TId id) => _index.ContainsKey(id);
 
     public async Task SerializeToJsonStreamAsync(Stream stream)
     {
@@ -134,7 +134,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
 
     public IEnumerator<KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>>> GetEnumerator()
     {
-        foreach (var key in _cache.Keys)
+        foreach (var key in _index.Keys)
         {
             yield return new KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>>(key, (VectorTextItem<TVocabularyKey, TMetadata>)Get(key));
         }
@@ -144,7 +144,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
 
     public async IAsyncEnumerator<KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>>> GetAsyncEnumerator(CancellationToken cancellationToken = default)
     {
-        foreach (var key in _cache.Keys)
+        foreach (var key in _index.Keys)
         {
             yield return new KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>>(key, (VectorTextItem<TVocabularyKey, TMetadata>)Get(key));
             await Task.Yield();

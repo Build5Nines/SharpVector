@@ -59,8 +59,11 @@ public class MemoryVectorDatabase<TMetadata>
     {
         await base.DeserializeFromBinaryStreamAsync(stream);
 
-        // Re-initialize the IdGenerator with the max Id value from the VectorStore
-        _idGenerator = new IntIdGenerator(VectorStore.GetIds().Max());
+        // Re-initialize the IdGenerator with the max Id value from the VectorStore when items exist.
+        var ids = VectorStore.GetIds().ToArray();
+        _idGenerator = ids.Length > 0
+            ? new IntIdGenerator(ids.Max())
+            : new IntIdGenerator();
     }
 
     /// <summary>
@@ -71,7 +74,10 @@ public class MemoryVectorDatabase<TMetadata>
     {
         base.DeserializeFromBinaryStream(stream);
 
-        // Re-initialize the IdGenerator with the max Id value from the VectorStore
-        _idGenerator = new IntIdGenerator(VectorStore.GetIds().Max());
+        // Re-initialize the IdGenerator with the max Id value from the VectorStore when items exist.
+        var ids = VectorStore.GetIds().ToArray();
+        _idGenerator = ids.Length > 0
+            ? new IntIdGenerator(ids.Max())
+            : new IntIdGenerator();
     }
 }
