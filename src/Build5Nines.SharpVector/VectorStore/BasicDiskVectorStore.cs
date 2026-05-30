@@ -125,18 +125,69 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
 
     public async Task SerializeToJsonStreamAsync(Stream stream)
     {
-        await JsonSerializer.SerializeAsync(stream, _index);
+        _rwLock.EnterWriteLock();
+        try
+        {
+            using var itemsFs = new FileStream(_itemsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+            while (_pending.TryDequeue(out var op))
+            {
+                if (op.isDelete)
+                {
+                    _index.TryRemove(op.id, out _);
+                }
+                else if (op.item is not null)
+                {
+                    itemsFs.Seek(0, SeekOrigin.End);
+                    var offset = itemsFs.Position;
+                    WriteItem(itemsFs, op.item);
+                    _index[op.id] = offset;
+                }
+            }
+            itemsFs.Flush(true);
+            PersistIndex();
+            File.WriteAllBytes(_walPath, Array.Empty<byte>());
+
+            var items = _visibleIds.Keys
+                .Select(id => new KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>>(id, (VectorTextItem<TVocabularyKey, TMetadata>)Get(id)))
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
+
+            await JsonSerializer.SerializeAsync(stream, items);
+        }
+        finally
+        {
+            _rwLock.ExitWriteLock();
+        }
     }
 
     public async Task DeserializeFromJsonStreamAsync(Stream stream)
     {
-        var loaded = await JsonSerializer.DeserializeAsync<ConcurrentDictionary<TId, long>>(stream);
+        var loaded = await JsonSerializer.DeserializeAsync<Dictionary<TId, VectorTextItem<TVocabularyKey, TMetadata>>>(stream);
         if (loaded != null)
         {
-            foreach (var kv in loaded)
+            _rwLock.EnterWriteLock();
+            try
             {
-                _index[kv.Key] = kv.Value;
-                _visibleIds[kv.Key] = 0;
+                _index.Clear();
+                _visibleIds.Clear();
+                _cache.Clear();
+
+                using var itemsFs = new FileStream(_itemsPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
+                foreach (var kv in loaded)
+                {
+                    itemsFs.Seek(0, SeekOrigin.End);
+                    var offset = itemsFs.Position;
+                    WriteItem(itemsFs, kv.Value);
+                    _index[kv.Key] = offset;
+                    _visibleIds[kv.Key] = 0;
+                    _cache[kv.Key] = kv.Value;
+                }
+                itemsFs.Flush(true);
+                PersistIndex();
+                File.WriteAllBytes(_walPath, Array.Empty<byte>());
+            }
+            finally
+            {
+                _rwLock.ExitWriteLock();
             }
         }
     }
