@@ -83,4 +83,18 @@ public class DiskVectorDatabaseTests
         Assert.IsFalse(db2.GetIds().Contains(id));
         Assert.ThrowsException<KeyNotFoundException>(() => db2.GetText(id));
     }
+
+    [TestMethod]
+    public async Task Delete_IsPersistedWhenDatabaseIsImmediatelyReopened()
+    {
+        var root = CreateTempDir();
+        var db = new BasicDiskVectorDatabase<string>(root);
+        var id = await db.AddTextAsync("delete me now", "m");
+
+        db.DeleteText(id);
+
+        var reopened = new BasicDiskVectorDatabase<string>(root);
+        Assert.IsFalse(reopened.GetIds().Contains(id));
+        Assert.ThrowsException<KeyNotFoundException>(() => reopened.GetText(id));
+    }
 }
