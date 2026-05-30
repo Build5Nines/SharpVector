@@ -51,6 +51,21 @@ public class DiskVectorDatabaseTests
     }
 
     [TestMethod]
+    public async Task AddText_IsImmediatelyVisibleToSearchAndIds()
+    {
+        var root = CreateTempDir();
+        var db = new BasicDiskVectorDatabase<string>(root);
+
+        await db.AddTextAsync("The quick brown fox", "a");
+
+        Assert.AreEqual(1, db.GetIds().Count());
+
+        var results = await db.SearchAsync("quick fox", threshold: null, pageIndex: 0, pageCount: null);
+        Assert.AreEqual(1, results.Texts.Count());
+        Assert.AreEqual("The quick brown fox", results.Texts.Single().Text);
+    }
+
+    [TestMethod]
     public async Task Delete_RemovesFromIndexButKeepsFile()
     {
         var root = CreateTempDir();
@@ -67,5 +82,19 @@ public class DiskVectorDatabaseTests
         var db2 = new BasicDiskVectorDatabase<string>(root);
         Assert.IsFalse(db2.GetIds().Contains(id));
         Assert.ThrowsException<KeyNotFoundException>(() => db2.GetText(id));
+    }
+
+    [TestMethod]
+    public async Task Delete_IsPersistedWhenDatabaseIsImmediatelyReopened()
+    {
+        var root = CreateTempDir();
+        var db = new BasicDiskVectorDatabase<string>(root);
+        var id = await db.AddTextAsync("delete me now", "m");
+
+        db.DeleteText(id);
+
+        var reopened = new BasicDiskVectorDatabase<string>(root);
+        Assert.IsFalse(reopened.GetIds().Contains(id));
+        Assert.ThrowsException<KeyNotFoundException>(() => reopened.GetText(id));
     }
 }
