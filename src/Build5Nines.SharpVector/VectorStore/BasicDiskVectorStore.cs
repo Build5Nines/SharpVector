@@ -76,13 +76,13 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
 
     public void Set(TId id, VectorTextItem<TVocabularyKey, TMetadata> item)
     {
-        // Write-Ahead Log entry to ensure durability (A in ACID)
-        AppendWalRecord(id, item, isDelete: false);
-
-        // Update memory state atomically so reads observe writes immediately
         _rwLock.EnterWriteLock();
         try
         {
+            // Write-Ahead Log entry to ensure durability (A in ACID)
+            AppendWalRecord(id, item, isDelete: false);
+
+            // Update memory state atomically so reads observe writes immediately
             _cache[id] = item;
             _visibleIds[id] = 0;
             _pending.Enqueue((id, item, false));
@@ -103,12 +103,12 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
     {
         var existing = Get(id);
 
-        // WAL for delete
-        AppendWalRecord(id, item: null, isDelete: true);
-
         _rwLock.EnterWriteLock();
         try
         {
+            // WAL for delete
+            AppendWalRecord(id, item: null, isDelete: true);
+
             _cache.TryRemove(id, out _);
             _visibleIds.TryRemove(id, out _);
             _pending.Enqueue((id, null, true));
@@ -268,26 +268,34 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
                     continue;
                 }
 
-                using var itemsFs = new FileStream(_itemsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
-                while (_pending.TryDequeue(out var op))
+                _rwLock.EnterWriteLock();
+                try
                 {
-                    if (op.isDelete)
+                    using var itemsFs = new FileStream(_itemsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+                    while (_pending.TryDequeue(out var op))
                     {
-                        _index.TryRemove(op.id, out _);
+                        if (op.isDelete)
+                        {
+                            _index.TryRemove(op.id, out _);
+                        }
+                        else if (op.item is not null)
+                        {
+                            itemsFs.Seek(0, SeekOrigin.End);
+                            var offset = itemsFs.Position;
+                            WriteItem(itemsFs, op.item);
+                            _index[op.id] = offset;
+                        }
                     }
-                    else if (op.item is not null)
-                    {
-                        itemsFs.Seek(0, SeekOrigin.End);
-                        var offset = itemsFs.Position;
-                        WriteItem(itemsFs, op.item);
-                        _index[op.id] = offset;
-                    }
-                }
-                itemsFs.Flush(true);
-                PersistIndex();
+                    itemsFs.Flush(true);
+                    PersistIndex();
 
-                // After index checkpoint, truncate WAL safely
-                File.WriteAllBytes(_walPath, Array.Empty<byte>());
+                    // After index checkpoint, truncate WAL safely
+                    File.WriteAllBytes(_walPath, Array.Empty<byte>());
+                }
+                finally
+                {
+                    _rwLock.ExitWriteLock();
+                }
             }
             catch (OperationCanceledException)
             {
@@ -314,24 +322,32 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
             // Attempt a final flush of pending operations synchronously
             try
             {
-                using var itemsFs = new FileStream(_itemsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
-                while (_pending.TryDequeue(out var op))
+                _rwLock.EnterWriteLock();
+                try
                 {
-                    if (op.isDelete)
+                    using var itemsFs = new FileStream(_itemsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+                    while (_pending.TryDequeue(out var op))
                     {
-                        _index.TryRemove(op.id, out _);
+                        if (op.isDelete)
+                        {
+                            _index.TryRemove(op.id, out _);
+                        }
+                        else if (op.item is not null)
+                        {
+                            itemsFs.Seek(0, SeekOrigin.End);
+                            var offset = itemsFs.Position;
+                            WriteItem(itemsFs, op.item);
+                            _index[op.id] = offset;
+                        }
                     }
-                    else if (op.item is not null)
-                    {
-                        itemsFs.Seek(0, SeekOrigin.End);
-                        var offset = itemsFs.Position;
-                        WriteItem(itemsFs, op.item);
-                        _index[op.id] = offset;
-                    }
+                    itemsFs.Flush(true);
+                    PersistIndex();
+                    File.WriteAllBytes(_walPath, Array.Empty<byte>());
                 }
-                itemsFs.Flush(true);
-                PersistIndex();
-                File.WriteAllBytes(_walPath, Array.Empty<byte>());
+                finally
+                {
+                    _rwLock.ExitWriteLock();
+                }
             }
             catch { }
 
