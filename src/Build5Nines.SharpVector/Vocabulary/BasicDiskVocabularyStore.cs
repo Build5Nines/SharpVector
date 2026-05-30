@@ -76,6 +76,7 @@ public class BasicDiskVocabularyStore<TKey> : IVocabularyStore<TKey, int>, IDisp
         if (loaded != null)
         {
             _vocab = loaded;
+            _cache = new ConcurrentDictionary<TKey, int>(loaded);
         }
     }
 

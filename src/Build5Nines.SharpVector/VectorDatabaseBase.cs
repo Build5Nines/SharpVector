@@ -249,14 +249,20 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TVocabula
         var totalCountFoundInSearch = similarities.Count();
 
         IEnumerable<IVectorTextResultItem<TId, TVocabularyKey, TMetadata>> resultsToReturn;
-        if (pageCount != null && pageCount >= 0 && pageIndex >= 0) {
+        int totalPages;
+        if (pageCount != null && pageCount >= 0 && pageIndex >= 0)
+        {
             resultsToReturn = similarities.Skip(pageIndex * pageCount.Value).Take(pageCount.Value);
-        } else {
+            totalPages = pageCount.Value == 0 ? 0 : (int)Math.Ceiling(totalCountFoundInSearch / (double)pageCount.Value);
+        }
+        else
+        {
             // no paging specified, return all results
             resultsToReturn = similarities;
+            totalPages = totalCountFoundInSearch > 0 ? 1 : 0;
         }
 
-        return new VectorTextResult<TId, TVocabularyKey, TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
+        return new VectorTextResult<TId, TVocabularyKey, TMetadata>(totalCountFoundInSearch, pageIndex, totalPages, resultsToReturn);
     }
 
     private async Task<IEnumerable<IVectorTextResultItem<TId, TVocabularyKey, TMetadata>>> CalculateVectorComparisonAsync(TVocabularyKey queryText, float? threshold = null, Func<TMetadata?, Task<bool>>? filter = null)
@@ -673,14 +679,20 @@ public abstract class VectorDatabaseBase<TId, TMetadata, TVectorStore, TIdGenera
         var totalCountFoundInSearch = similarities.Count();
 
         IEnumerable<IVectorTextResultItem<TId, string, TMetadata>> resultsToReturn;
-        if (pageCount != null && pageCount >= 0 && pageIndex >= 0) {
+        int totalPages;
+        if (pageCount != null && pageCount >= 0 && pageIndex >= 0)
+        {
             resultsToReturn = similarities.Skip(pageIndex * pageCount.Value).Take(pageCount.Value);
-        } else {
+            totalPages = pageCount.Value == 0 ? 0 : (int)Math.Ceiling(totalCountFoundInSearch / (double)pageCount.Value);
+        }
+        else
+        {
             // no paging specified, return all results
             resultsToReturn = similarities;
+            totalPages = totalCountFoundInSearch > 0 ? 1 : 0;
         }
 
-        return new VectorTextResult<TId, string, TMetadata>(totalCountFoundInSearch, pageIndex, pageCount.HasValue ? pageCount.Value : 1, resultsToReturn);
+        return new VectorTextResult<TId, string, TMetadata>(totalCountFoundInSearch, pageIndex, totalPages, resultsToReturn);
     }
 
     private async Task<IEnumerable<IVectorTextResultItem<TId, string, TMetadata>>> CalculateVectorComparisonAsync(string queryText, float? threshold = null, Func<TMetadata?, Task<bool>>? filter = null)

@@ -26,6 +26,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
     private readonly ReaderWriterLockSlim _rwLock = new(LockRecursionPolicy.SupportsRecursion);
 
     private readonly ConcurrentDictionary<TId, long> _index = new();
+    private readonly ConcurrentDictionary<TId, byte> _visibleIds = new();
     private readonly ConcurrentDictionary<TId, VectorTextItem<TVocabularyKey, TMetadata>> _cache = new();
 
     private readonly ConcurrentQueue<(TId id, VectorTextItem<TVocabularyKey, TMetadata>? item, bool isDelete)> _pending = new();
@@ -34,7 +35,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
 
     public TVocabularyStore VocabularyStore { get; }
 
-    public int Count => _cache.Count;
+    public int Count => _visibleIds.Count;
 
     public BasicDiskVectorStore(string rootPath, TVocabularyStore vocabularyStore)
     {
@@ -48,7 +49,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
         _backgroundFlushTask = Task.Run(BackgroundFlusherAsync);
     }
 
-    public IEnumerable<TId> GetIds() => _cache.Keys;
+    public IEnumerable<TId> GetIds() => _visibleIds.Keys;
 
     public IVectorTextItem<TVocabularyKey, TMetadata> Get(TId id)
     {
@@ -58,6 +59,8 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
         _rwLock.EnterReadLock();
         try
         {
+            if (!_visibleIds.ContainsKey(id)) throw new KeyNotFoundException();
+            if (_cache.TryGetValue(id, out cached)) return cached;
             if (!_index.TryGetValue(id, out var offset)) throw new KeyNotFoundException();
             using var fs = File.OpenRead(_itemsPath);
             fs.Seek(offset, SeekOrigin.Begin);
@@ -73,14 +76,15 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
 
     public void Set(TId id, VectorTextItem<TVocabularyKey, TMetadata> item)
     {
-        // Write-Ahead Log entry to ensure durability (A in ACID)
-        AppendWalRecord(id, item, isDelete: false);
-
-        // Update memory state atomically
         _rwLock.EnterWriteLock();
         try
         {
+            // Write-Ahead Log entry to ensure durability (A in ACID)
+            AppendWalRecord(id, item, isDelete: false);
+
+            // Update memory state atomically so reads observe writes immediately
             _cache[id] = item;
+            _visibleIds[id] = 0;
             _pending.Enqueue((id, item, false));
         }
         finally
@@ -99,13 +103,14 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
     {
         var existing = Get(id);
 
-        // WAL for delete
-        AppendWalRecord(id, item: null, isDelete: true);
-
         _rwLock.EnterWriteLock();
         try
         {
+            // WAL for delete
+            AppendWalRecord(id, item: null, isDelete: true);
+
             _cache.TryRemove(id, out _);
+            _visibleIds.TryRemove(id, out _);
             _pending.Enqueue((id, null, true));
         }
         finally
@@ -116,25 +121,80 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
         return existing;
     }
 
-    public bool ContainsKey(TId id) => _cache.ContainsKey(id);
+    public bool ContainsKey(TId id) => _visibleIds.ContainsKey(id);
 
     public async Task SerializeToJsonStreamAsync(Stream stream)
     {
-        await JsonSerializer.SerializeAsync(stream, _index);
+        _rwLock.EnterWriteLock();
+        try
+        {
+            using var itemsFs = new FileStream(_itemsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+            while (_pending.TryDequeue(out var op))
+            {
+                if (op.isDelete)
+                {
+                    _index.TryRemove(op.id, out _);
+                }
+                else if (op.item is not null)
+                {
+                    itemsFs.Seek(0, SeekOrigin.End);
+                    var offset = itemsFs.Position;
+                    WriteItem(itemsFs, op.item);
+                    _index[op.id] = offset;
+                }
+            }
+            itemsFs.Flush(true);
+            PersistIndex();
+            File.WriteAllBytes(_walPath, Array.Empty<byte>());
+
+            var items = _visibleIds.Keys
+                .Select(id => new KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>>(id, (VectorTextItem<TVocabularyKey, TMetadata>)Get(id)))
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
+
+            await JsonSerializer.SerializeAsync(stream, items);
+        }
+        finally
+        {
+            _rwLock.ExitWriteLock();
+        }
     }
 
     public async Task DeserializeFromJsonStreamAsync(Stream stream)
     {
-        var loaded = await JsonSerializer.DeserializeAsync<ConcurrentDictionary<TId, long>>(stream);
+        var loaded = await JsonSerializer.DeserializeAsync<Dictionary<TId, VectorTextItem<TVocabularyKey, TMetadata>>>(stream);
         if (loaded != null)
         {
-            foreach (var kv in loaded) _index[kv.Key] = kv.Value;
+            _rwLock.EnterWriteLock();
+            try
+            {
+                _index.Clear();
+                _visibleIds.Clear();
+                _cache.Clear();
+
+                using var itemsFs = new FileStream(_itemsPath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
+                foreach (var kv in loaded)
+                {
+                    itemsFs.Seek(0, SeekOrigin.End);
+                    var offset = itemsFs.Position;
+                    WriteItem(itemsFs, kv.Value);
+                    _index[kv.Key] = offset;
+                    _visibleIds[kv.Key] = 0;
+                    _cache[kv.Key] = kv.Value;
+                }
+                itemsFs.Flush(true);
+                PersistIndex();
+                File.WriteAllBytes(_walPath, Array.Empty<byte>());
+            }
+            finally
+            {
+                _rwLock.ExitWriteLock();
+            }
         }
     }
 
     public IEnumerator<KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>>> GetEnumerator()
     {
-        foreach (var key in _cache.Keys)
+        foreach (var key in _visibleIds.Keys)
         {
             yield return new KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>>(key, (VectorTextItem<TVocabularyKey, TMetadata>)Get(key));
         }
@@ -144,7 +204,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
 
     public async IAsyncEnumerator<KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>>> GetAsyncEnumerator(CancellationToken cancellationToken = default)
     {
-        foreach (var key in _cache.Keys)
+        foreach (var key in _visibleIds.Keys)
         {
             yield return new KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>>(key, (VectorTextItem<TVocabularyKey, TMetadata>)Get(key));
             await Task.Yield();
@@ -180,7 +240,11 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
         var loaded = JsonSerializer.Deserialize<ConcurrentDictionary<TId, long>>(fs);
         if (loaded != null)
         {
-            foreach (var kv in loaded) _index[kv.Key] = kv.Value;
+            foreach (var kv in loaded)
+            {
+                _index[kv.Key] = kv.Value;
+                _visibleIds[kv.Key] = 0;
+            }
         }
     }
 
@@ -201,6 +265,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
             if (isDelete)
             {
                 _index.TryRemove(id, out _);
+                _visibleIds.TryRemove(id, out _);
                 _cache.TryRemove(id, out _);
             }
             else
@@ -215,6 +280,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
                 WriteItem(ofs, item);
                 ofs.Flush(true);
                 _index[id] = offset;
+                _visibleIds[id] = 0;
                 _cache[id] = item;
             }
         }
@@ -253,26 +319,34 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
                     continue;
                 }
 
-                using var itemsFs = new FileStream(_itemsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
-                while (_pending.TryDequeue(out var op))
+                _rwLock.EnterWriteLock();
+                try
                 {
-                    if (op.isDelete)
+                    using var itemsFs = new FileStream(_itemsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+                    while (_pending.TryDequeue(out var op))
                     {
-                        _index.TryRemove(op.id, out _);
+                        if (op.isDelete)
+                        {
+                            _index.TryRemove(op.id, out _);
+                        }
+                        else if (op.item is not null)
+                        {
+                            itemsFs.Seek(0, SeekOrigin.End);
+                            var offset = itemsFs.Position;
+                            WriteItem(itemsFs, op.item);
+                            _index[op.id] = offset;
+                        }
                     }
-                    else if (op.item is not null)
-                    {
-                        itemsFs.Seek(0, SeekOrigin.End);
-                        var offset = itemsFs.Position;
-                        WriteItem(itemsFs, op.item);
-                        _index[op.id] = offset;
-                    }
-                }
-                itemsFs.Flush(true);
-                PersistIndex();
+                    itemsFs.Flush(true);
+                    PersistIndex();
 
-                // After index checkpoint, truncate WAL safely
-                File.WriteAllBytes(_walPath, Array.Empty<byte>());
+                    // After index checkpoint, truncate WAL safely
+                    File.WriteAllBytes(_walPath, Array.Empty<byte>());
+                }
+                finally
+                {
+                    _rwLock.ExitWriteLock();
+                }
             }
             catch (OperationCanceledException)
             {
@@ -299,24 +373,32 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
             // Attempt a final flush of pending operations synchronously
             try
             {
-                using var itemsFs = new FileStream(_itemsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
-                while (_pending.TryDequeue(out var op))
+                _rwLock.EnterWriteLock();
+                try
                 {
-                    if (op.isDelete)
+                    using var itemsFs = new FileStream(_itemsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+                    while (_pending.TryDequeue(out var op))
                     {
-                        _index.TryRemove(op.id, out _);
+                        if (op.isDelete)
+                        {
+                            _index.TryRemove(op.id, out _);
+                        }
+                        else if (op.item is not null)
+                        {
+                            itemsFs.Seek(0, SeekOrigin.End);
+                            var offset = itemsFs.Position;
+                            WriteItem(itemsFs, op.item);
+                            _index[op.id] = offset;
+                        }
                     }
-                    else if (op.item is not null)
-                    {
-                        itemsFs.Seek(0, SeekOrigin.End);
-                        var offset = itemsFs.Position;
-                        WriteItem(itemsFs, op.item);
-                        _index[op.id] = offset;
-                    }
+                    itemsFs.Flush(true);
+                    PersistIndex();
+                    File.WriteAllBytes(_walPath, Array.Empty<byte>());
                 }
-                itemsFs.Flush(true);
-                PersistIndex();
-                File.WriteAllBytes(_walPath, Array.Empty<byte>());
+                finally
+                {
+                    _rwLock.ExitWriteLock();
+                }
             }
             catch { }
 
