@@ -11,6 +11,8 @@ Add:
 
 - Added `src/test.sh` helper script to run the solution tests with XPlat code coverage and generate HTML, Markdown, and text coverage reports.
 - Added regression tests in `BugDiscoveryTests` and `DiskVectorDatabaseTests` to cover paging metadata, empty database stream round-tripping, disk persistence reload behavior, immediate visibility of disk-backed writes, and immediate reopen-after-delete persistence.
+- Added `CoverageExpansionTests` to extend coverage across model types, exception hierarchy, ID generators, `VectorTextResult`, `TextDataLoader`, `DatabaseFile`, memory store branches, and obsolete serialization wrappers.
+- Added `DiskStoreRegressionTests` to validate disk-backed vocabulary and vector store serialization, deserialization, enumeration, and persistence behavior.
 
 Fixed:
 
@@ -19,6 +21,9 @@ Fixed:
 - Fixed `BasicDiskVectorStore` read-after-write behavior so added items are immediately visible to `Count`, `GetIds()`, `ContainsKey()`, enumeration, and search before the background disk flush completes.
 - Fixed `BasicDiskVectorStore` delete persistence to avoid WAL truncation races when a database is reopened immediately after delete operations.
 - Fixed reopened disk-backed databases to correctly expose persisted IDs and search results after checkpoint recovery.
+- Fixed `BasicDiskVocabularyStore.DeserializeFromJsonStreamAsync` so deserialized vocabularies restore the in-memory lookup cache as well as the persisted vocabulary map.
+- Fixed `BasicDiskVectorStore.SerializeToJsonStreamAsync` to flush pending operations before serialization and persist actual vector items rather than only index offsets.
+- Fixed `BasicDiskVectorStore.DeserializeFromJsonStreamAsync` to rebuild item storage, index, visible IDs, and cache from serialized vector items.
 - Updated the package version to `2.2.1` and refreshed the copyright year range to `2024-2026`.
 
 Notes:
