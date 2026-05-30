@@ -10,14 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Add:
 
 - Added `src/test.sh` helper script to run the solution tests with XPlat code coverage and generate HTML, Markdown, and text coverage reports.
-- Added regression tests in `BugDiscoveryTests` and `DiskVectorDatabaseTests` to cover paging metadata, empty database stream round-tripping, disk persistence reload behavior, and immediate visibility of disk-backed writes.
+- Added regression tests in `BugDiscoveryTests` and `DiskVectorDatabaseTests` to cover paging metadata, empty database stream round-tripping, disk persistence reload behavior, immediate visibility of disk-backed writes, and immediate reopen-after-delete persistence.
 
 Fixed:
 
 - Fixed `.Search()` / `.SearchAsync()` result paging metadata so `TotalPages` is calculated from the total result count instead of echoing the requested page size.
 - Fixed `MemoryVectorDatabase<TMetadata>` deserialization from an empty binary stream so ID generation resets correctly instead of failing when no items exist.
 - Fixed `BasicDiskVectorStore` read-after-write behavior so added items are immediately visible to `Count`, `GetIds()`, `ContainsKey()`, enumeration, and search before the background disk flush completes.
+- Fixed `BasicDiskVectorStore` delete persistence to avoid WAL truncation races when a database is reopened immediately after delete operations.
 - Fixed reopened disk-backed databases to correctly expose persisted IDs and search results after checkpoint recovery.
+- Updated the package version to `2.2.1` and refreshed the copyright year range to `2024-2026`.
+
+Notes:
+
+- Added `coveragereport` to `.gitignore` to keep generated coverage artifacts out of source control.
 
 ## v2.2.0
 
