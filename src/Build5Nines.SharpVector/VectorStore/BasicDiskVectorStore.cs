@@ -26,6 +26,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
     private readonly ReaderWriterLockSlim _rwLock = new(LockRecursionPolicy.SupportsRecursion);
 
     private readonly ConcurrentDictionary<TId, long> _index = new();
+    private readonly ConcurrentDictionary<TId, byte> _visibleIds = new();
     private readonly ConcurrentDictionary<TId, VectorTextItem<TVocabularyKey, TMetadata>> _cache = new();
 
     private readonly ConcurrentQueue<(TId id, VectorTextItem<TVocabularyKey, TMetadata>? item, bool isDelete)> _pending = new();
@@ -34,7 +35,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
 
     public TVocabularyStore VocabularyStore { get; }
 
-    public int Count => _index.Count;
+    public int Count => _visibleIds.Count;
 
     public BasicDiskVectorStore(string rootPath, TVocabularyStore vocabularyStore)
     {
@@ -48,7 +49,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
         _backgroundFlushTask = Task.Run(BackgroundFlusherAsync);
     }
 
-    public IEnumerable<TId> GetIds() => _index.Keys;
+    public IEnumerable<TId> GetIds() => _visibleIds.Keys;
 
     public IVectorTextItem<TVocabularyKey, TMetadata> Get(TId id)
     {
@@ -58,6 +59,8 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
         _rwLock.EnterReadLock();
         try
         {
+            if (!_visibleIds.ContainsKey(id)) throw new KeyNotFoundException();
+            if (_cache.TryGetValue(id, out cached)) return cached;
             if (!_index.TryGetValue(id, out var offset)) throw new KeyNotFoundException();
             using var fs = File.OpenRead(_itemsPath);
             fs.Seek(offset, SeekOrigin.Begin);
@@ -76,11 +79,12 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
         // Write-Ahead Log entry to ensure durability (A in ACID)
         AppendWalRecord(id, item, isDelete: false);
 
-        // Update memory state atomically
+        // Update memory state atomically so reads observe writes immediately
         _rwLock.EnterWriteLock();
         try
         {
             _cache[id] = item;
+            _visibleIds[id] = 0;
             _pending.Enqueue((id, item, false));
         }
         finally
@@ -106,6 +110,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
         try
         {
             _cache.TryRemove(id, out _);
+            _visibleIds.TryRemove(id, out _);
             _pending.Enqueue((id, null, true));
         }
         finally
@@ -116,7 +121,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
         return existing;
     }
 
-    public bool ContainsKey(TId id) => _index.ContainsKey(id);
+    public bool ContainsKey(TId id) => _visibleIds.ContainsKey(id);
 
     public async Task SerializeToJsonStreamAsync(Stream stream)
     {
@@ -128,13 +133,17 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
         var loaded = await JsonSerializer.DeserializeAsync<ConcurrentDictionary<TId, long>>(stream);
         if (loaded != null)
         {
-            foreach (var kv in loaded) _index[kv.Key] = kv.Value;
+            foreach (var kv in loaded)
+            {
+                _index[kv.Key] = kv.Value;
+                _visibleIds[kv.Key] = 0;
+            }
         }
     }
 
     public IEnumerator<KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>>> GetEnumerator()
     {
-        foreach (var key in _index.Keys)
+        foreach (var key in _visibleIds.Keys)
         {
             yield return new KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>>(key, (VectorTextItem<TVocabularyKey, TMetadata>)Get(key));
         }
@@ -144,7 +153,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
 
     public async IAsyncEnumerator<KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>>> GetAsyncEnumerator(CancellationToken cancellationToken = default)
     {
-        foreach (var key in _index.Keys)
+        foreach (var key in _visibleIds.Keys)
         {
             yield return new KeyValuePair<TId, VectorTextItem<TVocabularyKey, TMetadata>>(key, (VectorTextItem<TVocabularyKey, TMetadata>)Get(key));
             await Task.Yield();
@@ -180,7 +189,11 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
         var loaded = JsonSerializer.Deserialize<ConcurrentDictionary<TId, long>>(fs);
         if (loaded != null)
         {
-            foreach (var kv in loaded) _index[kv.Key] = kv.Value;
+            foreach (var kv in loaded)
+            {
+                _index[kv.Key] = kv.Value;
+                _visibleIds[kv.Key] = 0;
+            }
         }
     }
 
@@ -201,6 +214,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
             if (isDelete)
             {
                 _index.TryRemove(id, out _);
+                _visibleIds.TryRemove(id, out _);
                 _cache.TryRemove(id, out _);
             }
             else
@@ -215,6 +229,7 @@ public class BasicDiskVectorStore<TId, TMetadata, TVocabularyStore, TVocabularyK
                 WriteItem(ofs, item);
                 ofs.Flush(true);
                 _index[id] = offset;
+                _visibleIds[id] = 0;
                 _cache[id] = item;
             }
         }
