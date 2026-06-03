@@ -3,6 +3,7 @@ using Build5Nines.SharpVector.Id;
 using Build5Nines.SharpVector.Preprocessing;
 using Build5Nines.SharpVector.Vectorization;
 using Build5Nines.SharpVector.VectorCompare;
+using Build5Nines.SharpVector.VectorEncoding;
 using Build5Nines.SharpVector.VectorStore;
 
 namespace Build5Nines.SharpVector;
@@ -34,6 +35,19 @@ public class MemoryVectorDatabase<TMetadata>
             new MemoryDictionaryVectorStoreWithVocabulary<int, TMetadata, DictionaryVocabularyStore<string>, string, int>(
                 new DictionaryVocabularyStore<string>()
             )
+        )
+    { }
+
+    /// <summary>
+    /// Create an in-memory vector database that compresses vectors with the
+    /// supplied encoding before storing them.
+    /// </summary>
+    public MemoryVectorDatabase(IVectorEncoding encoding)
+        : base(
+            new MemoryDictionaryVectorStoreWithVocabulary<int, TMetadata, DictionaryVocabularyStore<string>, string, int>(
+                new DictionaryVocabularyStore<string>()
+            ),
+            encoding
         )
     { }
 
